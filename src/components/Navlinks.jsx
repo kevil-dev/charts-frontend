@@ -19,7 +19,7 @@ export default function NavLinks() {
             href={link.href}
             className={cn(
               buttonVariants({ variant: "ghost", size: "sm" }),
-              isActive ? "bg-muted text-foreground font-medium border-b-2 border-primary rounded-none" : ""
+              isActive ? "text-foreground font-medium border-0 border-b-2 border-primary rounded-none" : ""
             )}
           >
             {link.label}
