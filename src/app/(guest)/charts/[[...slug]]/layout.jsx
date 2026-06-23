@@ -1,20 +1,18 @@
-import DynamicBreadcrumb from "@/components/DynamicBreadcrumb";
+import ChartHero from "@/components/ChartHero";
 
 export default function ChartsLayout({ children }) {
   return (
     <section className="relative overflow-hidden min-h-[420px]">
-      <div className="hero-mesh" />
+      {/* Decorative gradient blob */}
+      <div className="hero-mesh" aria-hidden="true" />
+
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-9">
-        <DynamicBreadcrumb />
-        <h1 className="text-5xl font-semibold mt-4 py-4 tracking-tighter">
-          The podcast chart.
-        </h1>
-        <h3 className="text-muted-foreground text-lg max-w-lg">
-          Every show ranked across Apple, Spotify, and YouTube — refreshed
-          daily, with movement, hosts, and reach in one view.
-        </h3>
-        
-        {children}
+        <ChartHero />
+
+        {/* Chart content (page.jsx) */}
+        <div className="mt-8">
+          {children}
+        </div>
       </div>
     </section>
   );
