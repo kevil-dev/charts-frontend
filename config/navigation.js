@@ -1,6 +1,13 @@
 export const navLinks = [
-  { href: "/features", label: "Features" },
+  { href: "/charts", label: "Charts" },
   { href: "/pricing", label: "Pricing" },
   { href: "/blog", label: "Blog" },
-  { href: "/company", label: "Company" },
+  { href: "/about", label: "About" },
+];
+
+export const footerLinks = [
+  { href: "https://www.linkedin.com/company/feedspot", label: "LinkedIn", icon: "Linkedin" },
+  { href: "https://www.instagram.com/feedspotdotcom/", label: "Instagram", icon: "Instagram" },
+  { href: "https://www.facebook.com/Feedspot", label: "Facebook", icon: "Facebook" },
+  { href: "https://twitter.com/_feedspot", label: "Twitter", icon: "Twitter" },
 ];

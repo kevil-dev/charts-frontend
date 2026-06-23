@@ -18,8 +18,8 @@ export default function NavLinks() {
             key={link.href}
             href={link.href}
             className={cn(
-              buttonVariants({ variant: "ghost", size: "sm" }),
-              isActive ? "text-foreground font-medium border-0 border-b-2 border-primary rounded-none" : ""
+              buttonVariants({ variant: "ghost", size: "lg" }),
+              isActive ? "bg-muted text-foreground font-medium" : ""
             )}
           >
             {link.label}
