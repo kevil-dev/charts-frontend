@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 import { buttonVariants } from "@/components/ui/button";
 import NavLinks from "./Navlinks";
 import MobileMenuToggle from "./MobileToggle";
@@ -7,7 +6,7 @@ import Logo from "./Logo";
 
 export default function LeftLinks() {
   return (
-    <header className="w-full border-b bg-background sticky top-0 bg-white shadow-2xs z-50">
+    <header className="w-full border-b bg-background sticky top-0 shadow-2xs z-50">
       <div className="mx-auto flex max-w-7xl items-center justify-between p-3">
         {/* Logo and Client-Side Navigation */}
         <div className="flex items-center gap-6">

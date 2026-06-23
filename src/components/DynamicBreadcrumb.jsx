@@ -4,6 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { HomeIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -37,6 +38,8 @@ export default function DynamicBreadcrumb() {
         {segments.map((segment, i) => {
           const label = resolveLabel(segment, i);
           const isLast = i === segments.length - 1;
+          // Build the partial path up to this segment so non-last items link back
+          const href = "/charts/" + segments.slice(0, i + 1).join("/");
 
           return (
             <React.Fragment key={segment}>
@@ -45,7 +48,9 @@ export default function DynamicBreadcrumb() {
                 {isLast ? (
                   <BreadcrumbPage>{label}</BreadcrumbPage>
                 ) : (
-                  <BreadcrumbPage>{label}</BreadcrumbPage>
+                  <BreadcrumbLink asChild>
+                    <Link href={href}>{label}</Link>
+                  </BreadcrumbLink>
                 )}
               </BreadcrumbItem>
             </React.Fragment>
