@@ -4,7 +4,6 @@ export default async function ChartPage({ params }) {
 
   return (
     <div>
-      <h1 className="text-5xl font-bold mt-4">The podcast chart.</h1>
     </div>
   );
 }
