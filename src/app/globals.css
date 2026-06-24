@@ -141,6 +141,16 @@
   --sidebar-ring: #0070f3;
 }
 
+::selection {
+  background-color: #171717;
+  color: #ffffff;
+}
+
+.dark ::selection {
+  background-color: #ededed;
+  color: #0a0a0a;
+}
+
 .hero-mesh {
   position: absolute;
   top: -220px;
