@@ -9,13 +9,25 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { countries, categories } from "../../config/charts";
+import { countries as STATIC_COUNTRIES, categories as STATIC_CATEGORIES } from "../../config/charts";
 
-// Flag emoji map — keyed to the country codes in config/charts.js
-const FLAG = {
-  us: "🇺🇸", in: "🇮🇳", uk: "🇬🇧", ca: "🇨🇦", au: "🇦🇺",
-  de: "🇩🇪", fr: "🇫🇷", br: "🇧🇷", mx: "🇲🇽", jp: "🇯🇵",
-};
+// Normalise API country objects { country_code, display_name, flag } to the internal shape
+function normaliseCountries(apiList) {
+  return apiList.map((c) => ({
+    code: c.country_code?.toLowerCase() ?? c.code,
+    name: c.display_name ?? c.name,
+    flag: c.flag ?? "",
+  }));
+}
+
+// Normalise API genre objects { native_id, name, ... } to the internal shape
+// TODO: confirm the label field name from the real API genre object
+function normaliseCategories(apiList) {
+  return apiList.map((g) => ({
+    slug:  g.native_id ?? g.slug,
+    label: g.name ?? g.label ?? g.native_id,
+  }));
+}
 
 /**
  * A component containing the dropdown filters (country and category) and the refresh action.
@@ -26,6 +38,8 @@ const FLAG = {
  * @param {(country: string) => void} props.onCountryChange - Callback for country selection change.
  * @param {(category: string) => void} props.onCategoryChange - Callback for category selection change.
  * @param {() => void} [props.onRefresh] - Optional callback for the refresh button.
+ * @param {Array}  [props.countriesList] - Live country list from useFilters (API-driven).
+ * @param {Array}  [props.categoriesList] - Live genre list from useFilters (API-driven).
  */
 export default function ChartFilters({
   currentCountry,
@@ -33,7 +47,12 @@ export default function ChartFilters({
   onCountryChange,
   onCategoryChange,
   onRefresh,
+  countriesList,
+  categoriesList,
 }) {
+  const countries  = countriesList  ? normaliseCountries(countriesList)  : STATIC_COUNTRIES;
+  const categories = categoriesList ? normaliseCategories(categoriesList) : STATIC_CATEGORIES;
+  const currentFlag = countries.find((c) => c.code === currentCountry)?.flag;
   return (
     <>
       {/* Country selector */}
@@ -44,7 +63,7 @@ export default function ChartFilters({
         >
           {/* Custom trigger label: flag + code */}
           <span className="text-base leading-none" aria-hidden="true">
-            {FLAG[currentCountry] ?? <GlobeIcon className="size-4 text-muted-foreground" />}
+            {currentFlag ?? <GlobeIcon className="size-4 text-muted-foreground" />}
           </span>
           <span className="text-xs font-mono font-medium uppercase text-muted-foreground">
             {currentCountry}
@@ -54,7 +73,7 @@ export default function ChartFilters({
         <SelectContent position="popper" align="start">
           {countries.map((c) => (
             <SelectItem key={c.code} value={c.code}>
-              <span className="mr-2" aria-hidden="true">{FLAG[c.code]}</span>
+              {c.flag && <span className="mr-2" aria-hidden="true">{c.flag}</span>}
               {c.name}
             </SelectItem>
           ))}
