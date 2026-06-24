@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { AlertCircleIcon, RefreshCwIcon, InboxIcon, BookmarkPlusIcon } from "lucide-react";
-import ChartRow, { PlatformIcon } from "@/components/ChartRow";
+import ChartRow, { PlatformIcon } from "./ChartRow";
 
 function PodiumSkeleton() {
   return (

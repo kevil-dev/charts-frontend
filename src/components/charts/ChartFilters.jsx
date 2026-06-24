@@ -8,7 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { FALLBACK_COUNTRIES, FALLBACK_CATEGORIES } from "../../config/charts";
+import { FALLBACK_COUNTRIES, FALLBACK_CATEGORIES } from "../../../config/charts";
 
 // API countries shape:  { country_code, display_name, flag }
 // API genres shape:     { native_id, display_name }
@@ -16,15 +16,15 @@ import { FALLBACK_COUNTRIES, FALLBACK_CATEGORIES } from "../../config/charts";
 
 function normaliseCountries(apiList) {
   return apiList.map((c) => ({
-    code:  (c.country_code ?? c.code ?? "").toLowerCase(),
-    name:  c.display_name ?? c.name ?? "",
-    flag:  c.flag ?? "",
+    code: (c.country_code ?? c.code ?? "").toLowerCase(),
+    name: c.display_name ?? c.name ?? "",
+    flag: c.flag ?? "",
   }));
 }
 
 function normaliseCategories(apiList) {
   return apiList.map((g) => ({
-    slug:  g.native_id ?? g.slug ?? "",
+    slug: g.native_id ?? g.slug ?? "",
     label: g.display_name ?? g.label ?? g.native_id ?? "",
   }));
 }
@@ -57,7 +57,7 @@ export default function ChartFilters({
     ? normaliseCategories(categoriesList)
     : FALLBACK_CATEGORIES;
 
-  const activeCountry  = countries.find((c) => c.code === currentCountry?.toLowerCase());
+  const activeCountry = countries.find((c) => c.code === currentCountry?.toLowerCase());
   const activeCategory = categories.find((c) => c.slug === currentCategory);
 
   const currentFlag = activeCountry?.flag ?? "";

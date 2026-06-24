@@ -1,7 +1,7 @@
 "use client";
 
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { platforms } from "../../config/charts";
+import { platforms } from "../../../config/charts";
 
 /**
  * A premium, iOS/macOS-style segmented control (tab switcher) for choosing the platform.

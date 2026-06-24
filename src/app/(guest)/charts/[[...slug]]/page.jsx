@@ -1,4 +1,4 @@
-import ChartSection from "@/components/ChartSection";
+import ChartSection from "@/components/charts/ChartSection";
 import { platforms, FALLBACK_COUNTRIES, FALLBACK_CATEGORIES } from "../../../../../config/charts";
 
 /** Resolve a human-readable title segment from the slug values */

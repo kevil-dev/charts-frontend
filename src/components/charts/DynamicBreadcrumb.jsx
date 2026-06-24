@@ -13,7 +13,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { platforms, countries, categories } from "../../config/charts";
+import { platforms, countries, categories } from "../../../config/charts";
 
 function resolveLabel(segment, index) {
   if (index === 0) return platforms.find((p) => p.slug === segment)?.label ?? segment;

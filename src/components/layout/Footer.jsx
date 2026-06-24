@@ -1,6 +1,6 @@
 import { FaLinkedin, FaInstagram, FaTwitter, FaFacebook } from "react-icons/fa";
-import Logo from "@/components/Logo";
-import { footerLinks } from "../../config/navigation";
+import Logo from "./Logo";
+import { footerLinks } from "../../../config/navigation";
 
 const iconMap = {
   Linkedin: FaLinkedin,

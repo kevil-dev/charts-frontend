@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import ChartHero from "@/components/ChartHero";
-import ChartTable from "@/components/ChartTable";
+import ChartHero from "./ChartHero";
+import ChartTable from "./ChartTable";
 import { useCharts } from "@/hooks/useCharts";
 
 function formatRunDate(runDate) {

@@ -2,10 +2,10 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import { RefreshCwIcon } from "lucide-react";
-import DynamicBreadcrumb from "@/components/DynamicBreadcrumb";
-import PlatformTabs from "@/components/PlatformTabs";
-import ChartFilters from "@/components/ChartFilters";
-import { platforms, countries, categories } from "../../config/charts";
+import DynamicBreadcrumb from "./DynamicBreadcrumb";
+import PlatformTabs from "./PlatformTabs";
+import ChartFilters from "./ChartFilters";
+import { platforms, countries, categories } from "../../../config/charts";
 import { useFilters } from "@/hooks/useFilters";
 
 export default function ChartHero({ runDate, refetch, isFetching }) {
@@ -16,7 +16,7 @@ export default function ChartHero({ runDate, refetch, isFetching }) {
   const segments = pathname.split("/").filter(Boolean);
   // segments[0] = "charts", [1] = platform, [2] = country, [3] = category
   const currentPlatform = segments[1] ?? platforms[0].slug;
-  const currentCountry  = segments[2] ?? countries[0].code;
+  const currentCountry = segments[2] ?? countries[0].code;
   const currentCategory = segments[3] ?? categories[0].slug;
 
   const { countries: liveCountries, genres: liveGenres, isLoading: filtersLoading } =
@@ -24,8 +24,8 @@ export default function ChartHero({ runDate, refetch, isFetching }) {
 
   /** Push a new URL, preserving whatever segments aren't being changed. */
   function navigate({ platform, country, category } = {}) {
-    const p   = platform ?? currentPlatform;
-    const c   = country  ?? currentCountry;
+    const p = platform ?? currentPlatform;
+    const c = country ?? currentCountry;
     const cat = category ?? currentCategory;
     router.push(`/charts/${p}/${c}/${cat}`);
   }

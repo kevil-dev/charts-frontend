@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { navLinks } from "../../config/navigation";
+import { navLinks } from "../../../config/navigation";
 import { cn } from "@/lib/utils"; // Using cn!
 import { buttonVariants } from "@/components/ui/button";
 

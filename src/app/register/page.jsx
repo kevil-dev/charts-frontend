@@ -6,10 +6,11 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 
-export default function LoginPage() {
-  const { user, isLoading, login } = useAuth();
+export default function RegisterPage() {
+  const { user, isLoading, register } = useAuth();
   const router = useRouter();
 
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
@@ -28,7 +29,7 @@ export default function LoginPage() {
     setSubmitting(true);
     setError(null);
     try {
-      await login(email, password);
+      await register(name, email, password);
       router.push("/charts");
     } catch (err) {
       setError(err.message);
@@ -42,20 +43,35 @@ export default function LoginPage() {
       <div className="w-full max-w-sm rounded-xl border bg-background shadow-sm p-8 flex flex-col gap-6">
         {/* Header */}
         <div className="flex flex-col gap-1">
-          <h1 className="text-2xl font-semibold tracking-tight">Welcome back</h1>
+          <h1 className="text-2xl font-semibold tracking-tight">Create an account</h1>
           <p className="text-sm text-muted-foreground">
-            Sign in to your Million Charts account
+            Start your Million Charts free trial today
           </p>
         </div>
 
         {/* Fields */}
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="login-email" className="text-sm font-medium">
+            <label htmlFor="register-name" className="text-sm font-medium">
+              Full name
+            </label>
+            <input
+              id="register-name"
+              type="text"
+              autoComplete="name"
+              placeholder="Jane Smith"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="h-9 rounded-lg border border-border bg-background px-3 text-sm outline-none ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring"
+            />
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="register-email" className="text-sm font-medium">
               Email
             </label>
             <input
-              id="login-email"
+              id="register-email"
               type="email"
               autoComplete="email"
               placeholder="you@example.com"
@@ -66,13 +82,13 @@ export default function LoginPage() {
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="login-password" className="text-sm font-medium">
+            <label htmlFor="register-password" className="text-sm font-medium">
               Password
             </label>
             <input
-              id="login-password"
+              id="register-password"
               type="password"
-              autoComplete="current-password"
+              autoComplete="new-password"
               placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -94,14 +110,14 @@ export default function LoginPage() {
           disabled={submitting}
           onClick={handleSubmit}
         >
-          {submitting ? "Logging in…" : "Log in"}
+          {submitting ? "Creating account…" : "Create account"}
         </Button>
 
         {/* Footer link */}
         <p className="text-center text-sm text-muted-foreground">
-          Don&apos;t have an account?{" "}
-          <Link href="/register" className="font-medium text-foreground underline-offset-4 hover:underline">
-            Sign up
+          Already have an account?{" "}
+          <Link href="/login" className="font-medium text-foreground underline-offset-4 hover:underline">
+            Log in
           </Link>
         </p>
       </div>

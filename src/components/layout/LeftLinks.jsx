@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { buttonVariants } from "@/components/ui/button";
-import NavLinks from "./Navlinks";
-import MobileMenuToggle from "./MobileToggle";
-import Logo from "./Logo";
+import NavLinks from "../layout/Navlinks";
+import MobileMenuToggle from "../layout/MobileToggle";
+import Logo from "../layout/Logo";
+import AuthButtons from "../layout/AuthButtons";
 
 export default function LeftLinks() {
   return (
@@ -26,17 +26,9 @@ export default function LeftLinks() {
           <NavLinks />
         </div>
 
-        {/* Server-Rendered Auth Buttons */}
+        {/* Auth Buttons — client island */}
         <div className="flex items-center gap-2 max-md:hidden">
-          <Link
-            href="/login"
-            className={buttonVariants({ variant: "secondary", size: "lg" })}
-          >
-            Login
-          </Link>
-          <Link href="/start" className={buttonVariants({ size: "lg" })}>
-            Free Trial
-          </Link>
+          <AuthButtons />
         </div>
 
         {/* Client-Side Mobile Toggle */}

@@ -5,11 +5,13 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { CiMenuFries } from "react-icons/ci";
 import { XIcon } from "lucide-react";
-import { navLinks } from "../../config/navigation";
-import { buttonVariants } from "@/components/ui/button";
+import { navLinks } from "../../../config/navigation";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/context/AuthContext";
 
 export default function MobileMenuToggle() {
+  const { user, isLoading, logout } = useAuth();
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   const menuRef = useRef(null);
@@ -98,18 +100,35 @@ export default function MobileMenuToggle() {
 
           {/* Auth actions */}
           <div className="mt-3 flex flex-col gap-2 border-t pt-4">
-            <Link
-              href="/login"
-              className={buttonVariants({ variant: "secondary", size: "lg" })}
-            >
-              Login
-            </Link>
-            <Link
-              href="/start"
-              className={buttonVariants({ size: "lg" })}
-            >
-              Free Trial
-            </Link>
+            {isLoading ? (
+              <div className="h-9" />
+            ) : user ? (
+              <>
+                <span className="px-1 text-sm text-muted-foreground">Hi, {user.name}</span>
+                <Button
+                  variant="secondary"
+                  size="lg"
+                  onClick={() => { logout(); setOpen(false); }}
+                >
+                  Logout
+                </Button>
+              </>
+            ) : (
+              <>
+                <Link
+                  href="/login"
+                  className={buttonVariants({ variant: "secondary", size: "lg" })}
+                >
+                  Login
+                </Link>
+                <Link
+                  href="/start"
+                  className={buttonVariants({ size: "lg" })}
+                >
+                  Free Trial
+                </Link>
+              </>
+            )}
           </div>
         </nav>
       </div>
