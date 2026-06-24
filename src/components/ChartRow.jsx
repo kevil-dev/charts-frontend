@@ -4,13 +4,37 @@ import { useState } from "react";
 import Image from "next/image";
 import { UserIcon, MapPinIcon } from "lucide-react";
 
+// Gradient palette for square avatar fallbacks — indexed by (rank % 8)
+const GRADIENTS = [
+  ["#0070f3", "#00dfd8"], // rank % 8 === 0
+  ["#007cf0", "#00dfd8"], // rank % 8 === 1
+  ["#7928ca", "#ff0080"], // rank % 8 === 2
+  ["#ff4d4d", "#f9cb28"], // rank % 8 === 3
+  ["#007cf0", "#7928ca"], // rank % 8 === 4
+  ["#ff0080", "#ff4d4d"], // rank % 8 === 5
+  ["#00dfd8", "#007cf0"], // rank % 8 === 6
+  ["#7928ca", "#4c2889"], // rank % 8 === 7
+];
+
 function nameToHue(str = "") {
   let hash = 0;
   for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
   return Math.abs(hash) % 360;
 }
 
-function ArtworkFallback({ name, size = 10 }) {
+function ArtworkFallback({ name, size = 10, square = false, rank = 1 }) {
+  if (square) {
+    const [colorA, colorB] = GRADIENTS[rank % 8];
+    return (
+      <div
+        className={`flex size-${size} shrink-0 items-center justify-center rounded-lg text-sm font-bold text-white`}
+        style={{ background: `linear-gradient(135deg, ${colorA} 0%, ${colorB} 100%)` }}
+        aria-hidden="true"
+      >
+        {(name?.[0] ?? "?").toUpperCase()}
+      </div>
+    );
+  }
   const hue = nameToHue(name);
   return (
     <div
@@ -23,14 +47,14 @@ function ArtworkFallback({ name, size = 10 }) {
   );
 }
 
-export function Artwork({ src, name, size = 10 }) {
+export function Artwork({ src, name, size = 10, square = false, rank = 1 }) {
   const [errored, setErrored] = useState(false);
   const px = size * 4;
 
-  if (!src || errored) return <ArtworkFallback name={name} size={size} />;
+  if (!src || errored) return <ArtworkFallback name={name} size={size} square={square} rank={rank} />;
 
   return (
-    <div className={`relative size-${size} shrink-0 overflow-hidden rounded-full`}>
+    <div className={`relative size-${size} shrink-0 overflow-hidden ${square ? "rounded-lg" : "rounded-full"}`}>
       <Image
         src={src}
         alt={name}
@@ -66,9 +90,10 @@ export function RankMoveBadge({ rankMove, overlay = false }) {
   return null;
 }
 
+// Inline brand SVGs — lucide-react has no accurate equivalents
 const AppleIcon = ({ className }) => (
   <svg viewBox="0 0 24 24" className={className} fill="currentColor">
-    <path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2zm0 4a3 3 0 1 1 0 6 3 3 0 0 1 0-6zm0 14.5a7.5 7.5 0 0 1-5.4-2.3 5 5 0 0 1 10.8 0A7.5 7.5 0 0 1 12 20.5z"/>
+    <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 4a3 3 0 1 1 0 6 3 3 0 0 1 0-6zm0 10.5c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
   </svg>
 );
 
@@ -84,25 +109,9 @@ const YouTubeIcon = ({ className }) => (
   </svg>
 );
 
-const PLATFORM_DEFS = [
-  {
-    key: "apple",
-    hoverColor: "hover:text-purple-500",
-    Icon: AppleIcon,
-  },
-  {
-    key: "spotify",
-    hoverColor: "hover:text-green-500",
-    Icon: SpotifyIcon,
-  },
-  {
-    key: "youtube",
-    hoverColor: "hover:text-red-500",
-    Icon: YouTubeIcon,
-  },
-];
+const ICON_MAP = { apple: AppleIcon, spotify: SpotifyIcon, youtube: YouTubeIcon };
 
-export function PlatformIcon({ row, className = "size-4" }) {
+export function PlatformIcon({ row, className = "size-4", dark = false }) {
   const platformLinks = [
     {
       key: "apple",
@@ -110,7 +119,6 @@ export function PlatformIcon({ row, className = "size-4" }) {
       href: row.apple_url || null,
       label: "Listen on Apple Podcasts",
       hoverColor: "hover:text-purple-500",
-      Icon: AppleIcon,
     },
     {
       key: "spotify",
@@ -118,7 +126,6 @@ export function PlatformIcon({ row, className = "size-4" }) {
       href: row.spotify_id ? `https://open.spotify.com/show/${row.spotify_id}` : null,
       label: "Listen on Spotify",
       hoverColor: "hover:text-green-500",
-      Icon: SpotifyIcon,
     },
     {
       key: "youtube",
@@ -126,7 +133,6 @@ export function PlatformIcon({ row, className = "size-4" }) {
       href: row.youtube_url || null,
       label: "Listen on YouTube",
       hoverColor: "hover:text-red-500",
-      Icon: YouTubeIcon,
     },
   ];
 
@@ -134,25 +140,27 @@ export function PlatformIcon({ row, className = "size-4" }) {
   if (visible.length === 0) return null;
 
   return (
-    <div className="flex items-center gap-2 min-w-24">
-      {visible.map(({ key, href, label, hoverColor, Icon }) =>
-        href ? (
+    <div className="flex items-center gap-0.5 min-w-22.5">
+      {visible.map(({ key, href, label, hoverColor }) => {
+        const Icon = ICON_MAP[key];
+        const hoverClass = dark ? "hover:text-white" : hoverColor;
+        return href ? (
           <a
             key={key}
             href={href}
             target="_blank"
             rel="noopener noreferrer"
             aria-label={label}
-            className={`text-muted-foreground transition-colors ${hoverColor}`}
+            className={`text-[#a1a1a1] transition-colors ${hoverClass}`}
           >
             <Icon className={className} />
           </a>
         ) : (
-          <span key={key} className="cursor-default text-muted-foreground">
+          <span key={key} className="cursor-default text-[#a1a1a1]">
             <Icon className={className} />
           </span>
-        )
-      )}
+        );
+      })}
     </div>
   );
 }
@@ -162,6 +170,8 @@ export default function ChartRow({ row, isSelected, onToggle }) {
     // TODO: replace with sonner toast when installed
     console.log("Add to list:", row.name);
   }
+
+  const showBadge = row.rank_move === "UP" || row.rank_move === "DOWN";
 
   return (
     <tr
@@ -188,13 +198,29 @@ export default function ChartRow({ row, isSelected, onToggle }) {
         {row.chart_rank}
       </td>
 
-      {/* Artwork + rank_move badge */}
+      {/* Square artwork + trend badge */}
       <td className="py-3 pr-4">
         <div className="relative inline-block">
-          <Artwork src={row.artwork} name={row.name} size={10} />
-          <div className="absolute -bottom-1 -right-1">
-            <RankMoveBadge rankMove={row.rank_move} overlay />
-          </div>
+          <Artwork src={row.artwork} name={row.name} size={10} square rank={row.chart_rank} />
+          {showBadge && (
+            <div
+              className={[
+                "absolute -bottom-1 -right-1 flex size-4.75 items-center justify-center",
+                "rounded-full border-2 border-white shadow-sm",
+                row.rank_move === "UP" ? "bg-[#0070f3]" : "bg-[#ee0000]",
+              ].join(" ")}
+            >
+              {row.rank_move === "UP" ? (
+                <svg viewBox="0 0 10 10" className="size-2.5" fill="none" stroke="white" strokeWidth="1.8">
+                  <path d="M2 6.5 5 3.5 8 6.5" />
+                </svg>
+              ) : (
+                <svg viewBox="0 0 10 10" className="size-2.5" fill="none" stroke="white" strokeWidth="1.8">
+                  <path d="M2 3.5 5 6.5 8 3.5" />
+                </svg>
+              )}
+            </div>
+          )}
         </div>
       </td>
 

@@ -1,5 +1,3 @@
-import ChartHero from "@/components/ChartHero";
-
 export default function ChartsLayout({ children }) {
   return (
     <section className="relative overflow-hidden min-h-[420px]">
@@ -7,12 +5,7 @@ export default function ChartsLayout({ children }) {
       <div className="hero-mesh" aria-hidden="true" />
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-9">
-        <ChartHero />
-
-        {/* Chart content (page.jsx) */}
-        <div className="mt-8">
-          {children}
-        </div>
+        {children}
       </div>
     </section>
   );

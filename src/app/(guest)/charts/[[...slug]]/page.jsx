@@ -1,4 +1,4 @@
-import ChartTable from "@/components/ChartTable";
+import ChartSection from "@/components/ChartSection";
 import { platforms, FALLBACK_COUNTRIES, FALLBACK_CATEGORIES } from "../../../../../config/charts";
 
 /** Resolve a human-readable title segment from the slug values */
@@ -23,6 +23,6 @@ export default async function ChartPage({ params }) {
   const [platform = "apple", country = "us", category = "top"] = slug;
 
   return (
-    <ChartTable platform={platform} country={country} category={category} />
+    <ChartSection platform={platform} country={country} category={category} />
   );
 }
