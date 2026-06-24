@@ -1,99 +1,166 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import { UserIcon, MapPinIcon } from "lucide-react";
-// react-icons used for brand platform icons — lucide-react has no Spotify/YouTube/Apple equivalents
-import { FaApple, FaSpotify, FaYoutube } from "react-icons/fa";
 
-/** Deterministic gradient hue from a string */
 function nameToHue(str = "") {
   let hash = 0;
   for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
   return Math.abs(hash) % 360;
 }
 
-function Initials({ name }) {
+function ArtworkFallback({ name, size = 10 }) {
   const hue = nameToHue(name);
-  const initials = (name ?? "")
-    .split(/\s+/)
-    .map((w) => w[0])
-    .slice(0, 2)
-    .join("")
-    .toUpperCase();
   return (
     <div
-      className="flex size-10 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
+      className={`flex size-${size} shrink-0 items-center justify-center rounded-full text-sm font-bold text-white`}
       style={{ background: `hsl(${hue}deg 55% 45%)` }}
       aria-hidden="true"
     >
-      {initials || "?"}
+      {(name?.[0] ?? "?").toUpperCase()}
     </div>
   );
 }
 
-function TrendBadge({ row }) {
-  // TODO: confirm field name — API may return row.trend ("up"|"down"|"flat")
-  //       or row.position_change (positive int = up, negative = down, 0 = flat)
-  const change = row.position_change ?? 0;
-  const trend = row.trend ?? (change > 0 ? "up" : change < 0 ? "down" : "flat");
+export function Artwork({ src, name, size = 10 }) {
+  const [errored, setErrored] = useState(false);
+  const px = size * 4;
 
-  if (trend === "up") {
+  if (!src || errored) return <ArtworkFallback name={name} size={size} />;
+
+  return (
+    <div className={`relative size-${size} shrink-0 overflow-hidden rounded-full`}>
+      <Image
+        src={src}
+        alt={name}
+        fill
+        sizes={`${px}px`}
+        className="object-cover"
+        onError={() => setErrored(true)}
+      />
+    </div>
+  );
+}
+
+export function RankMoveBadge({ rankMove, overlay = false }) {
+  const base = overlay
+    ? "absolute -bottom-1 -right-1 flex items-center justify-center rounded-full text-[9px] leading-none text-white"
+    : "inline-flex items-center justify-center rounded-full text-[9px] leading-none font-medium";
+
+  if (rankMove === "UP") {
     return (
-      <span className="absolute -bottom-1 -right-1 flex size-4 items-center justify-center rounded-full bg-emerald-500 text-[9px] leading-none text-white">
-        ▲
-      </span>
+      <span className={`${base} ${overlay ? "size-4 bg-green-600" : "h-4 px-1.5 bg-green-50 text-green-600"}`}>▲</span>
     );
   }
-  if (trend === "down") {
+  if (rankMove === "DOWN") {
     return (
-      <span className="absolute -bottom-1 -right-1 flex size-4 items-center justify-center rounded-full bg-red-500 text-[9px] leading-none text-white">
-        ▼
-      </span>
+      <span className={`${base} ${overlay ? "size-4 bg-red-500" : "h-4 px-1.5 bg-red-50 text-red-500"}`}>▼</span>
+    );
+  }
+  if (rankMove === "NEW") {
+    return (
+      <span className={`${base} ${overlay ? "size-4 bg-blue-500 text-[8px]" : "h-4 px-1.5 bg-blue-50 text-blue-500"}`}>NEW</span>
     );
   }
   return null;
 }
 
-function PlatformIcons({ row }) {
-  // TODO: confirm field names — API may return boolean flags or presence of platform URLs
-  const hasApple   = row.apple_url   ?? row.on_apple   ?? true;
-  const hasSpotify = row.spotify_url ?? row.on_spotify ?? false;
-  const hasYoutube = row.youtube_url ?? row.on_youtube ?? false;
+const AppleIcon = ({ className }) => (
+  <svg viewBox="0 0 24 24" className={className} fill="currentColor">
+    <path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2zm0 4a3 3 0 1 1 0 6 3 3 0 0 1 0-6zm0 14.5a7.5 7.5 0 0 1-5.4-2.3 5 5 0 0 1 10.8 0A7.5 7.5 0 0 1 12 20.5z"/>
+  </svg>
+);
+
+const SpotifyIcon = ({ className }) => (
+  <svg viewBox="0 0 24 24" className={className} fill="currentColor">
+    <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm4.586 14.424a.622.622 0 0 1-.857.207c-2.348-1.42-5.303-1.74-8.785-.953a.622.622 0 1 1-.277-1.215c3.808-.87 7.076-.495 9.712 1.104a.623.623 0 0 1 .207.857zm1.223-2.742a.779.779 0 0 1-1.07.257C14.39 12.3 10.278 11.82 7.1 12.76a.78.78 0 0 1-.456-1.489c3.624-1.112 8.147-.573 11.234 1.34a.78.78 0 0 1 .257 1.07h-.326zm.105-2.855C14.69 8.95 9.375 8.775 6.297 9.71a.937.937 0 1 1-.543-1.794c3.537-1.072 9.416-.865 13.13 1.34a.937.937 0 0 1-.97 1.61z"/>
+  </svg>
+);
+
+const YouTubeIcon = ({ className }) => (
+  <svg viewBox="0 0 24 24" className={className} fill="currentColor">
+    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+  </svg>
+);
+
+const PLATFORM_DEFS = [
+  {
+    key: "apple",
+    hoverColor: "hover:text-purple-500",
+    Icon: AppleIcon,
+  },
+  {
+    key: "spotify",
+    hoverColor: "hover:text-green-500",
+    Icon: SpotifyIcon,
+  },
+  {
+    key: "youtube",
+    hoverColor: "hover:text-red-500",
+    Icon: YouTubeIcon,
+  },
+];
+
+export function PlatformIcon({ row, className = "size-4" }) {
+  const platformLinks = [
+    {
+      key: "apple",
+      show: row.on_apple,
+      href: row.apple_url || null,
+      label: "Listen on Apple Podcasts",
+      hoverColor: "hover:text-purple-500",
+      Icon: AppleIcon,
+    },
+    {
+      key: "spotify",
+      show: row.on_spotify,
+      href: row.spotify_id ? `https://open.spotify.com/show/${row.spotify_id}` : null,
+      label: "Listen on Spotify",
+      hoverColor: "hover:text-green-500",
+      Icon: SpotifyIcon,
+    },
+    {
+      key: "youtube",
+      show: row.on_youtube,
+      href: row.youtube_url || null,
+      label: "Listen on YouTube",
+      hoverColor: "hover:text-red-500",
+      Icon: YouTubeIcon,
+    },
+  ];
+
+  const visible = platformLinks.filter((p) => p.show);
+  if (visible.length === 0) return null;
 
   return (
-    <div className="flex items-center gap-2">
-      {hasApple && (
-        <FaApple
-          className="size-4 text-muted-foreground transition-colors hover:text-black dark:hover:text-white"
-          aria-label="On Apple Podcasts"
-        />
-      )}
-      {hasSpotify && (
-        <FaSpotify
-          className="size-4 text-muted-foreground transition-colors hover:text-[#1DB954]"
-          aria-label="On Spotify"
-        />
-      )}
-      {hasYoutube && (
-        <FaYoutube
-          className="size-4 text-muted-foreground transition-colors hover:text-[#FF0000]"
-          aria-label="On YouTube"
-        />
+    <div className="flex items-center gap-2 min-w-24">
+      {visible.map(({ key, href, label, hoverColor, Icon }) =>
+        href ? (
+          <a
+            key={key}
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={label}
+            className={`text-muted-foreground transition-colors ${hoverColor}`}
+          >
+            <Icon className={className} />
+          </a>
+        ) : (
+          <span key={key} className="cursor-default text-muted-foreground">
+            <Icon className={className} />
+          </span>
+        )
       )}
     </div>
   );
 }
 
-export default function ChartRow({ row, rank, isSelected, onToggle }) {
-  // TODO: confirm field names from the real API response
-  const name    = row.name ?? row.title ?? "Unknown Podcast"; // TODO: confirm key
-  const hosts   = row.hosts ?? row.author ?? "";              // TODO: confirm key
-  const location = row.location ?? row.country_name ?? "";   // TODO: confirm key
-  const imageUrl = row.image_url ?? row.artwork_url ?? null; // TODO: confirm key
-
+export default function ChartRow({ row, isSelected, onToggle }) {
   function handleAddToList() {
-    // TODO: replace with sonner toast when/if installed — e.g. toast.success(`${name} added`)
-    console.log("Add to list:", name);
+    // TODO: replace with sonner toast when installed
+    console.log("Add to list:", row.name);
   }
 
   return (
@@ -110,58 +177,47 @@ export default function ChartRow({ row, rank, isSelected, onToggle }) {
         <input
           type="checkbox"
           checked={isSelected}
-          onChange={() => onToggle(row.id ?? rank)}
-          aria-label={`Select ${name}`}
+          onChange={() => onToggle(row.id)}
+          aria-label={`Select ${row.name}`}
           className="size-4 rounded border-border accent-primary"
         />
       </td>
 
       {/* Rank */}
       <td className="w-10 pr-3 text-right font-mono text-sm text-muted-foreground">
-        {rank}
+        {row.chart_rank}
       </td>
 
-      {/* Avatar + trend badge */}
+      {/* Artwork + rank_move badge */}
       <td className="py-3 pr-4">
         <div className="relative inline-block">
-          {imageUrl ? (
-            <div className="relative size-10 overflow-hidden rounded-full">
-              <Image
-                src={imageUrl}
-                alt={name}
-                fill
-                sizes="40px"
-                className="object-cover"
-                onError={(e) => { e.currentTarget.style.display = "none"; }}
-              />
-            </div>
-          ) : (
-            <Initials name={name} />
-          )}
-          <TrendBadge row={row} />
+          <Artwork src={row.artwork} name={row.name} size={10} />
+          <div className="absolute -bottom-1 -right-1">
+            <RankMoveBadge rankMove={row.rank_move} overlay />
+          </div>
         </div>
       </td>
 
-      {/* Name + hosts + location */}
+      {/* Name + artist + location */}
       <td className="min-w-0 py-3 pr-6">
-        <p className="truncate text-sm font-semibold leading-tight">{name}</p>
-        {hosts && (
+        <p className="truncate text-sm font-semibold leading-tight">{row.name}</p>
+        {row.artist_or_publisher && (
           <p className="mt-0.5 flex items-center gap-1 truncate text-xs text-muted-foreground">
             <UserIcon className="size-3 shrink-0" aria-hidden="true" />
-            {Array.isArray(hosts) ? hosts.join(", ") : hosts}
+            {row.artist_or_publisher}
           </p>
         )}
-        {location && (
+        {row.country_name && (
           <p className="mt-0.5 flex items-center gap-1 truncate text-xs text-muted-foreground">
             <MapPinIcon className="size-3 shrink-0" aria-hidden="true" />
-            {location}
+            {row.country_name}
           </p>
         )}
       </td>
 
       {/* Platform icons */}
       <td className="py-3 pr-6">
-        <PlatformIcons row={row} />
+        <PlatformIcon row={row} />
       </td>
 
       {/* Add to list */}

@@ -5,6 +5,7 @@ import DynamicBreadcrumb from "@/components/DynamicBreadcrumb";
 import PlatformTabs from "@/components/PlatformTabs";
 import ChartFilters from "@/components/ChartFilters";
 import { platforms, countries, categories } from "../../config/charts";
+import { useFilters } from "@/hooks/useFilters";
 
 export default function ChartHero() {
   const pathname = usePathname();
@@ -16,6 +17,9 @@ export default function ChartHero() {
   const currentPlatform = segments[1] ?? platforms[0].slug;
   const currentCountry  = segments[2] ?? countries[0].code;
   const currentCategory = segments[3] ?? categories[0].slug;
+
+  const { countries: liveCountries, genres: liveGenres, isLoading: filtersLoading } =
+    useFilters({ platform: currentPlatform, country: currentCountry });
 
   /** Push a new URL, preserving whatever segments aren't being changed. */
   function navigate({ platform, country, category } = {}) {
@@ -58,6 +62,9 @@ export default function ChartHero() {
           currentCategory={currentCategory}
           onCountryChange={(v) => navigate({ country: v })}
           onCategoryChange={(v) => navigate({ category: v })}
+          countriesList={liveCountries}
+          categoriesList={liveGenres}
+          filtersLoading={filtersLoading}
         />
       </div>
       {/* ── /Filter bar ────────────────────────────────────────────────────── */}

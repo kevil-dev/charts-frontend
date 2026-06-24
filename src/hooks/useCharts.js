@@ -29,9 +29,10 @@ export function useCharts({ platform, country, category, page = 1 }) {
     try {
       const result = await chartsApi.getCharts({
         platform,
-        country,
-        chart: category, // category slug maps directly to `chart` param
+        country: country.toUpperCase(), // API expects ISO alpha-2 uppercase (also uppercased in api.js)
+        chart: category,                // category slug from URL maps to `chart` param
         page,
+        limit: 50,
       });
       setData(result);
     } catch (err) {

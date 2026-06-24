@@ -1,7 +1,6 @@
 "use client";
 
-import { GlobeIcon, TrendingUpIcon, RefreshCwIcon } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { GlobeIcon, TrendingUpIcon } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -9,74 +8,89 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { countries as STATIC_COUNTRIES, categories as STATIC_CATEGORIES } from "../../config/charts";
+import { FALLBACK_COUNTRIES, FALLBACK_CATEGORIES } from "../../config/charts";
 
-// Normalise API country objects { country_code, display_name, flag } to the internal shape
+// API countries shape:  { country_code, display_name, flag }
+// API genres shape:     { native_id, display_name }
+// Internal shape used below: { code, name, flag } for countries, { slug, label } for genres
+
 function normaliseCountries(apiList) {
   return apiList.map((c) => ({
-    code: c.country_code?.toLowerCase() ?? c.code,
-    name: c.display_name ?? c.name,
-    flag: c.flag ?? "",
+    code:  (c.country_code ?? c.code ?? "").toLowerCase(),
+    name:  c.display_name ?? c.name ?? "",
+    flag:  c.flag ?? "",
   }));
 }
 
-// Normalise API genre objects { native_id, name, ... } to the internal shape
-// TODO: confirm the label field name from the real API genre object
 function normaliseCategories(apiList) {
   return apiList.map((g) => ({
-    slug:  g.native_id ?? g.slug,
-    label: g.name ?? g.label ?? g.native_id,
+    slug:  g.native_id ?? g.slug ?? "",
+    label: g.display_name ?? g.label ?? g.native_id ?? "",
   }));
 }
 
 /**
- * A component containing the dropdown filters (country and category) and the refresh action.
- * 
- * @param {object} props
- * @param {string} props.currentCountry - The currently selected country code.
- * @param {string} props.currentCategory - The currently selected category slug.
- * @param {(country: string) => void} props.onCountryChange - Callback for country selection change.
- * @param {(category: string) => void} props.onCategoryChange - Callback for category selection change.
- * @param {() => void} [props.onRefresh] - Optional callback for the refresh button.
- * @param {Array}  [props.countriesList] - Live country list from useFilters (API-driven).
- * @param {Array}  [props.categoriesList] - Live genre list from useFilters (API-driven).
+ * Country + category dropdowns. Refresh button is in ChartTable (has access to refetch).
+ *
+ * @param {string}   currentCountry
+ * @param {string}   currentCategory
+ * @param {Function} onCountryChange
+ * @param {Function} onCategoryChange
+ * @param {Array}    [countriesList]   — raw API countries from useFilters; null while loading
+ * @param {Array}    [categoriesList]  — raw API genres from useFilters; null while loading
+ * @param {boolean}  [filtersLoading]  — true while useFilters is in-flight
  */
 export default function ChartFilters({
   currentCountry,
   currentCategory,
   onCountryChange,
   onCategoryChange,
-  onRefresh,
   countriesList,
   categoriesList,
+  filtersLoading,
 }) {
-  const countries  = countriesList  ? normaliseCountries(countriesList)  : STATIC_COUNTRIES;
-  const categories = categoriesList ? normaliseCategories(categoriesList) : STATIC_CATEGORIES;
-  const currentFlag = countries.find((c) => c.code === currentCountry)?.flag;
+  const countries = countriesList?.length
+    ? normaliseCountries(countriesList)
+    : FALLBACK_COUNTRIES;
+
+  const categories = categoriesList?.length
+    ? normaliseCategories(categoriesList)
+    : FALLBACK_CATEGORIES;
+
+  const activeCountry  = countries.find((c) => c.code === currentCountry?.toLowerCase());
+  const activeCategory = categories.find((c) => c.slug === currentCategory);
+
+  const currentFlag = activeCountry?.flag ?? "";
+  const currentName = activeCountry?.name ?? currentCountry?.toUpperCase() ?? "";
+  const currentCategoryLabel = activeCategory?.label ?? currentCategory ?? "";
+
   return (
     <>
       {/* Country selector */}
       <Select value={currentCountry} onValueChange={onCountryChange}>
         <SelectTrigger
-          className="shrink-0 border-none bg-transparent shadow-none focus-visible:ring-0 hover:bg-muted/50 rounded-lg px-3 py-1.5 h-9 text-sm"
+          className="shrink-0 border-none bg-transparent shadow-none focus-visible:ring-0 hover:bg-muted/50 rounded-lg px-3 py-1.5 h-9 text-sm gap-1.5"
           aria-label="Select country"
         >
-          {/* Custom trigger label: flag + code */}
-          <span className="text-base leading-none" aria-hidden="true">
-            {currentFlag ?? <GlobeIcon className="size-4 text-muted-foreground" />}
-          </span>
-          <span className="text-xs font-mono font-medium uppercase text-muted-foreground">
-            {currentCountry}
-          </span>
-          <SelectValue />
+          {currentFlag
+            ? <span className="text-base leading-none" aria-hidden="true">{currentFlag}</span>
+            : <GlobeIcon className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+          }
+          <span className="truncate">{filtersLoading && !activeCountry ? "Loading…" : currentName}</span>
         </SelectTrigger>
         <SelectContent position="popper" align="start">
-          {countries.map((c) => (
-            <SelectItem key={c.code} value={c.code}>
-              {c.flag && <span className="mr-2" aria-hidden="true">{c.flag}</span>}
-              {c.name}
+          {filtersLoading && !countries.length ? (
+            <SelectItem value="__loading__" disabled className="py-2 px-3 text-muted-foreground">
+              Loading…
             </SelectItem>
-          ))}
+          ) : (
+            countries.map((c) => (
+              <SelectItem key={c.code} value={c.code} className="py-2 px-3">
+                {c.flag && <span className="mr-1.5" aria-hidden="true">{c.flag}</span>}
+                {c.name}
+              </SelectItem>
+            ))
+          )}
         </SelectContent>
       </Select>
 
@@ -87,31 +101,25 @@ export default function ChartFilters({
           aria-label="Select category"
         >
           <TrendingUpIcon className="size-3.5 shrink-0 text-muted-foreground" />
-          <SelectValue />
+          <span className="truncate">{filtersLoading && !activeCategory ? "Loading…" : currentCategoryLabel}</span>
         </SelectTrigger>
         <SelectContent position="popper" align="start">
-          {categories.map((c) => (
-            <SelectItem key={c.slug} value={c.slug}>
-              {c.label}
+          {filtersLoading && !categories.length ? (
+            <SelectItem value="__loading__" disabled className="py-2 px-3 text-muted-foreground">
+              Loading…
             </SelectItem>
-          ))}
+          ) : (
+            categories.map((c) => (
+              <SelectItem key={c.slug} value={c.slug} className="py-2 px-3">
+                {c.label}
+              </SelectItem>
+            ))
+          )}
         </SelectContent>
       </Select>
 
-      {/* Push refresh to the far right */}
+      {/* Spacer — keeps layout consistent with old design */}
       <div className="flex-1" />
-
-      {/* Refresh */}
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={onRefresh}
-        className="shrink-0 gap-1.5 h-8 text-xs font-medium rounded-lg px-3"
-        aria-label="Refresh chart data"
-      >
-        <RefreshCwIcon className="size-3" />
-        Refresh
-      </Button>
     </>
   );
 }
