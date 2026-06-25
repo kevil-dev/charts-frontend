@@ -11,65 +11,34 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { platforms, countries, categories } from "../../../config/charts";
 
-function resolveLabel(segment, index, liveCountries, liveGenres) {
-  if (index === 0) {
-    return platforms.find((p) => p.slug === segment)?.label ?? segment;
-  }
-  if (index === 1) {
-    const live = liveCountries.find(
-      (c) =>
-        (c.country_code ?? c.code ?? "").toLowerCase() ===
-        segment.toLowerCase(),
-    );
-    if (live) return live.display_name ?? live.name ?? segment.toUpperCase();
-    return (
-      countries.find((c) => c.code === segment)?.name ?? segment.toUpperCase()
-    );
-  }
-  if (index === 2) {
-    const live = liveGenres.find((g) => (g.native_id ?? g.slug) === segment);
-    if (live) return live.display_name ?? live.label ?? segment;
-    return categories.find((c) => c.slug === segment)?.label ?? segment;
-  }
-  return segment;
-}
-
-export default function DynamicBreadcrumb({
-  platform,
-  country,
-  category,
-  liveCountries = [],
-  liveGenres = [],
-}) {
-  const segments = [platform, country, category].filter(Boolean);
+export default function DynamicBreadcrumb({ platform, country, category, platformLabel, countryName, chartLabel }) {
+  const segments = [
+    { slug: platform, label: platformLabel ?? platform,                href: `/charts/${platform}` },
+    { slug: country,  label: countryName  ?? country.toUpperCase(),   href: `/charts/${platform}/${country}` },
+    { slug: category, label: chartLabel   ?? category,                 href: `/charts/${platform}/${country}/${category}` },
+  ].filter((s) => s.slug);
 
   return (
     <Breadcrumb>
       <BreadcrumbList>
         <BreadcrumbItem>
           <BreadcrumbLink asChild>
-            <Link href="/">
-              <HomeIcon className="size-4" />
-            </Link>
+            <Link href="/"><HomeIcon className="size-4" /></Link>
           </BreadcrumbLink>
         </BreadcrumbItem>
 
-        {segments.map((segment, i) => {
-          const label = resolveLabel(segment, i, liveCountries, liveGenres);
+        {segments.map((seg, i) => {
           const isLast = i === segments.length - 1;
-          const href = "/charts/" + segments.slice(0, i + 1).join("/");
-
           return (
-            <React.Fragment key={segment}>
+            <React.Fragment key={seg.slug}>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
                 {isLast ? (
-                  <BreadcrumbPage>{label}</BreadcrumbPage>
+                  <BreadcrumbPage>{seg.label}</BreadcrumbPage>
                 ) : (
                   <BreadcrumbLink asChild>
-                    <Link href={href}>{label}</Link>
+                    <Link href={seg.href}>{seg.label}</Link>
                   </BreadcrumbLink>
                 )}
               </BreadcrumbItem>

@@ -17,7 +17,7 @@ function formatRunDate(runDate) {
   }
 }
 
-export default function ChartSection({ platform, country, category }) {
+export default function ChartSection({ platform, country, category, platformLabel, countryName, countryFlag, chartLabel }) {
   const [page, setPage] = useState(1);
   const [selectedPodcast, setSelectedPodcast] = useState(null);
 
@@ -37,6 +37,10 @@ export default function ChartSection({ platform, country, category }) {
         platform={platform}
         country={country}
         category={category}
+        platformLabel={platformLabel}
+        countryName={countryName}
+        countryFlag={countryFlag}
+        chartLabel={chartLabel}
         runDate={runDate}
         refetch={refetch}
         isFetching={isFetching}

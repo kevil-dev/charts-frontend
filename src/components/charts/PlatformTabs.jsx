@@ -3,9 +3,7 @@
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { platforms } from "../../../config/charts";
 
-/**
- * A premium, iOS/macOS-style segmented control (tab switcher) for choosing the platform.
- * 
+/** * 
  * @param {object} props
  * @param {string} props.value - The currently active platform slug.
  * @param {(value: string) => void} props.onChange - Callback triggered when a platform is selected.

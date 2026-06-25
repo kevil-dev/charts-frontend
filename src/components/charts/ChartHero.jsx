@@ -7,7 +7,7 @@ import PlatformTabs from "./PlatformTabs";
 import ChartFilters from "./ChartFilters";
 import { useFilters } from "@/hooks/useFilters";
 
-export default function ChartHero({ platform, country, category, runDate, refetch, isFetching }) {
+export default function ChartHero({ platform, country, category, platformLabel, countryName, countryFlag, chartLabel, runDate, refetch, isFetching }) {
   const router = useRouter();
 
   const currentPlatform = platform;
@@ -32,15 +32,16 @@ export default function ChartHero({ platform, country, category, runDate, refetc
         platform={currentPlatform}
         country={currentCountry}
         category={currentCategory}
-        liveCountries={liveCountries ?? []}
-        liveGenres={liveGenres ?? []}
+        platformLabel={platformLabel}
+        countryName={countryName}
+        chartLabel={chartLabel}
       />
 
       {/* Live badge */}
       <div className="self-start inline-flex items-center gap-2 rounded-full border border-border bg-background px-3 py-1 shadow-sm">
         <span className="h-1.5 w-1.5 rounded-full bg-[#0070f3] animate-[livePulse_1.8s_ease-in-out_infinite]" />
         <span className="font-mono text-[11px] font-normal uppercase tracking-[0.06em] text-muted-foreground">
-          Live chart · Updated today
+          Last updated: {runDate}
         </span>
       </div>
 
@@ -54,13 +55,6 @@ export default function ChartHero({ platform, country, category, runDate, refetc
           daily, with movement, hosts, and reach in one view.
         </p>
       </div>
-
-      {/* Run date */}
-      {runDate && (
-        <p className="font-mono text-xs text-muted-foreground">
-          Last updated: {runDate}
-        </p>
-      )}
 
       {/* ── Filter bar ─────────────────────────────────────────────────────── */}
       <div className="flex items-center gap-1.5 overflow-x-auto rounded-xl border border-border bg-background px-2 py-1.5 shadow-sm">

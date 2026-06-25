@@ -8,11 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { FALLBACK_COUNTRIES, FALLBACK_CATEGORIES } from "../../../config/charts";
 
-// API countries shape:  { country_code, display_name, flag }
-// API genres shape:     { native_id, display_name }
-// Internal shape used below: { code, name, flag } for countries, { slug, label } for genres
 
 function normaliseCountries(apiList) {
   return apiList.map((c) => ({
@@ -49,18 +45,8 @@ export default function ChartFilters({
   categoriesList,
   filtersLoading,
 }) {
-  const countries = countriesList?.length
-    ? normaliseCountries(countriesList)
-    : FALLBACK_COUNTRIES;
-
-  // null = still loading → use static fallback so the UI isn't empty
-  // []   = API explicitly returned no genres (YouTube) → hide the dropdown
-  const categories =
-    categoriesList == null
-      ? FALLBACK_CATEGORIES
-      : categoriesList.length > 0
-      ? normaliseCategories(categoriesList)
-      : [];
+  const countries = countriesList?.length ? normaliseCountries(countriesList) : [];
+  const categories = categoriesList?.length ? normaliseCategories(categoriesList) : [];
 
   const activeCountry = countries.find((c) => c.code === currentCountry?.toLowerCase());
   const activeCategory = categories.find((c) => c.slug === currentCategory);
