@@ -31,7 +31,14 @@ export default function ChartSection({ platform, country, category }) {
 
   return (
     <>
-      <ChartHero runDate={runDate} refetch={refetch} isFetching={isFetching} />
+      <ChartHero
+        platform={platform}
+        country={country}
+        category={category}
+        runDate={runDate}
+        refetch={refetch}
+        isFetching={isFetching}
+      />
       <div className="mt-8 border-t border-border pt-6">
         <ChartTable
           key={`${platform}-${country}-${category}`}

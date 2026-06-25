@@ -37,25 +37,27 @@ api.interceptors.response.use(
 
 export const chartsApi = {
   /** Fetch paginated chart results */
-  getCharts({ platform, country, chart, page = 1, limit = 50 }) {
+  getCharts({ platform, country, chart, page = 1, limit = 50, signal }) {
     return api.get("/charts", {
       params: {
         platform,
-        country: country.toUpperCase(), // API expects ISO alpha-2 uppercase
+        country: country.toUpperCase(),
         chart,
         page,
         limit,
       },
+      signal,
     });
   },
 
   /** Fetch available countries and genre filters for a given platform */
-  getFilters({ platform, country }) {
+  getFilters({ platform, country, signal }) {
     return api.get("/charts/filters", {
       params: {
         platform,
         ...(country ? { country: country.toUpperCase() } : {}),
       },
+      signal,
     });
   },
 };

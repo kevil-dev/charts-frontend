@@ -2,9 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { HomeIcon } from "lucide-react";
-import { cn } from "@/lib/utils";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -15,16 +13,32 @@ import {
 } from "@/components/ui/breadcrumb";
 import { platforms, countries, categories } from "../../../config/charts";
 
-function resolveLabel(segment, index) {
-  if (index === 0) return platforms.find((p) => p.slug === segment)?.label ?? segment;
-  if (index === 1) return countries.find((c) => c.code === segment)?.name ?? segment.toUpperCase();
-  if (index === 2) return categories.find((c) => c.slug === segment)?.label ?? segment;
+function resolveLabel(segment, index, liveCountries, liveGenres) {
+  if (index === 0) {
+    return platforms.find((p) => p.slug === segment)?.label ?? segment;
+  }
+  if (index === 1) {
+    // Check live countries first (API shape: { country_code, display_name })
+    const live = liveCountries.find(
+      (c) => (c.country_code ?? c.code ?? "").toLowerCase() === segment.toLowerCase()
+    );
+    if (live) return live.display_name ?? live.name ?? segment.toUpperCase();
+    // Fall back to static list
+    return countries.find((c) => c.code === segment)?.name ?? segment.toUpperCase();
+  }
+  if (index === 2) {
+    // Check live genres first (API shape: { native_id, display_name })
+    const live = liveGenres.find((g) => (g.native_id ?? g.slug) === segment);
+    if (live) return live.display_name ?? live.label ?? segment;
+    // Fall back to static list
+    return categories.find((c) => c.slug === segment)?.label ?? segment;
+  }
   return segment;
 }
 
-export default function DynamicBreadcrumb() {
-  const pathname = usePathname();
-  const segments = pathname.split("/").filter(Boolean).slice(1); // strip 'charts'
+export default function DynamicBreadcrumb({ platform, country, category, liveCountries = [], liveGenres = [] }) {
+  // Build segments from props — no pathname parsing for labels
+  const segments = [platform, country, category].filter(Boolean);
 
   return (
     <Breadcrumb>
@@ -36,9 +50,8 @@ export default function DynamicBreadcrumb() {
         </BreadcrumbItem>
 
         {segments.map((segment, i) => {
-          const label = resolveLabel(segment, i);
+          const label = resolveLabel(segment, i, liveCountries, liveGenres);
           const isLast = i === segments.length - 1;
-          // Build the partial path up to this segment so non-last items link back
           const href = "/charts/" + segments.slice(0, i + 1).join("/");
 
           return (

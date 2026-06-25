@@ -12,27 +12,30 @@ export function useCharts({ platform, country, category, page = 1 }) {
   const [error, setError] = useState(null);
   const [isFetching, setIsFetching] = useState(false);
 
-  // Abort any in-flight request when deps change
   const abortRef = useRef(null);
 
   const fetch = useCallback(async () => {
     if (!platform || !country || !category) return;
 
+    // Cancel any in-flight request
     if (abortRef.current) abortRef.current.abort();
     abortRef.current = new AbortController();
 
+    // Always clear stale data so old rows never show during a new fetch
+    setData(null);
+    setIsLoading(true);
     setIsFetching(true);
-    if (!data) setIsLoading(true);
     setIsError(false);
     setError(null);
 
     try {
       const result = await chartsApi.getCharts({
         platform,
-        country: country.toUpperCase(), // API expects ISO alpha-2 uppercase (also uppercased in api.js)
-        chart: category,                // category slug from URL maps to `chart` param
+        country,   // api.js uppercases — do NOT uppercase here
+        chart: category,
         page,
         limit: 50,
+        signal: abortRef.current.signal,
       });
       setData(result);
     } catch (err) {
@@ -43,7 +46,6 @@ export function useCharts({ platform, country, category, page = 1 }) {
       setIsLoading(false);
       setIsFetching(false);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [platform, country, category, page]);
 
   useEffect(() => {

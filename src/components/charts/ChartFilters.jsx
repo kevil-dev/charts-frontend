@@ -79,18 +79,12 @@ export default function ChartFilters({
           <span className="truncate">{filtersLoading && !activeCountry ? "Loading…" : currentName}</span>
         </SelectTrigger>
         <SelectContent position="popper" align="start">
-          {filtersLoading && !countries.length ? (
-            <SelectItem value="__loading__" disabled className="py-2 px-3 text-muted-foreground">
-              Loading…
+          {countries.map((c) => (
+            <SelectItem key={c.code} value={c.code} className="py-2 px-3">
+              {c.flag && <span className="mr-1.5" aria-hidden="true">{c.flag}</span>}
+              {c.name}
             </SelectItem>
-          ) : (
-            countries.map((c) => (
-              <SelectItem key={c.code} value={c.code} className="py-2 px-3">
-                {c.flag && <span className="mr-1.5" aria-hidden="true">{c.flag}</span>}
-                {c.name}
-              </SelectItem>
-            ))
-          )}
+          ))}
         </SelectContent>
       </Select>
 
@@ -104,17 +98,11 @@ export default function ChartFilters({
           <span className="truncate">{filtersLoading && !activeCategory ? "Loading…" : currentCategoryLabel}</span>
         </SelectTrigger>
         <SelectContent position="popper" align="start">
-          {filtersLoading && !categories.length ? (
-            <SelectItem value="__loading__" disabled className="py-2 px-3 text-muted-foreground">
-              Loading…
+          {categories.map((c) => (
+            <SelectItem key={c.slug} value={c.slug} className="py-2 px-3">
+              {c.label}
             </SelectItem>
-          ) : (
-            categories.map((c) => (
-              <SelectItem key={c.slug} value={c.slug} className="py-2 px-3">
-                {c.label}
-              </SelectItem>
-            ))
-          )}
+          ))}
         </SelectContent>
       </Select>
 

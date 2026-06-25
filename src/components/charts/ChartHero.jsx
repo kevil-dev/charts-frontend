@@ -1,23 +1,18 @@
 "use client";
 
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { RefreshCwIcon } from "lucide-react";
 import DynamicBreadcrumb from "./DynamicBreadcrumb";
 import PlatformTabs from "./PlatformTabs";
 import ChartFilters from "./ChartFilters";
-import { platforms, countries, categories } from "../../../config/charts";
 import { useFilters } from "@/hooks/useFilters";
 
-export default function ChartHero({ runDate, refetch, isFetching }) {
-  const pathname = usePathname();
+export default function ChartHero({ platform, country, category, runDate, refetch, isFetching }) {
   const router = useRouter();
 
-  // URL shape: /charts/[platform]/[country]/[category]
-  const segments = pathname.split("/").filter(Boolean);
-  // segments[0] = "charts", [1] = platform, [2] = country, [3] = category
-  const currentPlatform = segments[1] ?? platforms[0].slug;
-  const currentCountry = segments[2] ?? countries[0].code;
-  const currentCategory = segments[3] ?? categories[0].slug;
+  const currentPlatform = platform;
+  const currentCountry  = country;
+  const currentCategory = category;
 
   const { countries: liveCountries, genres: liveGenres, isLoading: filtersLoading } =
     useFilters({ platform: currentPlatform, country: currentCountry });
@@ -33,7 +28,13 @@ export default function ChartHero({ runDate, refetch, isFetching }) {
   return (
     <div className="flex flex-col gap-6">
       {/* Breadcrumb */}
-      <DynamicBreadcrumb />
+      <DynamicBreadcrumb
+        platform={currentPlatform}
+        country={currentCountry}
+        category={currentCategory}
+        liveCountries={liveCountries ?? []}
+        liveGenres={liveGenres ?? []}
+      />
 
       {/* Live badge */}
       <div className="self-start inline-flex items-center gap-2 rounded-full border border-border bg-background px-3 py-1 shadow-sm">
@@ -101,4 +102,3 @@ export default function ChartHero({ runDate, refetch, isFetching }) {
     </div>
   );
 }
-

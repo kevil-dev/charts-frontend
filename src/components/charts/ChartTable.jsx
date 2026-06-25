@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { AlertCircleIcon, RefreshCwIcon, InboxIcon, BookmarkPlusIcon } from "lucide-react";
-import ChartRow, { PlatformIcon } from "./ChartRow";
+import ChartRow, { PlatformIcon, RankMoveBadge } from "./ChartRow";
 
 function PodiumSkeleton() {
   return (
@@ -48,7 +48,6 @@ function SkeletonRow() {
 function PodiumCard({ row, isFirst, isSelected, onToggle, onAddToList }) {
   const [artworkError, setArtworkError] = useState(false);
   const isDark = isFirst;
-  const showMove = row.rank_move === "UP" || row.rank_move === "DOWN";
 
   return (
     <div
@@ -130,18 +129,10 @@ function PodiumCard({ row, isFirst, isSelected, onToggle, onAddToList }) {
           </div>
         </div>
 
-        {/* Rank movement badge */}
-        {showMove && (
-          <div
-            className={[
-              "mt-4 self-start inline-flex items-center gap-1 px-2.25 py-1.25 rounded-full",
-              "font-mono font-medium text-xs tracking-[0.01em]",
-              isDark ? "bg-white/10 text-[#ededed]" : "bg-[#f5f5f5] text-[#171717]",
-            ].join(" ")}
-          >
-            {row.rank_move === "UP" ? "▲" : "▼"}
-          </div>
-        )}
+        {/* Rank movement badge — uses shared component so NEW/UNCHANGED are handled */}
+        <div className="mt-4 self-start">
+          <RankMoveBadge rankMove={row.rank_move} />
+        </div>
       </div>
 
       {/* Divider */}
@@ -170,6 +161,11 @@ function PodiumCard({ row, isFirst, isSelected, onToggle, onAddToList }) {
 export default function ChartTable({ page, setPage, data, isLoading, isError, error, isFetching, refetch }) {
   const [selected, setSelected] = useState(new Set());
   const masterRef = useRef(null);
+
+  // Clear row selection whenever the page changes
+  useEffect(() => {
+    setSelected(new Set());
+  }, [page]);
 
   const results = data?.results ?? [];
   const isFirstPage = page === 1;
