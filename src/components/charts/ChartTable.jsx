@@ -3,7 +3,8 @@
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { AlertCircleIcon, RefreshCwIcon, InboxIcon, BookmarkPlusIcon } from "lucide-react";
-import ChartRow, { PlatformIcon, RankMoveBadge } from "./ChartRow";
+import ChartRow, { PlatformIcon, RankMoveBadge, ChartRowCard } from "./ChartRow";
+import { useAuth } from "@/context/AuthContext";
 
 function PodiumSkeleton() {
   return (
@@ -45,14 +46,15 @@ function SkeletonRow() {
   );
 }
 
-function PodiumCard({ row, isFirst, isSelected, onToggle, onAddToList }) {
+function PodiumCard({ row, isFirst, isSelected, onToggle, onAddToList, onRowClick }) {
   const [artworkError, setArtworkError] = useState(false);
   const isDark = isFirst;
 
   return (
     <div
+      onClick={() => onRowClick?.(row)}
       className={[
-        "rounded-xl p-[22px] flex flex-col relative",
+        "rounded-xl p-[22px] flex flex-col relative cursor-pointer",
         isDark
           ? "bg-[#171717] text-white border border-[#2a2a2e]"
           : "bg-white border border-border text-foreground",
@@ -61,7 +63,7 @@ function PodiumCard({ row, isFirst, isSelected, onToggle, onAddToList }) {
       {/* Checkbox — top-right absolute */}
       <div className="absolute top-4 right-4">
         <button
-          onClick={() => onToggle(row.id)}
+          onClick={(e) => { e.stopPropagation(); onToggle(row.id); }}
           aria-label={isSelected ? `Deselect ${row.name}` : `Select ${row.name}`}
           className={[
             "flex size-7 items-center justify-center rounded-lg border transition-colors",
@@ -142,7 +144,7 @@ function PodiumCard({ row, isFirst, isSelected, onToggle, onAddToList }) {
       <div className="flex items-center justify-between">
         <PlatformIcon row={row} dark={isDark} />
         <button
-          onClick={() => onAddToList(row)}
+          onClick={(e) => { e.stopPropagation(); onAddToList(row); }}
           className={[
             "flex items-center gap-1.5 rounded-lg border px-[15px] py-[9px] text-sm font-medium transition-colors",
             isDark
@@ -158,9 +160,11 @@ function PodiumCard({ row, isFirst, isSelected, onToggle, onAddToList }) {
   );
 }
 
-export default function ChartTable({ page, setPage, data, isLoading, isError, error, isFetching, refetch }) {
+export default function ChartTable({ page, setPage, data, isLoading, isError, error, isFetching, refetch, onRowClick }) {
   const [selected, setSelected] = useState(new Set());
   const masterRef = useRef(null);
+  const { user } = useAuth();
+  const isGuest = !user;
 
   // Clear row selection whenever the page changes
   useEffect(() => {
@@ -171,7 +175,7 @@ export default function ChartTable({ page, setPage, data, isLoading, isError, er
   const isFirstPage = page === 1;
   const showPodium = isFirstPage && results.length >= 3;
   const podiumRows = showPodium ? results.slice(0, 3) : [];
-  const tableRows = showPodium ? results.slice(3) : results;
+  const tableRows = results;
   const rowIds = results.map((r) => r.id);
 
   useEffect(() => {
@@ -213,7 +217,7 @@ export default function ChartTable({ page, setPage, data, isLoading, isError, er
             <div className="h-7 w-40 rounded bg-muted animate-pulse" />
             <div className="h-3 w-28 rounded bg-muted animate-pulse" />
           </div>
-          <div className="grid grid-cols-3 gap-4 mb-12">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-12">
             {Array.from({ length: 3 }, (_, i) => <PodiumSkeleton key={i} />)}
           </div>
         </div>
@@ -272,7 +276,7 @@ export default function ChartTable({ page, setPage, data, isLoading, isError, er
               This week's leaders
             </span>
           </div>
-          <div className="grid grid-cols-3 gap-4 mb-12">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-12">
             {podiumRows.map((row, i) => (
               <PodiumCard
                 key={row.id}
@@ -281,6 +285,7 @@ export default function ChartTable({ page, setPage, data, isLoading, isError, er
                 isSelected={selected.has(row.id)}
                 onToggle={toggleRow}
                 onAddToList={handleAddSingle}
+                onRowClick={onRowClick}
               />
             ))}
           </div>
@@ -309,8 +314,9 @@ export default function ChartTable({ page, setPage, data, isLoading, isError, er
         </div>
 
         {/* Table */}
-        <div className="overflow-hidden rounded-xl border border-border bg-background shadow-sm">
-          <div className="overflow-x-auto">
+        <div className="overflow-hidden rounded-xl border border-border bg-card chart-glow">
+          {/* Desktop table — hidden on mobile */}
+          <div className="hidden md:block overflow-x-auto">
             <table className="w-full table-auto">
               <thead>
                 <tr className="border-b border-border bg-muted/40 text-xs text-muted-foreground">
@@ -337,32 +343,69 @@ export default function ChartTable({ page, setPage, data, isLoading, isError, er
                     row={row}
                     isSelected={selected.has(row.id)}
                     onToggle={toggleRow}
+                    onRowClick={onRowClick}
                   />
                 ))}
               </tbody>
             </table>
           </div>
 
+          {/* Mobile card list — hidden on desktop */}
+          <div className="md:hidden divide-y divide-border">
+            {tableRows.map((row) => (
+              <ChartRowCard
+                key={row.id}
+                row={row}
+                isSelected={selected.has(row.id)}
+                onToggle={toggleRow}
+                onRowClick={onRowClick}
+              />
+            ))}
+          </div>
+
           {/* Pagination */}
           {lastPage > 1 && (
-            <div className="flex items-center justify-between border-t border-border px-4 py-3 text-xs text-muted-foreground">
-              <span>Page {currentPage} of {lastPage}</span>
-              <div className="flex items-center gap-1.5">
-                <button
-                  onClick={() => setPage((p) => Math.max(1, p - 1))}
-                  disabled={currentPage <= 1}
-                  className="rounded-md border border-border px-2.5 py-1 font-medium hover:bg-muted disabled:opacity-40"
-                >
-                  Previous
-                </button>
-                <button
-                  onClick={() => setPage((p) => Math.min(lastPage, p + 1))}
-                  disabled={currentPage >= lastPage}
-                  className="rounded-md border border-border px-2.5 py-1 font-medium hover:bg-muted disabled:opacity-40"
-                >
-                  Next
-                </button>
-              </div>
+            <div className="border-t border-border">
+              {isGuest ? (
+                /* Guest gate — full-width CTA, works on both mobile and desktop */
+                <div className="flex flex-col items-center gap-2 px-4 py-5 text-center sm:flex-row sm:justify-between sm:text-left">
+                  <div>
+                    <p className="text-sm font-medium text-foreground">
+                      {lastPage - 1} more page{lastPage - 1 !== 1 ? "s" : ""} available
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      Sign in to browse the full chart
+                    </p>
+                  </div>
+                  <a
+                    href="/login"
+                    className="inline-flex shrink-0 items-center gap-1.5 rounded-md bg-primary px-3.5 py-1.5 text-xs font-medium text-primary-foreground hover:opacity-90 transition-opacity"
+                  >
+                    Sign in to continue
+                  </a>
+                </div>
+              ) : (
+                /* Logged-in pagination — unchanged */
+                <div className="flex items-center justify-between px-4 py-3 text-xs text-muted-foreground">
+                  <span>Page {currentPage} of {lastPage}</span>
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      onClick={() => setPage((p) => Math.max(1, p - 1))}
+                      disabled={currentPage <= 1}
+                      className="rounded-md border border-border px-2.5 py-1 font-medium hover:bg-muted disabled:opacity-40"
+                    >
+                      Previous
+                    </button>
+                    <button
+                      onClick={() => setPage((p) => Math.min(lastPage, p + 1))}
+                      disabled={currentPage >= lastPage}
+                      className="rounded-md border border-border px-2.5 py-1 font-medium hover:bg-muted disabled:opacity-40"
+                    >
+                      Next
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>

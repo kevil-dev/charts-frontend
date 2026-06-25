@@ -155,8 +155,8 @@
   position: absolute;
   top: -220px;
   left: calc(50% - 600px);
-  width: 1200px;
-  height: 620px;
+  width: 1250px;
+  height: 720px;
   pointer-events: none;
   opacity: 0.92;
   filter: blur(46px);
@@ -193,4 +193,46 @@
   html {
     @apply font-sans;
   }
+}
+
+.auth-panel-right {
+  background:
+    radial-gradient(ellipse 120% 80% at 100% 0%,   rgba(45, 27, 105, 0.95) 0%,  transparent 55%),
+    radial-gradient(ellipse 80%  90% at 110% 60%,  rgba(121, 40, 202, 0.6)  0%,  transparent 60%),
+    radial-gradient(ellipse 60%  50% at 20%  80%,  rgba(26, 10, 46, 0.8)    0%,  transparent 70%),
+    #0a0a0a;
+}
+
+/* .chart-glow {
+  box-shadow:
+    0 1px 4px  rgba(0,   0,   0,   0.06),
+    0 0  56px -14px rgba(0,   223, 216, 0.13),
+    0 0  48px -12px rgba(121, 40,  202, 0.13),
+    0 0  40px -10px rgba(0,   124, 240, 0.11),
+    0 20px 56px -22px rgba(255, 0,  128, 0.08);
+} */
+/* .chart-glow {
+  box-shadow:
+    0 1px 4px rgba(0, 0, 0, 0.08),
+    0 0 56px -14px rgba(0, 223, 216, 0.28),
+    0 0 48px -12px rgba(121, 40, 202, 0.28),
+    0 0 40px -10px rgba(0, 124, 240, 0.24),
+    0 20px 56px -22px rgba(255, 0, 128, 0.20);
+} */
+.chart-glow {
+  box-shadow:
+    0 1px 4px rgba(0, 0, 0, 0.08),
+    0 0 32px -8px rgba(0, 223, 216, 0.35),
+    0 0 28px -6px rgba(121, 40, 202, 0.35),
+    0 0 24px -4px rgba(0, 124, 240, 0.30),
+    0 10px 30px -10px rgba(255, 0, 128, 0.25);
+}
+
+.dark .chart-glow {
+  box-shadow:
+    0 1px 4px  rgba(0,   0,   0,   0.30),
+    0 0  56px -14px rgba(0,   223, 216, 0.18),
+    0 0  48px -12px rgba(121, 40,  202, 0.18),
+    0 0  40px -10px rgba(0,   124, 240, 0.16),
+    0 20px 56px -22px rgba(255, 0,  128, 0.12);
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
@@ -45,19 +45,20 @@ export default function RegisterPage() {
   const [error, setError] = useState(null);
   const [submitting, setSubmitting] = useState(false);
 
-  if (isLoading) return null;
+  useEffect(() => {
+    if (!isLoading && user) {
+      router.replace("/charts/apple/us/top");
+    }
+  }, [isLoading, user, router]);
 
-  if (user) {
-    router.replace("/charts");
-    return null;
-  }
+  if (isLoading || user) return null;
 
   async function handleSubmit() {
     setSubmitting(true);
     setError(null);
     try {
       await register(name, email, password);
-      router.push("/charts");
+      router.push("/charts/apple/us/top");
     } catch (err) {
       setError(err.message);
     } finally {

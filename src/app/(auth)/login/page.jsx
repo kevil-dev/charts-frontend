@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -34,9 +34,11 @@ function GoogleIcon() {
   );
 }
 
-export default function LoginPage() {
+function LoginPageContent() {
   const { user, isLoading, login } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const from = searchParams.get("from");
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -44,19 +46,20 @@ export default function LoginPage() {
   const [error, setError] = useState(null);
   const [submitting, setSubmitting] = useState(false);
 
-  if (isLoading) return null;
+  useEffect(() => {
+    if (!isLoading && user) {
+      router.replace("/charts/apple/us/top");
+    }
+  }, [isLoading, user, router]);
 
-  if (user) {
-    router.replace("/charts");
-    return null;
-  }
+  if (isLoading || user) return null;
 
   async function handleSubmit() {
     setSubmitting(true);
     setError(null);
     try {
       await login(email, password);
-      router.push("/charts");
+      router.push(from && from.startsWith("/") ? from : "/charts/apple/us/top");
     } catch (err) {
       setError(err.message);
     } finally {
@@ -182,5 +185,13 @@ export default function LoginPage() {
         </Link>
       </p>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginPageContent />
+    </Suspense>
   );
 }

@@ -1,5 +1,5 @@
 export const navLinks = [
-  { href: "/charts", label: "Charts" },
+  { href: "/charts/apple/us/top", label: "Charts" },
   { href: "/pricing", label: "Pricing" },
   { href: "/blog", label: "Blog" },
   { href: "/about", label: "About" },

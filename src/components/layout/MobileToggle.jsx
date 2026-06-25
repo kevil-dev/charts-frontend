@@ -72,7 +72,7 @@ export default function MobileMenuToggle() {
         role="dialog"
         aria-label="Mobile navigation"
         className={cn(
-          "fixed left-0 right-0 top-[57px] z-40 bg-background border-b shadow-lg md:hidden",
+          "fixed left-0 right-0 top-[57px] z-50 bg-background border-b shadow-lg md:hidden",
           "transition-all duration-200 ease-in-out",
           open
             ? "opacity-100 translate-y-0 pointer-events-auto"
@@ -104,7 +104,17 @@ export default function MobileMenuToggle() {
               <div className="h-9" />
             ) : user ? (
               <>
-                <span className="px-1 text-sm text-muted-foreground">Hi, {user.name}</span>
+                <div className="flex items-center gap-2.5 px-1">
+                  <div
+                    className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-semibold select-none"
+                    aria-hidden="true"
+                  >
+                    {(user.name?.[0] ?? user.email?.[0] ?? "U").toUpperCase()}
+                  </div>
+                  <span className="truncate text-sm text-muted-foreground">
+                    {user.name ?? user.email}
+                  </span>
+                </div>
                 <Button
                   variant="secondary"
                   size="lg"
@@ -122,7 +132,7 @@ export default function MobileMenuToggle() {
                   Login
                 </Link>
                 <Link
-                  href="/start"
+                  href="/register"
                   className={buttonVariants({ size: "lg" })}
                 >
                   Free Trial

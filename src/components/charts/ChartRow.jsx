@@ -165,7 +165,7 @@ export function PlatformIcon({ row, className = "size-4", dark = false }) {
   );
 }
 
-export default function ChartRow({ row, isSelected, onToggle }) {
+export default function ChartRow({ row, isSelected, onToggle, onRowClick }) {
   function handleAddToList() {
     // TODO: replace with sonner toast when installed
     console.log("Add to list:", row.name);
@@ -175,8 +175,9 @@ export default function ChartRow({ row, isSelected, onToggle }) {
 
   return (
     <tr
+      onClick={() => onRowClick?.(row)}
       className={[
-        "group transition-colors",
+        "group transition-colors cursor-pointer",
         isSelected
           ? "border-l-2 border-l-primary bg-primary/5"
           : "hover:bg-muted/40",
@@ -187,9 +188,10 @@ export default function ChartRow({ row, isSelected, onToggle }) {
         <input
           type="checkbox"
           checked={isSelected}
-          onChange={() => onToggle(row.id)}
+          onChange={(e) => { e.stopPropagation(); onToggle(row.id); }}
           aria-label={`Select ${row.name}`}
           className="size-4 rounded border-border accent-primary"
+          onClick={(e) => e.stopPropagation()}
         />
       </td>
 
@@ -256,5 +258,67 @@ export default function ChartRow({ row, isSelected, onToggle }) {
         </button>
       </td>
     </tr>
+  );
+}
+
+export function ChartRowCard({ row, isSelected, onToggle, onRowClick }) {
+  const showBadge = row.rank_move === "UP" || row.rank_move === "DOWN" || row.rank_move === "NEW";
+
+  return (
+    <div
+      onClick={() => onRowClick?.(row)}
+      className={[
+        "flex items-center gap-3 px-4 py-3 border-b border-border last:border-0 cursor-pointer transition-colors",
+        isSelected ? "bg-primary/5 border-l-2 border-l-primary" : "hover:bg-muted/40",
+      ].join(" ")}
+    >
+      {/* Checkbox */}
+      <input
+        type="checkbox"
+        checked={isSelected}
+        onChange={(e) => { e.stopPropagation(); onToggle(row.id); }}
+        aria-label={`Select ${row.name}`}
+        className="size-4 shrink-0 rounded border-border accent-primary"
+        onClick={(e) => e.stopPropagation()}
+      />
+
+      {/* Rank */}
+      <span className="w-6 shrink-0 text-right font-mono text-xs text-muted-foreground">
+        {row.chart_rank}
+      </span>
+
+      {/* Artwork */}
+      <div className="relative shrink-0">
+        <Artwork src={row.artwork} name={row.name} size={10} square rank={row.chart_rank} />
+        {showBadge && (
+          <div className={[
+            "absolute -bottom-1 -right-1 flex size-4 items-center justify-center",
+            "rounded-full border-2 border-background shadow-sm",
+            row.rank_move === "UP" ? "bg-[#0070f3]" : row.rank_move === "NEW" ? "bg-blue-500" : "bg-[#ee0000]",
+          ].join(" ")}>
+            {row.rank_move === "UP" ? (
+              <svg viewBox="0 0 10 10" className="size-2" fill="none" stroke="white" strokeWidth="1.8"><path d="M2 6.5 5 3.5 8 6.5"/></svg>
+            ) : row.rank_move === "NEW" ? (
+              <span className="text-[6px] font-bold text-white leading-none">N</span>
+            ) : (
+              <svg viewBox="0 0 10 10" className="size-2" fill="none" stroke="white" strokeWidth="1.8"><path d="M2 3.5 5 6.5 8 3.5"/></svg>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Name + publisher */}
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm font-semibold leading-tight">{row.name}</p>
+        {row.artist_or_publisher && (
+          <p className="mt-0.5 truncate text-xs text-muted-foreground">{row.artist_or_publisher}</p>
+        )}
+      </div>
+
+      {/* Platform icons */}
+      <div className="shrink-0">
+        <PlatformIcon row={row} className="size-3.5" />
+      </div>
+    </div>
   );
 }

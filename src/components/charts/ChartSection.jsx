@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import ChartHero from "./ChartHero";
 import ChartTable from "./ChartTable";
+import PodcastDrawer from "./PodcastDrawer";
 import { useCharts } from "@/hooks/useCharts";
 
 function formatRunDate(runDate) {
@@ -18,6 +19,7 @@ function formatRunDate(runDate) {
 
 export default function ChartSection({ platform, country, category }) {
   const [page, setPage] = useState(1);
+  const [selectedPodcast, setSelectedPodcast] = useState(null);
 
   useEffect(() => {
     setPage(1);
@@ -50,8 +52,13 @@ export default function ChartSection({ platform, country, category }) {
           error={error}
           isFetching={isFetching}
           refetch={refetch}
+          onRowClick={setSelectedPodcast}
         />
       </div>
+      <PodcastDrawer
+        podcast={selectedPodcast}
+        onClose={() => setSelectedPodcast(null)}
+      />
     </>
   );
 }

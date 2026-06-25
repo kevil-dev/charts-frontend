@@ -16,9 +16,20 @@ export default function AuthButtons() {
   }
 
   if (user) {
+    const initial = (user.name?.[0] ?? user.email?.[0] ?? "U").toUpperCase();
     return (
       <>
-        <span className="text-sm text-muted-foreground">Hi, {user.name}</span>
+        <div className="flex items-center gap-2.5">
+          <div
+            className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-semibold select-none"
+            aria-hidden="true"
+          >
+            {initial}
+          </div>
+          <span className="max-w-[120px] truncate text-sm text-muted-foreground">
+            {user.name ?? user.email}
+          </span>
+        </div>
         <Button variant="secondary" size="lg" onClick={logout}>
           Logout
         </Button>
@@ -34,7 +45,7 @@ export default function AuthButtons() {
       >
         Login
       </Link>
-      <Link href="/start" className={buttonVariants({ size: "lg" })}>
+      <Link href="/register" className={buttonVariants({ size: "lg" })}>
         Free Trial
       </Link>
     </>

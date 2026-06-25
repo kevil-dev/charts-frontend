@@ -13,7 +13,7 @@ export default function AuthLayout({ children }) {
             <Logo />
           </Link>
           <Link
-            href="/"
+            href="/charts"
             className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
           >
             <ArrowLeftIcon className="size-3.5" />
@@ -41,19 +41,14 @@ export default function AuthLayout({ children }) {
       </div>
 
       {/* ── Right Panel ───────────────────────────────────────────────────── */}
-      <div
-        className="hidden lg:flex lg:w-[45%] flex-col items-start justify-center pl-12 pr-8"
-        style={{
-          background:
-            "radial-gradient(ellipse at top right, #2d1b69 0%, #1a0a2e 30%, #0a0a0a 70%)",
-        }}
-      >
-        <h2 className="text-5xl font-bold leading-tight tracking-tight text-white">
+      <div className="relative hidden overflow-hidden lg:flex lg:w-[45%] flex-col items-start justify-center pl-12 pr-8 bg-black">
+        <div className="hero-mesh" aria-hidden="true" />
+        <h2 className="relative z-10 text-5xl font-bold leading-tight tracking-tight text-white">
           Every chart.
           <br />
           One login.
         </h2>
-        <p className="mt-4 max-w-md leading-relaxed text-[#888888]">
+        <p className="relative z-10 mt-4 max-w-md leading-relaxed text-[#888888]">
           Track Apple, Spotify, and YouTube rankings — refreshed daily, with
           movement, hosts, and reach in a single view.
         </p>
