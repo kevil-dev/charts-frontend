@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { CiMenuFries } from "react-icons/ci";
 import { XIcon } from "lucide-react";
 import { navLinks } from "../../../config/navigation";
@@ -12,8 +12,15 @@ import { useAuth } from "@/context/AuthContext";
 
 export default function MobileMenuToggle() {
   const { user, isLoading, logout } = useAuth();
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
+
+  function handleLogout() {
+    logout();
+    setOpen(false);
+    router.push("/charts/apple/us/top");
+  }
   const menuRef = useRef(null);
 
   // Close menu on route change
@@ -72,7 +79,7 @@ export default function MobileMenuToggle() {
         role="dialog"
         aria-label="Mobile navigation"
         className={cn(
-          "fixed left-0 right-0 top-[57px] z-50 bg-background border-b shadow-lg md:hidden",
+          "fixed left-0 right-0 top-(--navbar-height) z-50 bg-background border-b shadow-lg md:hidden",
           "transition-all duration-200 ease-in-out",
           open
             ? "opacity-100 translate-y-0 pointer-events-auto"
@@ -118,7 +125,7 @@ export default function MobileMenuToggle() {
                 <Button
                   variant="secondary"
                   size="lg"
-                  onClick={() => { logout(); setOpen(false); }}
+                  onClick={handleLogout}
                 >
                   Logout
                 </Button>

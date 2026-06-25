@@ -67,7 +67,11 @@ export default function ChartHero({ platform, country, category, runDate, refetc
         {/* Platform segmented control */}
         <PlatformTabs
           value={currentPlatform}
-          onChange={(v) => navigate({ platform: v })}
+          onChange={(v) =>
+            v === "youtube"
+              ? navigate({ platform: v, country: "us", category: "top" })
+              : navigate({ platform: v })
+          }
         />
 
         {/* Divider */}

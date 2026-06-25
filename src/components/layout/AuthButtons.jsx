@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { Button, buttonVariants } from "@/components/ui/button";
 
@@ -10,6 +11,12 @@ import { Button, buttonVariants } from "@/components/ui/button";
  */
 export default function AuthButtons() {
   const { user, isLoading, logout } = useAuth();
+  const router = useRouter();
+
+  function handleLogout() {
+    logout();
+    router.push("/charts/apple/us/top");
+  }
 
   if (isLoading) {
     return <div className="w-36" />;
@@ -30,7 +37,7 @@ export default function AuthButtons() {
             {user.name ?? user.email}
           </span>
         </div>
-        <Button variant="secondary" size="lg" onClick={logout}>
+        <Button variant="secondary" size="lg" onClick={handleLogout}>
           Logout
         </Button>
       </>

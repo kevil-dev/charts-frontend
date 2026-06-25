@@ -4,8 +4,11 @@ import ChartErrorBoundary from "@/components/charts/ChartErrorBoundary";
 import { platforms, FALLBACK_COUNTRIES, FALLBACK_CATEGORIES } from "../../../../../config/charts";
 
 const VALID_PLATFORMS = platforms.map((p) => p.slug);
-const VALID_COUNTRIES = FALLBACK_COUNTRIES.map((c) => c.code);
-const VALID_CATEGORIES = FALLBACK_CATEGORIES.map((c) => c.slug);
+const VALID_CATEGORIES = [
+  ...FALLBACK_CATEGORIES.map((c) => c.slug),
+  "top-podcasts", // Spotify DB slug — resolveChart maps it correctly
+  "trending",     // Spotify trending chart
+];
 
 const DEFAULT = { platform: "apple", country: "us", category: "top" };
 
@@ -42,11 +45,6 @@ export default async function ChartPage({ params }) {
 
   // Missing country → fill in default, keep valid platform
   if (!country) {
-    redirect(`/charts/${platform}/${DEFAULT.country}/${DEFAULT.category}`);
-  }
-
-  // Invalid country → redirect keeping valid platform
-  if (!VALID_COUNTRIES.includes(country.toLowerCase())) {
     redirect(`/charts/${platform}/${DEFAULT.country}/${DEFAULT.category}`);
   }
 

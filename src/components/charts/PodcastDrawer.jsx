@@ -49,7 +49,7 @@ export default function PodcastDrawer({ podcast, onClose }) {
         aria-modal="true"
         aria-label={podcast?.name ?? "Podcast detail"}
         className={[
-          "fixed right-0 top-0 z-50 h-full w-full max-w-md bg-background shadow-2xl",
+          "fixed right-0 top-(--navbar-height) z-50 h-[calc(100%-var(--navbar-height))] w-full max-w-md bg-background shadow-2xl md:top-0 md:h-full",
           "flex flex-col transition-transform duration-300 ease-out",
           isOpen ? "translate-x-0" : "translate-x-full",
         ].join(" ")}

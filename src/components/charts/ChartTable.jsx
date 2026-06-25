@@ -390,14 +390,14 @@ export default function ChartTable({ page, setPage, data, isLoading, isError, er
                   <span>Page {currentPage} of {lastPage}</span>
                   <div className="flex items-center gap-1.5">
                     <button
-                      onClick={() => setPage((p) => Math.max(1, p - 1))}
+                      onClick={() => { setPage((p) => Math.max(1, p - 1)); window.scrollTo({ top: 0, behavior: "smooth" }); }}
                       disabled={currentPage <= 1}
                       className="rounded-md border border-border px-2.5 py-1 font-medium hover:bg-muted disabled:opacity-40"
                     >
                       Previous
                     </button>
                     <button
-                      onClick={() => setPage((p) => Math.min(lastPage, p + 1))}
+                      onClick={() => { setPage((p) => Math.min(lastPage, p + 1)); window.scrollTo({ top: 0, behavior: "smooth" }); }}
                       disabled={currentPage >= lastPage}
                       className="rounded-md border border-border px-2.5 py-1 font-medium hover:bg-muted disabled:opacity-40"
                     >

@@ -53,9 +53,14 @@ export default function ChartFilters({
     ? normaliseCountries(countriesList)
     : FALLBACK_COUNTRIES;
 
-  const categories = categoriesList?.length
-    ? normaliseCategories(categoriesList)
-    : FALLBACK_CATEGORIES;
+  // null = still loading → use static fallback so the UI isn't empty
+  // []   = API explicitly returned no genres (YouTube) → hide the dropdown
+  const categories =
+    categoriesList == null
+      ? FALLBACK_CATEGORIES
+      : categoriesList.length > 0
+      ? normaliseCategories(categoriesList)
+      : [];
 
   const activeCountry = countries.find((c) => c.code === currentCountry?.toLowerCase());
   const activeCategory = categories.find((c) => c.slug === currentCategory);
@@ -88,23 +93,25 @@ export default function ChartFilters({
         </SelectContent>
       </Select>
 
-      {/* Category selector */}
-      <Select value={currentCategory} onValueChange={onCategoryChange}>
-        <SelectTrigger
-          className="shrink-0 border-none bg-transparent shadow-none focus-visible:ring-0 hover:bg-muted/50 rounded-lg px-3 py-1.5 h-9 text-sm gap-2"
-          aria-label="Select category"
-        >
-          <TrendingUpIcon className="size-3.5 shrink-0 text-muted-foreground" />
-          <span className="truncate">{filtersLoading && !activeCategory ? "Loading…" : currentCategoryLabel}</span>
-        </SelectTrigger>
-        <SelectContent position="popper" align="start">
-          {categories.map((c) => (
-            <SelectItem key={c.slug} value={c.slug} className="py-2 px-3">
-              {c.label}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      {/* Category selector — hidden when the platform has no genres (e.g. YouTube) */}
+      {categories.length > 0 && (
+        <Select value={currentCategory} onValueChange={onCategoryChange}>
+          <SelectTrigger
+            className="shrink-0 border-none bg-transparent shadow-none focus-visible:ring-0 hover:bg-muted/50 rounded-lg px-3 py-1.5 h-9 text-sm gap-2"
+            aria-label="Select category"
+          >
+            <TrendingUpIcon className="size-3.5 shrink-0 text-muted-foreground" />
+            <span className="truncate">{filtersLoading && !activeCategory ? "Loading…" : currentCategoryLabel}</span>
+          </SelectTrigger>
+          <SelectContent position="popper" align="start">
+            {categories.map((c) => (
+              <SelectItem key={c.slug} value={c.slug} className="py-2 px-3">
+                {c.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      )}
 
       {/* Spacer — keeps layout consistent with old design */}
       <div className="flex-1" />
