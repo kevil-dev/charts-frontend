@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
+import axios from "axios";
 import { chartsApi } from "@/lib/api";
 
 /** Module-level cache: platform → { countries, genres, fetchedAt } */
@@ -32,8 +33,7 @@ export function useFilters({ platform, country }) {
     if (!platform) return;
 
     // Serve from cache if still fresh — no network call, no loading state
-    const cacheKey = platform;
-    const cached = filtersCache.get(cacheKey);
+    const cached = filtersCache.get(platform);
     if (cached && Date.now() - cached.fetchedAt < CACHE_TTL_MS) {
       setCountries(cached.countries);
       setGenres(cached.genres);
@@ -41,28 +41,31 @@ export function useFilters({ platform, country }) {
     }
 
     if (abortRef.current) abortRef.current.abort();
-    abortRef.current = new AbortController();
+    const controller = new AbortController();
+    abortRef.current = controller;
 
     setIsLoading(true);
     try {
       const result = await chartsApi.getFilters({
         platform,
         country: countryRef.current,
-        signal: abortRef.current.signal,
+        signal: controller.signal,
       });
-      const entry = {
-        countries: result.countries ?? [],
-        genres: result.genres ?? [],
+      if (controller.signal.aborted || abortRef.current !== controller) return;
+      const countriesData = result.countries ?? [];
+      const genresData = result.genres ?? [];
+      filtersCache.set(platform, {
+        countries: countriesData,
+        genres: genresData,
         fetchedAt: Date.now(),
-      };
-      filtersCache.set(cacheKey, entry);
-      setCountries(entry.countries);
-      setGenres(entry.genres);
+      });
+      setCountries(countriesData);
+      setGenres(genresData);
     } catch (err) {
-      if (err.name === "CanceledError" || err.name === "AbortError") return;
+      if (axios.isCancel(err) || err.name === "CanceledError" || err.name === "AbortError") return;
       // Silently fall back to static config — callers handle the null case
     } finally {
-      setIsLoading(false);
+      if (abortRef.current === controller) setIsLoading(false);
     }
   }, [platform]); // Only platform as dep — intentional, see JSDoc above
 

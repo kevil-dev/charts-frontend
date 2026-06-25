@@ -1,10 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
+import axios from "axios";
 import { chartsApi } from "@/lib/api";
 
-/**
- * Fetches paginated chart data.
- * Maps the URL `category` slug to the `chart` query param the API expects.
- */
 export function useCharts({ platform, country, category, page = 1 }) {
   const [data, setData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -17,11 +14,10 @@ export function useCharts({ platform, country, category, page = 1 }) {
   const fetch = useCallback(async () => {
     if (!platform || !country || !category) return;
 
-    // Cancel any in-flight request
     if (abortRef.current) abortRef.current.abort();
-    abortRef.current = new AbortController();
+    const controller = new AbortController();
+    abortRef.current = controller;
 
-    // Always clear stale data so old rows never show during a new fetch
     setData(null);
     setIsLoading(true);
     setIsFetching(true);
@@ -35,16 +31,26 @@ export function useCharts({ platform, country, category, page = 1 }) {
         chart: category,
         page,
         limit: 50,
-        signal: abortRef.current.signal,
+        signal: controller.signal,
       });
+      // Ignore results from a request that has since been superseded
+      if (controller.signal.aborted || abortRef.current !== controller) return;
       setData(result);
+      setIsError(false);
+      setError(null);
     } catch (err) {
-      if (err.name === "CanceledError" || err.name === "AbortError") return;
+      // Never surface cancellations
+      if (axios.isCancel(err) || err.name === "CanceledError" || err.name === "AbortError") return;
+      // Ignore errors from a superseded request
+      if (abortRef.current !== controller) return;
       setIsError(true);
       setError(err);
     } finally {
-      setIsLoading(false);
-      setIsFetching(false);
+      // Only the current request owns the loading flags
+      if (abortRef.current === controller) {
+        setIsLoading(false);
+        setIsFetching(false);
+      }
     }
   }, [platform, country, category, page]);
 
