@@ -18,26 +18,31 @@ function resolveLabel(segment, index, liveCountries, liveGenres) {
     return platforms.find((p) => p.slug === segment)?.label ?? segment;
   }
   if (index === 1) {
-    // Check live countries first (API shape: { country_code, display_name })
     const live = liveCountries.find(
-      (c) => (c.country_code ?? c.code ?? "").toLowerCase() === segment.toLowerCase()
+      (c) =>
+        (c.country_code ?? c.code ?? "").toLowerCase() ===
+        segment.toLowerCase(),
     );
     if (live) return live.display_name ?? live.name ?? segment.toUpperCase();
-    // Fall back to static list
-    return countries.find((c) => c.code === segment)?.name ?? segment.toUpperCase();
+    return (
+      countries.find((c) => c.code === segment)?.name ?? segment.toUpperCase()
+    );
   }
   if (index === 2) {
-    // Check live genres first (API shape: { native_id, display_name })
     const live = liveGenres.find((g) => (g.native_id ?? g.slug) === segment);
     if (live) return live.display_name ?? live.label ?? segment;
-    // Fall back to static list
     return categories.find((c) => c.slug === segment)?.label ?? segment;
   }
   return segment;
 }
 
-export default function DynamicBreadcrumb({ platform, country, category, liveCountries = [], liveGenres = [] }) {
-  // Build segments from props — no pathname parsing for labels
+export default function DynamicBreadcrumb({
+  platform,
+  country,
+  category,
+  liveCountries = [],
+  liveGenres = [],
+}) {
   const segments = [platform, country, category].filter(Boolean);
 
   return (
@@ -45,7 +50,9 @@ export default function DynamicBreadcrumb({ platform, country, category, liveCou
       <BreadcrumbList>
         <BreadcrumbItem>
           <BreadcrumbLink asChild>
-            <Link href="/"><HomeIcon className="size-4" /></Link>
+            <Link href="/">
+              <HomeIcon className="size-4" />
+            </Link>
           </BreadcrumbLink>
         </BreadcrumbItem>
 

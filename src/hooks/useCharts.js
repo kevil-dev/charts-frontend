@@ -27,26 +27,22 @@ export function useCharts({ platform, country, category, page = 1 }) {
     try {
       const result = await chartsApi.getCharts({
         platform,
-        country,   // api.js uppercases — do NOT uppercase here
+        country,   
         chart: category,
         page,
         limit: 50,
         signal: controller.signal,
       });
-      // Ignore results from a request that has since been superseded
       if (controller.signal.aborted || abortRef.current !== controller) return;
       setData(result);
       setIsError(false);
       setError(null);
     } catch (err) {
-      // Never surface cancellations
       if (axios.isCancel(err) || err.name === "CanceledError" || err.name === "AbortError") return;
-      // Ignore errors from a superseded request
       if (abortRef.current !== controller) return;
       setIsError(true);
       setError(err);
     } finally {
-      // Only the current request owns the loading flags
       if (abortRef.current === controller) {
         setIsLoading(false);
         setIsFetching(false);
