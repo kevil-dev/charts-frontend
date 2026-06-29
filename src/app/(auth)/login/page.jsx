@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
@@ -35,7 +35,44 @@ function GoogleIcon() {
 }
 
 function LoginPageContent() {
-  const { user, isLoading, login } = useAuth();
+  const googleBtnRef = useRef(null);
+
+  useEffect(() => {
+    const tryRender = () => {
+      if (!window.google || !googleBtnRef.current) return false;
+
+      window.google.accounts.id.initialize({
+        client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
+        callback: async (response) => {
+          try {
+            await loginWithGoogle(response.credential);
+            router.push(
+              from && from.startsWith("/") ? from : "/charts/apple/us/top",
+            );
+          } catch (err) {
+            setError(err.message);
+          }
+        },
+      });
+
+      window.google.accounts.id.renderButton(googleBtnRef.current, {
+        theme: "outline",
+        size: "large",
+        width: 320,
+      });
+      return true;
+    };
+
+    if (tryRender()) return;
+
+    // GIS not ready yet — poll briefly until the script loads
+    const interval = setInterval(() => {
+      if (tryRender()) clearInterval(interval);
+    }, 100);
+
+    return () => clearInterval(interval);
+  }, []);
+  const { user, isLoading, login, loginWithGoogle } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
   const from = searchParams.get("from");
@@ -87,14 +124,16 @@ function LoginPageContent() {
       </div>
 
       {/* Google button (disabled placeholder) */}
-      <Button
+      {/* <Button
         variant="outline"
         className="h-11 w-full gap-2 cursor-not-allowed opacity-60"
         disabled
       >
         <GoogleIcon />
         Continue with Google
-      </Button>
+      </Button> */}
+      {/* Google button (GIS-rendered) */}
+      <div ref={googleBtnRef} className="flex justify-center" />
 
       {/* OR divider */}
       <div className="flex items-center">

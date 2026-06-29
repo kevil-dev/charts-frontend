@@ -7,15 +7,29 @@ import PlatformTabs from "./PlatformTabs";
 import ChartFilters from "./ChartFilters";
 import { useFilters } from "@/hooks/useFilters";
 
-export default function ChartHero({ platform, country, category, platformLabel, countryName, countryFlag, chartLabel, runDate, refetch, isFetching }) {
+export default function ChartHero({
+  platform,
+  country,
+  category,
+  platformLabel,
+  countryName,
+  countryFlag,
+  chartLabel,
+  runDate,
+  refetch,
+  isFetching,
+}) {
   const router = useRouter();
 
   const currentPlatform = platform;
-  const currentCountry  = country;
+  const currentCountry = country;
   const currentCategory = category;
 
-  const { countries: liveCountries, genres: liveGenres, isLoading: filtersLoading } =
-    useFilters({ platform: currentPlatform, country: currentCountry });
+  const {
+    countries: liveCountries,
+    genres: liveGenres,
+    isLoading: filtersLoading,
+  } = useFilters({ platform: currentPlatform, country: currentCountry });
 
   /** Push a new URL, preserving whatever segments aren't being changed. */
   function navigate({ platform, country, category } = {}) {
@@ -92,7 +106,9 @@ export default function ChartHero({ platform, country, category, platformLabel, 
           aria-label="Refresh chart data"
           className="flex shrink-0 items-center gap-1 rounded-md px-2.5 py-1.5 text-xs font-medium text-muted-foreground hover:bg-muted hover:text-foreground disabled:opacity-50"
         >
-          <RefreshCwIcon className={`size-3.5 ${isFetching ? "animate-spin" : ""}`} />
+          <RefreshCwIcon
+            className={`size-3.5 ${isFetching ? "animate-spin" : ""}`}
+          />
           {isFetching ? "Refreshing…" : "Refresh"}
         </button>
       </div>

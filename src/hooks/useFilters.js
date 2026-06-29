@@ -11,7 +11,6 @@ export function clearFiltersCache(platform) {
     filtersCache.clear();
     return;
   }
-  // Safely delete all cached combinations for this specific platform
   for (const key of filtersCache.keys()) {
     if (key.startsWith(`${platform}-`)) {
       filtersCache.delete(key);
@@ -25,15 +24,12 @@ export function useFilters({ platform, country }) {
   const [isLoading, setIsLoading] = useState(false);
 
   const abortRef = useRef(null);
-  // NOTE: countryRef was completely removed to allow natural React updates
 
   const fetch = useCallback(async () => {
     if (!platform) return;
 
-    // 1. The "Dumb Cache" Key
     const cacheKey = `${platform}-${country || 'GLOBAL'}`;
 
-    // Serve from cache if still fresh
     const cached = filtersCache.get(cacheKey);
     if (cached && Date.now() - cached.fetchedAt < CACHE_TTL_MS) {
       setCountries(cached.countries);
@@ -49,7 +45,7 @@ export function useFilters({ platform, country }) {
     try {
       const result = await chartsApi.getFilters({
         platform,
-        country, // 2. Passing the prop directly to the API
+        country,
         signal: controller.signal,
       });
       if (controller.signal.aborted || abortRef.current !== controller) return;
@@ -57,7 +53,6 @@ export function useFilters({ platform, country }) {
       const countriesData = result.countries ?? [];
       const genresData = result.genres ?? [];
       
-      // 3. Save to cache using the unique combination key
       filtersCache.set(cacheKey, {
         countries: countriesData,
         genres: genresData,
@@ -68,11 +63,11 @@ export function useFilters({ platform, country }) {
       setGenres(genresData);
     } catch (err) {
       if (axios.isCancel(err) || err.name === "CanceledError" || err.name === "AbortError") return;
-      // Silently fall back to static config — callers handle the null case
+      
     } finally {
       if (abortRef.current === controller) setIsLoading(false);
     }
-  }, [platform, country]); // 4. country is now correctly tracked as a dependency
+  }, [platform, country]); 
 
   useEffect(() => {
     fetch();

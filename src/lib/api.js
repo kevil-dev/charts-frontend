@@ -11,7 +11,6 @@ const api = axios.create({
   headers: { "Content-Type": "application/json" },
 });
 
-// Attach Bearer token from localStorage (SSR-safe)
 api.interceptors.request.use((config) => {
   if (typeof window !== "undefined") {
     const token = localStorage.getItem("mp_token");
@@ -22,11 +21,9 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Unwrap the data envelope; normalise errors so callers never inspect axios internals
 api.interceptors.response.use(
   (response) => response.data.data,
   (err) => {
-    // Preserve cancellations untouched — callers use axios.isCancel / err.name to ignore them
     if (axios.isCancel(err)) {
       return Promise.reject(err);
     }
@@ -41,7 +38,6 @@ api.interceptors.response.use(
 );
 
 export const chartsApi = {
-  /** Fetch paginated chart results */
   getCharts({ platform, country, chart, page = 1, limit = 50, signal }) {
     return api.get("/charts", {
       params: {
@@ -55,7 +51,6 @@ export const chartsApi = {
     });
   },
 
-  /** Fetch available countries and genre filters for a given platform */
   getFilters({ platform, country, signal }) {
     return api.get("/charts/filters", {
       params: {

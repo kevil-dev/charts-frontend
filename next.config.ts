@@ -14,6 +14,7 @@ const nextConfig: NextConfig = {
       // YouTube thumbnails (video) and channel/podcast artwork
       { protocol: "https", hostname: "i.ytimg.com" },
       { protocol: "https", hostname: "yt3.googleusercontent.com" },
+      { protocol: "https", hostname: "yt3.ggpht.com" },
       // Spotify podcast images (older CDN)
       { protocol: "https", hostname: "*.spotifycdn.com" },
       // Fallback: allow any https image if the above don't cover a new CDN

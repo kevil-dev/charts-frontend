@@ -2,8 +2,17 @@
 
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
-import { AlertCircleIcon, RefreshCwIcon, InboxIcon, BookmarkPlusIcon } from "lucide-react";
-import ChartRow, { PlatformIcon, RankMoveBadge, ChartRowCard } from "./ChartRow";
+import {
+  AlertCircleIcon,
+  RefreshCwIcon,
+  InboxIcon,
+  BookmarkPlusIcon,
+} from "lucide-react";
+import ChartRow, {
+  PlatformIcon,
+  RankMoveBadge,
+  ChartRowCard,
+} from "./ChartRow";
 import { useAuth } from "@/context/AuthContext";
 
 function PodiumSkeleton() {
@@ -33,20 +42,37 @@ function PodiumSkeleton() {
 function SkeletonRow() {
   return (
     <tr className="animate-pulse">
-      <td className="w-10 pl-4 pr-2 py-3"><div className="size-4 rounded bg-muted" /></td>
-      <td className="w-10 pr-3 py-3"><div className="h-4 w-6 rounded bg-muted ml-auto" /></td>
-      <td className="py-3 pr-4"><div className="size-10 rounded-lg bg-muted" /></td>
+      <td className="w-10 pl-4 pr-2 py-3">
+        <div className="size-4 rounded bg-muted" />
+      </td>
+      <td className="w-10 pr-3 py-3">
+        <div className="h-4 w-6 rounded bg-muted ml-auto" />
+      </td>
+      <td className="py-3 pr-4">
+        <div className="size-10 rounded-lg bg-muted" />
+      </td>
       <td className="py-3 pr-6 min-w-0">
         <div className="h-4 w-48 rounded bg-muted mb-1.5" />
         <div className="h-3 w-32 rounded bg-muted" />
       </td>
-      <td className="py-3 pr-6"><div className="size-4 rounded bg-muted" /></td>
-      <td className="py-3 pr-4"><div className="h-6 w-16 rounded bg-muted ml-auto" /></td>
+      <td className="py-3 pr-6">
+        <div className="size-4 rounded bg-muted" />
+      </td>
+      <td className="py-3 pr-4">
+        <div className="h-6 w-16 rounded bg-muted ml-auto" />
+      </td>
     </tr>
   );
 }
 
-function PodiumCard({ row, isFirst, isSelected, onToggle, onAddToList, onRowClick }) {
+function PodiumCard({
+  row,
+  isFirst,
+  isSelected,
+  onToggle,
+  onAddToList,
+  onRowClick,
+}) {
   const [artworkError, setArtworkError] = useState(false);
   const isDark = isFirst;
 
@@ -63,8 +89,13 @@ function PodiumCard({ row, isFirst, isSelected, onToggle, onAddToList, onRowClic
       {/* Checkbox — top-right absolute */}
       <div className="absolute top-4 right-4">
         <button
-          onClick={(e) => { e.stopPropagation(); onToggle(row.id); }}
-          aria-label={isSelected ? `Deselect ${row.name}` : `Select ${row.name}`}
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggle(row.id);
+          }}
+          aria-label={
+            isSelected ? `Deselect ${row.name}` : `Select ${row.name}`
+          }
           className={[
             "flex size-7 items-center justify-center rounded-lg border transition-colors",
             isSelected
@@ -72,12 +103,18 @@ function PodiumCard({ row, isFirst, isSelected, onToggle, onAddToList, onRowClic
                 ? "bg-white border-white"
                 : "bg-[#171717] border-[#171717]"
               : isDark
-              ? "border-white/30 bg-white/5"
-              : "border-[#d4d4d4] bg-white",
+                ? "border-white/30 bg-white/5"
+                : "border-[#d4d4d4] bg-white",
           ].join(" ")}
         >
           {isSelected && (
-            <svg viewBox="0 0 12 12" className="size-3" fill="none" stroke={isDark ? "#171717" : "white"} strokeWidth="2.5">
+            <svg
+              viewBox="0 0 12 12"
+              className="size-3"
+              fill="none"
+              stroke={isDark ? "#171717" : "white"}
+              strokeWidth="2.5"
+            >
               <path d="M2 6l3 3 5-5" />
             </svg>
           )}
@@ -103,9 +140,10 @@ function PodiumCard({ row, isFirst, isSelected, onToggle, onAddToList, onRowClic
           ) : (
             <div
               className="flex size-14 shrink-0 items-center justify-center rounded-full text-lg font-semibold"
-              style={isDark
-                ? { background: "linear-gradient(140deg,#3a3a40,#232327)" }
-                : { background: "#ededed" }
+              style={
+                isDark
+                  ? { background: "linear-gradient(140deg,#3a3a40,#232327)" }
+                  : { background: "#ededed" }
               }
             >
               <span className={isDark ? "text-[#e5e5e5]" : "text-[#171717]"}>
@@ -120,11 +158,15 @@ function PodiumCard({ row, isFirst, isSelected, onToggle, onAddToList, onRowClic
               #{row.chart_rank}
               {isFirst && <span className="text-[#ededed]"> · Leading</span>}
             </p>
-            <p className={`font-semibold text-[21px] tracking-[-0.03em] leading-[1.15] mt-1.25 ${isDark ? "text-white" : "text-foreground"}`}>
+            <p
+              className={`font-semibold text-[21px] tracking-[-0.03em] leading-[1.15] mt-1.25 ${isDark ? "text-white" : "text-foreground"}`}
+            >
               {row.name}
             </p>
             {row.artist_or_publisher && (
-              <p className={`mt-1.75 text-sm tracking-[-0.01em] leading-[1.4] ${isDark ? "text-[#a1a1a1]" : "text-muted-foreground"}`}>
+              <p
+                className={`mt-1.75 text-sm tracking-[-0.01em] leading-[1.4] ${isDark ? "text-[#a1a1a1]" : "text-muted-foreground"}`}
+              >
                 {row.artist_or_publisher}
               </p>
             )}
@@ -138,13 +180,18 @@ function PodiumCard({ row, isFirst, isSelected, onToggle, onAddToList, onRowClic
       </div>
 
       {/* Divider */}
-      <div className={`h-px my-5 ${isDark ? "bg-white/[12%]" : "bg-[#ebebeb]"}`} />
+      <div
+        className={`h-px my-5 ${isDark ? "bg-white/[12%]" : "bg-[#ebebeb]"}`}
+      />
 
       {/* Bottom row */}
       <div className="flex items-center justify-between">
         <PlatformIcon row={row} dark={isDark} />
         <button
-          onClick={(e) => { e.stopPropagation(); onAddToList(row); }}
+          onClick={(e) => {
+            e.stopPropagation();
+            onAddToList(row);
+          }}
           className={[
             "flex items-center gap-1.5 rounded-lg border px-[15px] py-[9px] text-sm font-medium transition-colors",
             isDark
@@ -160,11 +207,22 @@ function PodiumCard({ row, isFirst, isSelected, onToggle, onAddToList, onRowClic
   );
 }
 
-export default function ChartTable({ page, setPage, data, isLoading, isError, error, isFetching, refetch, onRowClick }) {
+export default function ChartTable({
+  page,
+  setPage,
+  data,
+  isLoading,
+  isError,
+  error,
+  isFetching,
+  refetch,
+  onRowClick,
+}) {
   const [selected, setSelected] = useState(new Set());
   const masterRef = useRef(null);
   const { user } = useAuth();
   const isGuest = !user;
+  const topRef = useRef(null);
 
   // Clear row selection whenever the page changes
   useEffect(() => {
@@ -180,7 +238,8 @@ export default function ChartTable({ page, setPage, data, isLoading, isError, er
 
   useEffect(() => {
     if (!masterRef.current) return;
-    const allSelected = rowIds.length > 0 && rowIds.every((id) => selected.has(id));
+    const allSelected =
+      rowIds.length > 0 && rowIds.every((id) => selected.has(id));
     const someSelected = rowIds.some((id) => selected.has(id));
     masterRef.current.checked = allSelected;
     masterRef.current.indeterminate = !allSelected && someSelected;
@@ -218,12 +277,18 @@ export default function ChartTable({ page, setPage, data, isLoading, isError, er
             <div className="h-3 w-28 rounded bg-muted animate-pulse" />
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-12">
-            {Array.from({ length: 3 }, (_, i) => <PodiumSkeleton key={i} />)}
+            {Array.from({ length: 3 }, (_, i) => (
+              <PodiumSkeleton key={i} />
+            ))}
           </div>
         </div>
         <div className="overflow-hidden rounded-xl border border-border bg-background shadow-sm">
           <table className="w-full table-auto">
-            <tbody>{Array.from({ length: 7 }, (_, i) => <SkeletonRow key={i} />)}</tbody>
+            <tbody>
+              {Array.from({ length: 7 }, (_, i) => (
+                <SkeletonRow key={i} />
+              ))}
+            </tbody>
           </table>
         </div>
       </div>
@@ -252,8 +317,12 @@ export default function ChartTable({ page, setPage, data, isLoading, isError, er
     return (
       <div className="flex flex-col items-center gap-3 rounded-xl border border-border bg-background px-6 py-14 text-center">
         <InboxIcon className="size-8 text-muted-foreground" />
-        <p className="text-sm font-medium">No chart data available for these filters.</p>
-        <p className="text-xs text-muted-foreground">Try a different country or category.</p>
+        <p className="text-sm font-medium">
+          No chart data available for these filters.
+        </p>
+        <p className="text-xs text-muted-foreground">
+          Try a different country or category.
+        </p>
       </div>
     );
   }
@@ -264,7 +333,7 @@ export default function ChartTable({ page, setPage, data, isLoading, isError, er
   const total = data?.total ?? results.length;
 
   return (
-    <div className="flex flex-col gap-6">
+    <div ref={topRef} className="flex flex-col gap-6">
       {/* ── Podium (top 3) ─────────────────────────────────────────────── */}
       {showPodium && (
         <div>
@@ -296,7 +365,9 @@ export default function ChartTable({ page, setPage, data, isLoading, isError, er
       <div className="flex flex-col gap-3">
         {/* Meta row */}
         <div className="flex items-center justify-between gap-4 text-xs text-muted-foreground">
-          <span className="font-semibold text-foreground text-xl">The full chart.</span>
+          <span className="font-semibold text-foreground text-xl">
+            The full chart.
+          </span>
           <div className="flex items-center gap-2">
             <span>
               {selectedCount > 0
@@ -371,7 +442,8 @@ export default function ChartTable({ page, setPage, data, isLoading, isError, er
                 <div className="flex flex-col items-center gap-2 px-4 py-5 text-center sm:flex-row sm:justify-between sm:text-left">
                   <div>
                     <p className="text-sm font-medium text-foreground">
-                      {lastPage - 1} more page{lastPage - 1 !== 1 ? "s" : ""} available
+                      {lastPage - 1} more page{lastPage - 1 !== 1 ? "s" : ""}{" "}
+                      available
                     </p>
                     <p className="text-xs text-muted-foreground mt-0.5">
                       Sign in to browse the full chart
@@ -387,17 +459,35 @@ export default function ChartTable({ page, setPage, data, isLoading, isError, er
               ) : (
                 /* Logged-in pagination — unchanged */
                 <div className="flex items-center justify-between px-4 py-3 text-xs text-muted-foreground">
-                  <span>Page {currentPage} of {lastPage}</span>
+                  <span>
+                    Page {currentPage} of {lastPage}
+                  </span>
                   <div className="flex items-center gap-1.5">
                     <button
-                      onClick={() => { setPage((p) => Math.max(1, p - 1)); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+                      onClick={() => {
+                        setPage((p) => Math.max(1, p - 1));
+                        requestAnimationFrame(() =>
+                          topRef.current?.scrollIntoView({
+                            behavior: "smooth",
+                            block: "start",
+                          }),
+                        );
+                      }}
                       disabled={currentPage <= 1}
                       className="rounded-md border border-border px-2.5 py-1 font-medium hover:bg-muted disabled:opacity-40"
                     >
                       Previous
                     </button>
                     <button
-                      onClick={() => { setPage((p) => Math.min(lastPage, p + 1)); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+                      onClick={() => {
+                        setPage((p) => Math.min(lastPage, p + 1));
+                        requestAnimationFrame(() =>
+                          topRef.current?.scrollIntoView({
+                            behavior: "smooth",
+                            block: "start",
+                          }),
+                        );
+                      }}
                       disabled={currentPage >= lastPage}
                       className="rounded-md border border-border px-2.5 py-1 font-medium hover:bg-muted disabled:opacity-40"
                     >

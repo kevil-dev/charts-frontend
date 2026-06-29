@@ -105,7 +105,15 @@
   --brand-violet: #7928ca;
   --brand-pink: #ff0080;
   --brand-amber: #f9cb28;
-  --brand-gradient: linear-gradient(135deg, #007cf0, #00dfd8, #7928ca, #ff0080, #ff4d4d, #f9cb28);
+  --brand-gradient: linear-gradient(
+    135deg,
+    #007cf0,
+    #00dfd8,
+    #7928ca,
+    #ff0080,
+    #ff4d4d,
+    #f9cb28
+  );
 }
 
 .dark {
@@ -142,6 +150,10 @@
   --sidebar-border: #2a2a2a;
   --sidebar-ring: #0070f3;
 }
+html,
+body {
+  cursor: url("/Normal.cur") 8 8, auto;
+}
 
 ::selection {
   background-color: #171717;
@@ -164,25 +176,65 @@
   filter: blur(46px);
   animation: meshFloat 14s ease-in-out infinite;
   background:
-    radial-gradient(38% 60% at 12% 32%, rgba(0,223,216,.55), transparent 70%),
-    radial-gradient(40% 60% at 32% 18%, rgba(0,124,240,.60), transparent 72%),
-    radial-gradient(36% 58% at 54% 30%, rgba(121,40,202,.50), transparent 70%),
-    radial-gradient(38% 60% at 74% 20%, rgba(255,0,128,.50), transparent 70%),
-    radial-gradient(34% 56% at 90% 34%, rgba(249,203,40,.50), transparent 70%),
-    radial-gradient(30% 50% at 84% 8%,  rgba(255,77,77,.45), transparent 70%);
-  -webkit-mask-image: radial-gradient(ellipse 70% 100% at 50% 0%, #000 35%, transparent 78%);
-          mask-image: radial-gradient(ellipse 70% 100% at 50% 0%, #000 35%, transparent 78%);
+    radial-gradient(
+      38% 60% at 12% 32%,
+      rgba(0, 223, 216, 0.55),
+      transparent 70%
+    ),
+    radial-gradient(
+      40% 60% at 32% 18%,
+      rgba(0, 124, 240, 0.6),
+      transparent 72%
+    ),
+    radial-gradient(
+      36% 58% at 54% 30%,
+      rgba(121, 40, 202, 0.5),
+      transparent 70%
+    ),
+    radial-gradient(
+      38% 60% at 74% 20%,
+      rgba(255, 0, 128, 0.5),
+      transparent 70%
+    ),
+    radial-gradient(
+      34% 56% at 90% 34%,
+      rgba(249, 203, 40, 0.5),
+      transparent 70%
+    ),
+    radial-gradient(30% 50% at 84% 8%, rgba(255, 77, 77, 0.45), transparent 70%);
+  -webkit-mask-image: radial-gradient(
+    ellipse 70% 100% at 50% 0%,
+    #000 35%,
+    transparent 78%
+  );
+  mask-image: radial-gradient(
+    ellipse 70% 100% at 50% 0%,
+    #000 35%,
+    transparent 78%
+  );
 }
 
 @keyframes meshFloat {
-  0%, 100% { transform: translateY(0px); }
-  33%       { transform: translateY(-24px); }
-  66%       { transform: translateY(12px); }
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  33% {
+    transform: translateY(-24px);
+  }
+  66% {
+    transform: translateY(12px);
+  }
 }
 
 @keyframes livePulse {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0.35; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
 }
 
 @layer base {
@@ -199,9 +251,21 @@
 
 .auth-panel-right {
   background:
-    radial-gradient(ellipse 120% 80% at 100% 0%,   rgba(45, 27, 105, 0.95) 0%,  transparent 55%),
-    radial-gradient(ellipse 80%  90% at 110% 60%,  rgba(121, 40, 202, 0.6)  0%,  transparent 60%),
-    radial-gradient(ellipse 60%  50% at 20%  80%,  rgba(26, 10, 46, 0.8)    0%,  transparent 70%),
+    radial-gradient(
+      ellipse 120% 80% at 100% 0%,
+      rgba(45, 27, 105, 0.95) 0%,
+      transparent 55%
+    ),
+    radial-gradient(
+      ellipse 80% 90% at 110% 60%,
+      rgba(121, 40, 202, 0.6) 0%,
+      transparent 60%
+    ),
+    radial-gradient(
+      ellipse 60% 50% at 20% 80%,
+      rgba(26, 10, 46, 0.8) 0%,
+      transparent 70%
+    ),
     #0a0a0a;
 }
 
@@ -226,15 +290,15 @@
     0 1px 4px rgba(0, 0, 0, 0.08),
     0 0 32px -8px rgba(0, 223, 216, 0.35),
     0 0 28px -6px rgba(121, 40, 202, 0.35),
-    0 0 24px -4px rgba(0, 124, 240, 0.30),
+    0 0 24px -4px rgba(0, 124, 240, 0.3),
     0 10px 30px -10px rgba(255, 0, 128, 0.25);
 }
 
 .dark .chart-glow {
   box-shadow:
-    0 1px 4px  rgba(0,   0,   0,   0.30),
-    0 0  56px -14px rgba(0,   223, 216, 0.18),
-    0 0  48px -12px rgba(121, 40,  202, 0.18),
-    0 0  40px -10px rgba(0,   124, 240, 0.16),
-    0 20px 56px -22px rgba(255, 0,  128, 0.12);
+    0 1px 4px rgba(0, 0, 0, 0.3),
+    0 0 56px -14px rgba(0, 223, 216, 0.18),
+    0 0 48px -12px rgba(121, 40, 202, 0.18),
+    0 0 40px -10px rgba(0, 124, 240, 0.16),
+    0 20px 56px -22px rgba(255, 0, 128, 0.12);
 }

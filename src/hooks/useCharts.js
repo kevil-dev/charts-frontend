@@ -18,8 +18,7 @@ export function useCharts({ platform, country, category, page = 1 }) {
     const controller = new AbortController();
     abortRef.current = controller;
 
-    setData(null);
-    setIsLoading(true);
+    setIsLoading(data === null);
     setIsFetching(true);
     setIsError(false);
     setError(null);

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { XIcon, LockIcon, ArrowLeftIcon } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
@@ -10,6 +10,9 @@ export default function PodcastDrawer({ podcast, onClose }) {
   const { user } = useAuth();
   const isGuest = !user;
   const isOpen = !!podcast;
+  const [artworkError, setArtworkError] = useState(false);
+
+  useEffect(() => { setArtworkError(false); }, [podcast?.id]);
 
   useEffect(() => {
     if (isOpen) {
@@ -86,13 +89,15 @@ export default function PodcastDrawer({ podcast, onClose }) {
               {/* Artwork + rank hero */}
               <div className="flex items-start gap-4 px-5 pt-5 pb-4">
                 <div className="relative size-20 shrink-0 overflow-hidden rounded-xl">
-                  {podcast.artwork ? (
+                  {podcast.artwork && !artworkError ? (
                     <Image
                       src={podcast.artwork}
                       alt={podcast.name}
                       fill
                       sizes="80px"
                       className="object-cover"
+                      loading="eager"
+                      onError={() => setArtworkError(true)}
                     />
                   ) : (
                     <div className="flex size-full items-center justify-center rounded-xl bg-muted text-xl font-bold text-muted-foreground">

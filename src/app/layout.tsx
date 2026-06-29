@@ -4,7 +4,7 @@ import "./globals.css";
 import LeftLinks from "@/components/layout/LeftLinks";
 import Footer from "@/components/layout/Footer";
 import { AuthProvider } from "@/context/AuthContext";
-
+import Script from "next/script";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -31,6 +31,10 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
+        <Script
+          src="https://accounts.google.com/gsi/client"
+          strategy="afterInteractive"
+        />
         <AuthProvider>
           <LeftLinks />
           <main className="flex-1">

@@ -166,7 +166,7 @@ export function PlatformIcon({ row, className = "size-4 ", dark = false }) {
   if (visible.length === 0) return null;
 
   return (
-    <div className="flex items-center gap-1 min-w-22.5">
+    <div className="flex items-center gap-2 min-w-22.5">
       {visible.map(({ key, href, label, hoverColor }) => {
         const Icon = ICON_MAP[key];
         const hoverClass = dark ? "hover:text-white" : hoverColor;

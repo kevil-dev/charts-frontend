@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
@@ -35,7 +35,7 @@ function GoogleIcon() {
 }
 
 export default function RegisterPage() {
-  const { user, isLoading, register } = useAuth();
+  const { user, isLoading, register, loginWithGoogle } = useAuth();
   const router = useRouter();
 
   const [name, setName] = useState("");
@@ -50,6 +50,42 @@ export default function RegisterPage() {
       router.replace("/charts/apple/us/top");
     }
   }, [isLoading, user, router]);
+
+  const googleBtnRef = useRef(null);
+
+  useEffect(() => {
+    const tryRender = () => {
+      if (!window.google || !googleBtnRef.current) return false;
+
+      window.google.accounts.id.initialize({
+        client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
+        callback: async (response) => {
+          try {
+            await loginWithGoogle(response.credential);
+            router.push("/charts/apple/us/top");
+          } catch (err) {
+            setError(err.message);
+          }
+        },
+      });
+
+      window.google.accounts.id.renderButton(googleBtnRef.current, {
+        theme: "outline",
+        size: "large",
+        width: 320,
+        text: "signup_with",
+      });
+      return true;
+    };
+
+    if (tryRender()) return;
+
+    const interval = setInterval(() => {
+      if (tryRender()) clearInterval(interval);
+    }, 100);
+
+    return () => clearInterval(interval);
+  }, []);
 
   if (isLoading || user) return null;
 
@@ -86,14 +122,16 @@ export default function RegisterPage() {
       </div>
 
       {/* Google button (disabled placeholder) */}
-      <Button
+      {/* <Button
         variant="outline"
         className="h-11 w-full gap-2 cursor-not-allowed opacity-60"
         disabled
       >
         <GoogleIcon />
         Sign up with Google
-      </Button>
+      </Button> */}
+      {/* Google button (GIS-rendered) */}
+      <div ref={googleBtnRef} className="flex justify-center" />
 
       {/* OR divider */}
       <div className="flex items-center">
