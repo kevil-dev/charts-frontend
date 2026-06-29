@@ -10,12 +10,14 @@ import { showDeleteToast } from "./DeleteToast";
 
 function SkeletonHeader() {
   return (
-    <div className="flex gap-6 px-4 py-6 sm:gap-8 sm:px-6 animate-pulse">
-      <div className="size-24 sm:size-32 rounded-xl bg-muted/60 shrink-0" />
-      <div className="flex flex-1 flex-col gap-3 pt-1">
-        <div className="h-6 w-48 rounded bg-muted/60" />
-        <div className="h-4 w-72 rounded bg-muted/60" />
-        <div className="h-3 w-24 rounded bg-muted/60 mt-1" />
+    <div className="px-6 py-8 animate-pulse">
+      <div className="flex flex-col gap-6 sm:flex-row sm:items-start">
+        <div className="shrink-0 rounded-xl bg-muted/60" style={{ width: 128, height: 128 }} />
+        <div className="flex flex-1 flex-col gap-3 pt-1">
+          <div className="h-10 w-56 rounded-md bg-muted/60" />
+          <div className="h-4 w-72 rounded bg-muted/60" />
+          <div className="h-3 w-28 rounded bg-muted/60 mt-1" />
+        </div>
       </div>
     </div>
   );
@@ -23,7 +25,7 @@ function SkeletonHeader() {
 
 function SkeletonRow() {
   return (
-    <div className="flex items-center gap-3 px-4 py-3 border-b border-border animate-pulse">
+    <div className="flex items-center gap-3 px-4 py-3 border-b border-border last:border-0 animate-pulse">
       <div className="size-10 rounded-lg bg-muted/60 shrink-0" />
       <div className="flex flex-1 flex-col gap-1.5">
         <div className="h-3.5 w-40 rounded bg-muted/60" />
@@ -61,7 +63,7 @@ export default function ListPage({ listId }) {
         updateMeta({ is_shared: true });
       }
     } catch {
-      // revert silently — state unchanged
+      // revert silently
     }
   }, [list, updateMeta]);
 
@@ -84,7 +86,7 @@ export default function ListPage({ listId }) {
     return (
       <div>
         <SkeletonHeader />
-        <div className="border-t border-border">
+        <div className="mx-6 mb-6 rounded-xl border border-border bg-card overflow-hidden">
           {[...Array(6)].map((_, i) => (
             <SkeletonRow key={i} />
           ))}
@@ -104,23 +106,23 @@ export default function ListPage({ listId }) {
   const items = list.items ?? [];
 
   return (
-    <div>
-      <ListHeader
-        list={list}
-        onUpdate={handleUpdate}
-        onShareToggle={handleShareToggle}
-      />
+  <div>
+    {/* Hero — full width, no max-w wrapper */}
+    <ListHeader
+      list={list}
+      onUpdate={handleUpdate}
+      onShareToggle={handleShareToggle}
+    />
 
-      <div className="border-t border-border">
+    {/* Rows — constrained width, same as charts table */}
+    <div className="mx-auto max-w-4xl px-6 mt-6 mb-6">
+      <div className="rounded-xl border border-border bg-card overflow-hidden">
         {items.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-center">
             <p className="text-base font-medium text-foreground">No podcasts yet</p>
             <p className="mt-1 text-sm text-muted-foreground">
               Go to{" "}
-              <Link
-                href="/charts/apple/us/top"
-                className="underline underline-offset-4 hover:text-foreground transition-colors"
-              >
+              <Link href="/charts/apple/us/top" className="underline underline-offset-4 hover:text-foreground transition-colors">
                 Charts
               </Link>{" "}
               to add some
@@ -133,5 +135,6 @@ export default function ListPage({ listId }) {
         )}
       </div>
     </div>
-  );
+  </div>
+);
 }

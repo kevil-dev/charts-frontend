@@ -6,9 +6,12 @@ import {
   LockIcon,
   Link2Icon,
   PlusIcon,
+  DownloadIcon,
   ChevronDownIcon,
 } from "lucide-react";
 import { Artwork } from "@/features/charts/components/ChartRow";
+
+// ── Export helpers ────────────────────────────────────────────────────────────
 
 function downloadFile(filename, content, mimeType) {
   const blob = new Blob([content], { type: mimeType });
@@ -31,80 +34,64 @@ function exportCsv(list) {
       item.added_at ?? "",
     ]),
   ];
-  const csv = rows.map((r) => r.join(",")).join("\n");
-  downloadFile(`${list.title ?? "list"}.csv`, csv, "text/csv");
-}
-
-function exportJson(list) {
-  const json = JSON.stringify(list.items ?? [], null, 2);
-  downloadFile(`${list.title ?? "list"}.json`, json, "application/json");
-}
-
-function ArtworkCell({ item, index }) {
-  if (!item) {
-    return (
-      <div className="aspect-square w-full rounded-sm bg-muted/60" />
-    );
-  }
-  return (
-    <Artwork
-      src={item.artwork_url}
-      name={item.podcast_name}
-      size={10}
-      square
-      rank={index + 1}
-    />
+  downloadFile(
+    `${list.title ?? "list"}.csv`,
+    rows.map((r) => r.join(",")).join("\n"),
+    "text/csv"
   );
 }
 
-function InlineText({ value, onSave, maxLength, placeholder, readOnly, className, multiline }) {
+function exportJson(list) {
+  downloadFile(
+    `${list.title ?? "list"}.json`,
+    JSON.stringify(list.items ?? [], null, 2),
+    "application/json"
+  );
+}
+
+// ── Artwork grid cell ─────────────────────────────────────────────────────────
+
+function ArtworkCell({ item, index }) {
+  if (!item) return <div className="size-16 bg-muted" />;
+  return <Artwork src={item.artwork_url} name={item.podcast_name} size={16} square rank={index + 1} />;
+}
+
+// ── Inline title ──────────────────────────────────────────────────────────────
+
+function InlineTitle({ value, onSave, readOnly }) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(value ?? "");
-  const inputRef = useRef(null);
 
   function startEdit() {
     if (readOnly) return;
     setDraft(value ?? "");
     setEditing(true);
-    setTimeout(() => inputRef.current?.focus(), 0);
   }
 
   function commit() {
     setEditing(false);
     const trimmed = draft.trim();
-    if (trimmed !== (value ?? "")) {
-      onSave(trimmed);
-    }
+    if (trimmed && trimmed !== (value ?? "")) onSave(trimmed);
   }
 
   function onKeyDown(e) {
-    if (e.key === "Enter" && !multiline) {
-      e.preventDefault();
-      commit();
-    }
-    if (e.key === "Escape") {
-      setEditing(false);
-      setDraft(value ?? "");
-    }
+    if (e.key === "Enter") { e.preventDefault(); commit(); }
+    if (e.key === "Escape") { setEditing(false); setDraft(value ?? ""); }
   }
 
   if (editing) {
-    const Tag = multiline ? "textarea" : "input";
     return (
-      <div className="relative w-full">
-        <Tag
-          ref={inputRef}
+      <div>
+        <input
+          autoFocus
           value={draft}
-          onChange={(e) => setDraft(e.target.value.slice(0, maxLength))}
+          onChange={(e) => setDraft(e.target.value.slice(0, 60))}
           onBlur={commit}
           onKeyDown={onKeyDown}
-          maxLength={maxLength}
-          rows={multiline ? 3 : undefined}
-          className={`w-full resize-none rounded-md border border-border bg-background px-2 py-1 text-foreground outline-none focus:ring-2 focus:ring-ring ${className}`}
+          maxLength={60}
+          className="text-4xl font-bold tracking-tight bg-transparent border-b border-border outline-none w-full"
         />
-        <span className="absolute right-2 bottom-1.5 text-[10px] text-muted-foreground select-none">
-          {draft.length}/{maxLength}
-        </span>
+        <span className="text-xs text-muted-foreground">{draft.length}/60</span>
       </div>
     );
   }
@@ -115,147 +102,201 @@ function InlineText({ value, onSave, maxLength, placeholder, readOnly, className
       role={readOnly ? undefined : "button"}
       tabIndex={readOnly ? undefined : 0}
       onKeyDown={(e) => e.key === "Enter" && startEdit()}
-      className={`block w-full ${readOnly ? "" : "cursor-text hover:opacity-70 transition-opacity"} ${className}`}
+      className={`text-4xl font-bold tracking-tight text-foreground leading-tight block ${
+        readOnly ? "" : "cursor-text hover:opacity-80 transition-opacity"
+      }`}
     >
-      {value || <span className="text-muted-foreground">{placeholder}</span>}
+      {value || <span className="text-muted-foreground/50">Untitled list</span>}
     </span>
   );
 }
 
-export default function ListHeader({ list, onUpdate, onShareToggle, readOnly = false }) {
+// ── Inline description ────────────────────────────────────────────────────────
+
+function InlineDescription({ value, onSave, readOnly }) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(value ?? "");
+
+  function startEdit() {
+    if (readOnly) return;
+    setDraft(value ?? "");
+    setEditing(true);
+  }
+
+  function commit() {
+    setEditing(false);
+    const trimmed = draft.trim();
+    if (trimmed !== (value ?? "")) onSave(trimmed);
+  }
+
+  function onKeyDown(e) {
+    if (e.key === "Escape") { setEditing(false); setDraft(value ?? ""); }
+  }
+
+  if (editing) {
+    return (
+      <div>
+        <textarea
+          autoFocus
+          rows={2}
+          value={draft}
+          onChange={(e) => setDraft(e.target.value.slice(0, 200))}
+          onBlur={commit}
+          onKeyDown={onKeyDown}
+          maxLength={200}
+          className="text-base bg-transparent border-b border-border outline-none w-full resize-none"
+        />
+        <span className="text-xs text-muted-foreground">{draft.length}/200</span>
+      </div>
+    );
+  }
+
+  return (
+    <span
+      onClick={startEdit}
+      role={readOnly ? undefined : "button"}
+      tabIndex={readOnly ? undefined : 0}
+      onKeyDown={(e) => e.key === "Enter" && startEdit()}
+      className={`text-base text-muted-foreground block ${
+        readOnly ? "" : "cursor-text hover:opacity-80 transition-opacity"
+      }`}
+    >
+      {value || (
+        <span className="text-muted-foreground/40">
+          {readOnly ? null : "Add a description…"}
+        </span>
+      )}
+    </span>
+  );
+}
+
+// ── Main component ────────────────────────────────────────────────────────────
+
+export default function ListHeader({
+  list,
+  onUpdate,
+  onShareToggle,
+  readOnly = false,
+}) {
   const router = useRouter();
   const [exportOpen, setExportOpen] = useState(false);
   const exportRef = useRef(null);
+
   const items = list?.items ?? [];
   const artworkSlots = [0, 1, 2, 3].map((i) => items[i] ?? null);
   const itemCount = items.length;
 
   const handleTitleSave = useCallback(
-    (title) => {
-      if (!title) return;
-      onUpdate?.({ title });
-    },
+    (title) => { if (title) onUpdate?.({ title }); },
     [onUpdate]
   );
-
   const handleDescriptionSave = useCallback(
-    (description) => {
-      onUpdate?.({ description });
-    },
+    (description) => onUpdate?.({ description }),
     [onUpdate]
   );
 
   return (
-    <div className="flex flex-col gap-6 px-4 py-6 sm:flex-row sm:items-start sm:gap-8 sm:px-6">
-      {/* 2×2 artwork grid */}
-      <div className="grid shrink-0 grid-cols-2 gap-1 rounded-xl overflow-hidden size-24 sm:size-32">
-        {artworkSlots.map((item, i) => (
-          <ArtworkCell key={i} item={item} index={i} />
-        ))}
-      </div>
+    <div className="relative overflow-hidden w-full">
+      {/* Animated gradient mesh — identical to ChartHero */}
+      <div className="hero-mesh" aria-hidden="true" />
 
-      {/* Meta */}
-      <div className="flex min-w-0 flex-1 flex-col gap-2">
-        {/* Title */}
-        <InlineText
-          value={list?.title}
-          onSave={handleTitleSave}
-          maxLength={60}
-          placeholder="Untitled list"
-          readOnly={readOnly}
-          className="text-xl font-bold leading-tight tracking-tight"
-        />
+      {/* Content */}
+      <div className="relative z-10 px-6 pt-8 pb-6">
+        <div className="flex items-start gap-6">
 
-        {/* Description */}
-        <InlineText
-          value={list?.description}
-          onSave={handleDescriptionSave}
-          maxLength={200}
-          placeholder="Add a description..."
-          readOnly={readOnly}
-          multiline
-          className="text-sm text-muted-foreground"
-        />
-
-        {/* Stats row */}
-        <div className="flex flex-wrap items-center gap-3 mt-1">
-          <span className="text-xs text-muted-foreground">
-            {itemCount} {itemCount === 1 ? "show" : "shows"}
-          </span>
-
-          {/* Privacy badge */}
-          <button
-            onClick={() => !readOnly && onShareToggle?.()}
-            disabled={readOnly}
-            className="flex items-center gap-1 rounded-full border border-border px-2.5 py-0.5 text-xs text-muted-foreground transition-colors hover:bg-muted disabled:pointer-events-none"
-          >
-            {list?.is_shared ? (
-              <>
-                <Link2Icon className="size-3" />
-                Shared
-              </>
-            ) : (
-              <>
-                <LockIcon className="size-3" />
-                Private
-              </>
-            )}
-          </button>
-        </div>
-
-        {/* Actions row */}
-        {!readOnly && (
-          <div className="flex items-center gap-2 mt-2">
-            <button
-              onClick={() => router.push("/charts/apple/us/top")}
-              className="flex items-center gap-1.5 rounded-full bg-foreground px-4 py-1.5 text-xs font-medium text-background transition-opacity hover:opacity-80"
-            >
-              <PlusIcon className="size-3.5" />
-              Add podcasts
-            </button>
-
-            {/* Export dropdown */}
-            <div className="relative" ref={exportRef}>
-              <button
-                onClick={() => setExportOpen((v) => !v)}
-                onBlur={(e) => {
-                  if (!exportRef.current?.contains(e.relatedTarget)) {
-                    setExportOpen(false);
-                  }
-                }}
-                className="flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-              >
-                Export
-                <ChevronDownIcon className="size-3" />
-              </button>
-
-              {exportOpen && (
-                <div className="absolute left-0 top-full z-50 mt-1 w-36 rounded-lg border border-border bg-popover shadow-md">
-                  <button
-                    onMouseDown={(e) => {
-                      e.preventDefault();
-                      exportCsv(list);
-                      setExportOpen(false);
-                    }}
-                    className="w-full px-3 py-2 text-left text-xs hover:bg-muted rounded-t-lg"
-                  >
-                    Export as CSV
-                  </button>
-                  <button
-                    onMouseDown={(e) => {
-                      e.preventDefault();
-                      exportJson(list);
-                      setExportOpen(false);
-                    }}
-                    className="w-full px-3 py-2 text-left text-xs hover:bg-muted rounded-b-lg"
-                  >
-                    Export as JSON
-                  </button>
-                </div>
-              )}
-            </div>
+          {/* 2×2 artwork grid */}
+          <div className="grid grid-cols-2 gap-0.5 size-32 rounded-xl overflow-hidden shrink-0">
+            {artworkSlots.map((item, i) => (
+              <ArtworkCell key={i} item={item} index={i} />
+            ))}
           </div>
-        )}
+
+          {/* Meta */}
+          <div className="flex flex-col gap-1 min-w-0 flex-1 pt-1">
+            <InlineTitle
+              value={list?.title}
+              onSave={handleTitleSave}
+              readOnly={readOnly}
+            />
+
+            <InlineDescription
+              value={list?.description}
+              onSave={handleDescriptionSave}
+              readOnly={readOnly}
+            />
+
+            {/* Stats + privacy pill */}
+            <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
+              <span>{itemCount} {itemCount === 1 ? "show" : "shows"}</span>
+              <span aria-hidden="true">·</span>
+              <button
+                onClick={() => !readOnly && onShareToggle?.()}
+                disabled={readOnly}
+                className="inline-flex items-center gap-1 rounded-full border border-border px-2.5 py-0.5 text-xs hover:bg-muted transition-colors disabled:pointer-events-none"
+              >
+                {list?.is_shared ? (
+                  <><Link2Icon className="size-3" />Shared</>
+                ) : (
+                  <><LockIcon className="size-3" />Private</>
+                )}
+              </button>
+            </div>
+
+            {/* Action buttons — hidden in readOnly mode */}
+            {!readOnly && (
+              <div className="mt-4 flex items-center gap-3">
+                <button
+                  onClick={() => router.push("/charts/apple/us/top")}
+                  className="rounded-full bg-foreground text-background text-sm font-medium px-5 py-2 hover:opacity-80 transition-opacity flex items-center gap-1.5"
+                >
+                  <PlusIcon className="size-4" />
+                  Add podcasts
+                </button>
+
+                <div className="relative" ref={exportRef}>
+                  <button
+                    onClick={() => setExportOpen((v) => !v)}
+                    onBlur={(e) => {
+                      if (!exportRef.current?.contains(e.relatedTarget)) {
+                        setExportOpen(false);
+                      }
+                    }}
+                    className="rounded-full border border-border text-sm font-medium px-4 py-2 hover:bg-muted transition-colors flex items-center gap-1.5"
+                  >
+                    <DownloadIcon className="size-4" />
+                    Export
+                    <ChevronDownIcon className="size-3" />
+                  </button>
+
+                  {exportOpen && (
+                    <div className="absolute left-0 top-full z-50 mt-1 w-40 rounded-lg border border-border bg-popover shadow-md overflow-hidden">
+                      <button
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          exportCsv(list);
+                          setExportOpen(false);
+                        }}
+                        className="w-full px-4 py-2.5 text-left text-sm hover:bg-muted transition-colors"
+                      >
+                        Export as CSV
+                      </button>
+                      <button
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          exportJson(list);
+                          setExportOpen(false);
+                        }}
+                        className="w-full px-4 py-2.5 text-left text-sm hover:bg-muted transition-colors border-t border-border"
+                      >
+                        Export as JSON
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -1,7 +1,6 @@
 import api from "@/lib/api";
 
 const listsApi = {
-  // Lists
   getAll: () =>
     api.get("/lists"),
 
@@ -17,7 +16,6 @@ const listsApi = {
   destroy: (id) =>
     api.delete(`/lists/${id}`),
 
-  // Share
   share: (id) =>
     api.post(`/lists/${id}/share`),
 
@@ -27,7 +25,6 @@ const listsApi = {
   getShared: (token) =>
     api.get(`/lists/shared/${token}`),
 
-  // Items
   addItem: (listId, itemData) =>
     api.post(`/lists/${listId}/items`, itemData),
 

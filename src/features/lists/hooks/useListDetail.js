@@ -13,8 +13,9 @@ export function useListDetail(id) {
     try {
       setLoading(true);
       const res = await listsApi.getOne(id);
-      setList(res.data.data.list);
+      setList(res.list);
     } catch (err) {
+        console.error("useListDetail fetch error:", err);
       setError(err);
     } finally {
       setLoading(false);
@@ -65,7 +66,7 @@ export function useListDetail(id) {
 
   const addItem = useCallback(async (listId, itemData) => {
     const res = await listsApi.addItem(listId, itemData);
-    const newItem = res.data.data.item;
+    const newItem = res.item;
     setList((prev) => {
       if (!prev) return prev;
       return { ...prev, items: [...prev.items, newItem] };

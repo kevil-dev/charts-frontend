@@ -18,7 +18,7 @@ export default function CreateFirstList() {
     try {
       setCreating(true);
       const res = await listsApi.create(t);
-      const newList = res.data?.data?.list;
+      const newList = res.list;
       if (newList?.id) router.push(`/lists/${newList.id}`);
     } catch {
       setCreating(false);
