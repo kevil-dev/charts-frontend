@@ -5,6 +5,7 @@ import LeftLinks from "@/components/layout/LeftLinks";
 import Footer from "@/components/layout/Footer";
 import { AuthProvider } from "@/features/auth/context/AuthContext";
 import Script from "next/script";
+import { Toaster } from "sonner";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -36,11 +37,13 @@ export default function RootLayout({
           strategy="afterInteractive"
         />
         <AuthProvider>
+
           <LeftLinks />
           <main className="flex-1">
             {children}
           </main>
           <Footer />
+          <Toaster position="bottom-right" richColors />
         </AuthProvider>
       </body>
     </html>

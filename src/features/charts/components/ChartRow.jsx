@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { UserIcon, MapPinIcon } from "lucide-react";
+import { UserIcon, MapPinIcon, Trash2Icon } from "lucide-react";
 
 // Gradient palette for square avatar fallbacks — indexed by (rank % 8)
 const GRADIENTS = [
@@ -310,48 +310,54 @@ export default function ChartRow({ row, isSelected, onToggle, onRowClick }) {
   );
 }
 
-export function ChartRowCard({ row, isSelected, onToggle, onRowClick }) {
+export function ChartRowCard({ row, isSelected, onToggle, onRowClick, listMode = false, onDelete }) {
   const showBadge =
-    row.rank_move === "UP" ||
-    row.rank_move === "DOWN" ||
-    row.rank_move === "NEW";
+    !listMode &&
+    (row.rank_move === "UP" ||
+      row.rank_move === "DOWN" ||
+      row.rank_move === "NEW");
 
   return (
     <div
-      onClick={() => onRowClick?.(row)}
+      onClick={() => !listMode && onRowClick?.(row)}
       className={[
-        "flex items-center gap-3 px-4 py-3 border-b border-border last:border-0 cursor-pointer transition-colors",
-        isSelected
+        "group flex items-center gap-3 px-4 py-3 border-b border-border last:border-0 transition-colors",
+        listMode ? "cursor-default" : "cursor-pointer",
+        isSelected && !listMode
           ? "bg-primary/5 border-l-2 border-l-primary"
           : "hover:bg-muted/40",
       ].join(" ")}
     >
-      {/* Checkbox */}
-      <input
-        type="checkbox"
-        checked={isSelected}
-        onChange={(e) => {
-          e.stopPropagation();
-          onToggle(row.id);
-        }}
-        aria-label={`Select ${row.name}`}
-        className="size-4 shrink-0 rounded border-border accent-primary"
-        onClick={(e) => e.stopPropagation()}
-      />
+      {/* Checkbox — hidden in list mode */}
+      {!listMode && (
+        <input
+          type="checkbox"
+          checked={isSelected}
+          onChange={(e) => {
+            e.stopPropagation();
+            onToggle(row.id);
+          }}
+          aria-label={`Select ${row.name}`}
+          className="size-4 shrink-0 rounded border-border accent-primary"
+          onClick={(e) => e.stopPropagation()}
+        />
+      )}
 
-      {/* Rank */}
-      <span className="w-6 shrink-0 text-right font-mono text-xs text-muted-foreground">
-        {row.chart_rank}
-      </span>
+      {/* Rank — hidden in list mode */}
+      {!listMode && (
+        <span className="w-6 shrink-0 text-right font-mono text-xs text-muted-foreground">
+          {row.chart_rank}
+        </span>
+      )}
 
-      {/* Artwork */}
+      {/* Artwork — badge hidden in list mode */}
       <div className="relative shrink-0">
         <Artwork
           src={row.artwork}
           name={row.name}
           size={10}
           square
-          rank={row.chart_rank}
+          rank={row.chart_rank ?? 1}
         />
         {showBadge && (
           <div
@@ -410,6 +416,20 @@ export function ChartRowCard({ row, isSelected, onToggle, onRowClick }) {
       <div className="shrink-0">
         <PlatformIcon row={row} className="size-3.5" />
       </div>
+
+      {/* Delete button — only in list mode when a handler is provided */}
+      {listMode && onDelete && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete?.();
+          }}
+          aria-label={`Remove ${row.name} from list`}
+          className="ml-1 shrink-0 rounded-md p-1.5 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 hover:bg-destructive/10 hover:text-destructive focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <Trash2Icon className="size-4" />
+        </button>
+      )}
     </div>
   );
 }
