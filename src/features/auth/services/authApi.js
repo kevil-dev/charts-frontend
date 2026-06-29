@@ -6,4 +6,5 @@ export const authApi = {
     api.post("/auth/register", { name, email, password }),
   google: (credential) => api.post("/auth/google", { credential }),
   me: () => api.get("/auth/me"),
+  logout: () => api.post("/auth/logout"),
 };
