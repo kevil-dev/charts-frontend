@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import axios from "axios";
-import { chartsApi } from "@/lib/api";
+import { chartsApi } from "@/features/charts/services/chartsApi";
 
 /** Module-level cache: cacheKey (platform-country) → { countries, genres, fetchedAt } */
 const filtersCache = new Map();

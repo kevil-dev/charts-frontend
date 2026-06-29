@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import ChartSection from "@/components/charts/ChartSection";
+import ChartSection from "@/features/charts/components/ChartSection";
 import { platforms } from "../../../../../config/charts";
 
 const VALID_PLATFORMS = platforms.map((p) => p.slug);

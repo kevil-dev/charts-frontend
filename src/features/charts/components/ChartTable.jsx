@@ -13,7 +13,7 @@ import ChartRow, {
   RankMoveBadge,
   ChartRowCard,
 } from "./ChartRow";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/features/auth/context/AuthContext";
 
 function PodiumSkeleton() {
   return (

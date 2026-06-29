@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { XIcon, LockIcon, ArrowLeftIcon } from "lucide-react";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/features/auth/context/AuthContext";
 import { RankMoveBadge } from "./ChartRow";
 
 export default function PodcastDrawer({ podcast, onClose }) {

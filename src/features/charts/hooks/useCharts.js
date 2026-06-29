@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import axios from "axios";
-import { chartsApi } from "@/lib/api";
+import { chartsApi } from "@/features/charts/services/chartsApi";
 
 export function useCharts({ platform, country, category, page = 1 }) {
   const [data, setData] = useState(null);

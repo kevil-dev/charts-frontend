@@ -5,8 +5,7 @@ import { RefreshCwIcon } from "lucide-react";
 import DynamicBreadcrumb from "./DynamicBreadcrumb";
 import PlatformTabs from "./PlatformTabs";
 import ChartFilters from "./ChartFilters";
-import { useFilters } from "@/hooks/useFilters";
-
+import { useFilters } from "@/features/charts/hooks/useFilters";
 export default function ChartHero({
   platform,
   country,

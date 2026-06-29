@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useCharts } from "@/features/charts/hooks/useCharts";
 import ChartHero from "./ChartHero";
 import ChartTable from "./ChartTable";
 import PodcastDrawer from "./PodcastDrawer";
-import { useCharts } from "@/hooks/useCharts";
 
 function formatRunDate(runDate) {
   if (!runDate) return null;

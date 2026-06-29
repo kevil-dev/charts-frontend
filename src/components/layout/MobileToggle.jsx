@@ -8,7 +8,7 @@ import { XIcon } from "lucide-react";
 import { navLinks } from "../../../config/navigation";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/features/auth/context/AuthContext";
 
 export default function MobileMenuToggle() {
   const { user, isLoading, logout } = useAuth();

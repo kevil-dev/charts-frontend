@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/features/auth/context/AuthContext";
 import { Button } from "@/components/ui/button";
 
 function GoogleIcon() {

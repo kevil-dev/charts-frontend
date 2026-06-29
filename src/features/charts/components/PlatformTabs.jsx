@@ -1,8 +1,7 @@
 "use client";
 
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { platforms } from "../../../config/charts";
-
+import { platforms } from "../../../../config/charts";
 /** * 
  * @param {object} props
  * @param {string} props.value - The currently active platform slug.
