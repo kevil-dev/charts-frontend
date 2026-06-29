@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useCharts } from "@/features/charts/hooks/useCharts";
 import ChartHero from "./ChartHero";
 import ChartTable from "./ChartTable";
@@ -17,16 +17,23 @@ function formatRunDate(runDate) {
   }
 }
 
-export default function ChartSection({ platform, country, category, platformLabel, countryName, countryFlag, chartLabel }) {
-  const [page, setPage] = useState(1);
+export default function ChartSection({
+  platform,
+  country,
+  category,
+  platformLabel,
+  countryName,
+  countryFlag,
+  chartLabel,
+  currentPage,
+}) {
   const [selectedPodcast, setSelectedPodcast] = useState(null);
 
-  useEffect(() => {
-    setPage(1);
-  }, [platform, country, category]);
-
   const { data, isLoading, isError, error, isFetching, refetch } = useCharts({
-    platform, country, category, page,
+    platform,
+    country,
+    category,
+    page: currentPage,
   });
 
   const runDate = formatRunDate(data?.run_date);
@@ -48,8 +55,7 @@ export default function ChartSection({ platform, country, category, platformLabe
       <div className="mt-8 border-t border-border pt-6">
         <ChartTable
           key={`${platform}-${country}-${category}`}
-          page={page}
-          setPage={setPage}
+          page={currentPage}
           data={data}
           isLoading={isLoading}
           isError={isError}

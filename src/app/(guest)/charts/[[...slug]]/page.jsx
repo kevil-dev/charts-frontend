@@ -25,16 +25,15 @@ export async function generateMetadata({ params }) {
   const { slug = [] } = await params;
   const [platform = DEFAULT.platform, country = DEFAULT.country, category = DEFAULT.category] = slug;
   const meta = await fetchMeta(platform, country, category);
-  if (!meta) {
-    return { title: "Million Podcast Charts" };
-  }
+  if (!meta) return { title: "Million Podcast Charts" };
   return {
     title: `${meta.platform_label} · ${meta.country_name} · ${meta.chart_label} — Million Podcast Charts`,
   };
 }
 
-export default async function ChartPage({ params }) {
+export default async function ChartPage({ params, searchParams }) {
   const { slug = [] } = await params;
+  const resolvedSearch = await searchParams;
 
   if (slug.length === 0) redirect(FALLBACK_URL);
 
@@ -45,8 +44,9 @@ export default async function ChartPage({ params }) {
   if (!category) redirect(`/charts/${platform}/${country}/${DEFAULT.category}`);
 
   const meta = await fetchMeta(platform, country, category);
-
   if (!meta) redirect(FALLBACK_URL);
+
+  const currentPage = Math.max(1, parseInt(resolvedSearch?.page) || 1);
 
   return (
     <ChartSection
@@ -57,6 +57,7 @@ export default async function ChartPage({ params }) {
       countryName={meta.country_name}
       countryFlag={meta.country_flag}
       chartLabel={meta.chart_label}
+      currentPage={currentPage}
     />
   );
 }

@@ -1,12 +1,10 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import Image from "next/image";
 import {
   AlertCircleIcon,
   RefreshCwIcon,
   InboxIcon,
-  BookmarkPlusIcon,
 } from "lucide-react";
 import ChartRow, {
   PlatformIcon,
@@ -14,202 +12,12 @@ import ChartRow, {
   ChartRowCard,
 } from "./ChartRow";
 import { useAuth } from "@/features/auth/context/AuthContext";
-
-function PodiumSkeleton() {
-  return (
-    <div className="animate-pulse rounded-xl border border-border bg-background p-5.5 flex flex-col">
-      <div className="flex items-start gap-4.5">
-        <div className="size-14 shrink-0 rounded-full bg-muted" />
-        <div className="flex-1 space-y-2 pt-1">
-          <div className="h-3 w-8 rounded bg-muted" />
-          <div className="h-5 w-36 rounded bg-muted" />
-          <div className="h-3 w-24 rounded bg-muted" />
-        </div>
-      </div>
-      <div className="flex-1" />
-      <div className="h-px my-5 bg-muted" />
-      <div className="flex items-center justify-between">
-        <div className="flex gap-1">
-          <div className="size-4 rounded bg-muted" />
-          <div className="size-4 rounded bg-muted" />
-        </div>
-        <div className="h-8 w-24 rounded-lg bg-muted" />
-      </div>
-    </div>
-  );
-}
-
-function SkeletonRow() {
-  return (
-    <tr className="animate-pulse">
-      <td className="w-10 pl-4 pr-2 py-3">
-        <div className="size-4 rounded bg-muted" />
-      </td>
-      <td className="w-10 pr-3 py-3">
-        <div className="h-4 w-6 rounded bg-muted ml-auto" />
-      </td>
-      <td className="py-3 pr-4">
-        <div className="size-10 rounded-lg bg-muted" />
-      </td>
-      <td className="py-3 pr-6 min-w-0">
-        <div className="h-4 w-48 rounded bg-muted mb-1.5" />
-        <div className="h-3 w-32 rounded bg-muted" />
-      </td>
-      <td className="py-3 pr-6">
-        <div className="size-4 rounded bg-muted" />
-      </td>
-      <td className="py-3 pr-4">
-        <div className="h-6 w-16 rounded bg-muted ml-auto" />
-      </td>
-    </tr>
-  );
-}
-
-function PodiumCard({
-  row,
-  isFirst,
-  isSelected,
-  onToggle,
-  onAddToList,
-  onRowClick,
-}) {
-  const [artworkError, setArtworkError] = useState(false);
-  const isDark = isFirst;
-
-  return (
-    <div
-      onClick={() => onRowClick?.(row)}
-      className={[
-        "rounded-xl p-[22px] flex flex-col relative cursor-pointer",
-        isDark
-          ? "bg-[#171717] text-white border border-[#2a2a2e]"
-          : "bg-white border border-border text-foreground",
-      ].join(" ")}
-    >
-      {/* Checkbox — top-right absolute */}
-      <div className="absolute top-4 right-4">
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onToggle(row.id);
-          }}
-          aria-label={
-            isSelected ? `Deselect ${row.name}` : `Select ${row.name}`
-          }
-          className={[
-            "flex size-7 items-center justify-center rounded-lg border transition-colors",
-            isSelected
-              ? isDark
-                ? "bg-white border-white"
-                : "bg-[#171717] border-[#171717]"
-              : isDark
-                ? "border-white/30 bg-white/5"
-                : "border-[#d4d4d4] bg-white",
-          ].join(" ")}
-        >
-          {isSelected && (
-            <svg
-              viewBox="0 0 12 12"
-              className="size-3"
-              fill="none"
-              stroke={isDark ? "#171717" : "white"}
-              strokeWidth="2.5"
-            >
-              <path d="M2 6l3 3 5-5" />
-            </svg>
-          )}
-        </button>
-      </div>
-
-      {/* Grows to fill available height — pins divider+footer to bottom */}
-      <div className="flex-1">
-        {/* Top section: artwork + info */}
-        <div className="flex items-start gap-4.5">
-          {/* Artwork */}
-          {row.artwork && !artworkError ? (
-            <div className="relative size-14 shrink-0 overflow-hidden rounded-full">
-              <Image
-                src={row.artwork}
-                alt={row.name}
-                fill
-                sizes="56px"
-                className="object-cover"
-                onError={() => setArtworkError(true)}
-              />
-            </div>
-          ) : (
-            <div
-              className="flex size-14 shrink-0 items-center justify-center rounded-full text-lg font-semibold"
-              style={
-                isDark
-                  ? { background: "linear-gradient(140deg,#3a3a40,#232327)" }
-                  : { background: "#ededed" }
-              }
-            >
-              <span className={isDark ? "text-[#e5e5e5]" : "text-[#171717]"}>
-                {(row.name?.[0] ?? "?").toUpperCase()}
-              </span>
-            </div>
-          )}
-
-          {/* Info */}
-          <div className="flex-1 min-w-0 pr-10">
-            <p className="font-mono text-[13px] font-medium tracking-[0.02em] text-[#a1a1a1]">
-              #{row.chart_rank}
-              {isFirst && <span className="text-[#ededed]"> · Leading</span>}
-            </p>
-            <p
-              className={`font-semibold text-[21px] tracking-[-0.03em] leading-[1.15] mt-1.25 ${isDark ? "text-white" : "text-foreground"}`}
-            >
-              {row.name}
-            </p>
-            {row.artist_or_publisher && (
-              <p
-                className={`mt-1.75 text-sm tracking-[-0.01em] leading-[1.4] ${isDark ? "text-[#a1a1a1]" : "text-muted-foreground"}`}
-              >
-                {row.artist_or_publisher}
-              </p>
-            )}
-          </div>
-        </div>
-
-        {/* Rank movement badge — uses shared component so NEW/UNCHANGED are handled */}
-        <div className="mt-4 self-start">
-          <RankMoveBadge rankMove={row.rank_move} />
-        </div>
-      </div>
-
-      {/* Divider */}
-      <div
-        className={`h-px my-5 ${isDark ? "bg-white/[12%]" : "bg-[#ebebeb]"}`}
-      />
-
-      {/* Bottom row */}
-      <div className="flex items-center justify-between">
-        <PlatformIcon row={row} dark={isDark} />
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onAddToList(row);
-          }}
-          className={[
-            "flex items-center gap-1.5 rounded-lg border px-[15px] py-[9px] text-sm font-medium transition-colors",
-            isDark
-              ? "bg-white text-[#171717] border-white hover:bg-[#ededed]"
-              : "bg-white text-[#171717] border-[#ebebeb] hover:bg-[#171717] hover:text-white hover:border-[#171717]",
-          ].join(" ")}
-        >
-          <BookmarkPlusIcon className="size-4" />
-          Add to list
-        </button>
-      </div>
-    </div>
-  );
-}
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import { PodiumSkeleton,SkeletonRow } from "./ChartsSkeletons";
+import PodiumCard from "./PodiumCard"
 
 export default function ChartTable({
   page,
-  setPage,
   data,
   isLoading,
   isError,
@@ -266,6 +74,18 @@ export default function ChartTable({
   function handleAddSingle(row) {
     // TODO: replace with sonner toast when installed
     console.log("Add to list:", row.name);
+  }
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  function goToPage(pageNumber) {
+    const params = new URLSearchParams(searchParams);
+    params.set("page", String(pageNumber));
+    router.push(`${pathname}?${params.toString()}`);
+    requestAnimationFrame(() =>
+      topRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }),
+    );
   }
 
   if (isLoading) {
@@ -450,7 +270,7 @@ export default function ChartTable({
                     </p>
                   </div>
                   <a
-                    href="/login"
+                    href={`/login?from=${pathname}`}
                     className="inline-flex shrink-0 items-center gap-1.5 rounded-md bg-primary px-3.5 py-1.5 text-xs font-medium text-primary-foreground hover:opacity-90 transition-opacity"
                   >
                     Sign in to continue
@@ -458,36 +278,21 @@ export default function ChartTable({
                 </div>
               ) : (
                 /* Logged-in pagination — unchanged */
+                /* Logged-in pagination — URL driven */
                 <div className="flex items-center justify-between px-4 py-3 text-xs text-muted-foreground">
                   <span>
                     Page {currentPage} of {lastPage}
                   </span>
                   <div className="flex items-center gap-1.5">
                     <button
-                      onClick={() => {
-                        setPage((p) => Math.max(1, p - 1));
-                        requestAnimationFrame(() =>
-                          topRef.current?.scrollIntoView({
-                            behavior: "smooth",
-                            block: "start",
-                          }),
-                        );
-                      }}
+                      onClick={() => goToPage(currentPage - 1)}
                       disabled={currentPage <= 1}
                       className="rounded-md border border-border px-2.5 py-1 font-medium hover:bg-muted disabled:opacity-40"
                     >
                       Previous
                     </button>
                     <button
-                      onClick={() => {
-                        setPage((p) => Math.min(lastPage, p + 1));
-                        requestAnimationFrame(() =>
-                          topRef.current?.scrollIntoView({
-                            behavior: "smooth",
-                            block: "start",
-                          }),
-                        );
-                      }}
+                      onClick={() => goToPage(currentPage + 1)}
                       disabled={currentPage >= lastPage}
                       className="rounded-md border border-border px-2.5 py-1 font-medium hover:bg-muted disabled:opacity-40"
                     >

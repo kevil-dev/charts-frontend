@@ -85,9 +85,9 @@ function LoginPageContent() {
 
   useEffect(() => {
     if (!isLoading && user) {
-      router.replace("/charts/apple/us/top");
+      router.replace(from && from.startsWith("/") ? from : "/charts/apple/us/top");
     }
-  }, [isLoading, user, router]);
+  }, [isLoading, user, router, from]);
 
   if (isLoading || user) return null;
 
