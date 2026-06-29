@@ -26,6 +26,12 @@ export default function AuthButtons() {
     const initial = (user.name?.[0] ?? user.email?.[0] ?? "U").toUpperCase();
     return (
       <>
+        <Link
+          href="/lists"
+          className={buttonVariants({ variant: "ghost", size: "lg" })}
+        >
+          My Lists
+        </Link>
         <div className="flex items-center gap-2.5">
           <div
             className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-semibold select-none"

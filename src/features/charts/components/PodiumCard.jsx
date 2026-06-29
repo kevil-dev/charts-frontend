@@ -4,16 +4,18 @@ import { useState } from "react";
 import Image from "next/image";
 import { BookmarkPlusIcon } from "lucide-react";
 import { PlatformIcon, RankMoveBadge } from "./ChartRow";
+import AddToListDropdown from "@/features/lists/components/AddToListDropdown";
 
 export default function PodiumCard({
   row,
   isFirst,
   isSelected,
   onToggle,
-  onAddToList,
   onRowClick,
+  platform,
 }) {
   const [artworkError, setArtworkError] = useState(false);
+  const [addOpen, setAddOpen] = useState(false);
   const isDark = isFirst;
 
   return (
@@ -98,21 +100,28 @@ export default function PodiumCard({
       {/* Bottom row */}
       <div className="flex items-center justify-between">
         <PlatformIcon row={row} dark={isDark} />
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onAddToList(row);
-          }}
-          className={[
-            "flex items-center gap-1.5 rounded-lg border px-[15px] py-[9px] text-sm font-medium transition-colors",
-            isDark
-              ? "bg-white text-[#171717] border-white hover:bg-[#ededed]"
-              : "bg-white text-[#171717] border-[#ebebeb] hover:bg-[#171717] hover:text-white hover:border-[#171717]",
-          ].join(" ")}
-        >
-          <BookmarkPlusIcon className="size-4" />
-          Add to list
-        </button>
+        <div className="relative">
+          <button
+            onMouseDown={(e) => e.stopPropagation()}
+            onClick={(e) => { e.stopPropagation(); setAddOpen((v) => !v); }}
+            className={[
+              "flex items-center gap-1.5 rounded-lg border px-[15px] py-[9px] text-sm font-medium transition-colors",
+              isDark
+                ? "bg-white text-[#171717] border-white hover:bg-[#ededed]"
+                : "bg-white text-[#171717] border-[#ebebeb] hover:bg-[#171717] hover:text-white hover:border-[#171717]",
+            ].join(" ")}
+          >
+            <BookmarkPlusIcon className="size-4" />
+            Add to list
+          </button>
+          <AddToListDropdown
+            rows={[row]}
+            platform={platform}
+            open={addOpen}
+            onClose={() => setAddOpen(false)}
+            anchorClassName="absolute right-0 top-full z-50 mt-2 w-64 rounded-xl border border-border bg-popover shadow-lg"
+          />
+        </div>
       </div>
     </div>
   );

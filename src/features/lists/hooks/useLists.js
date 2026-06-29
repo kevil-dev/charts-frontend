@@ -3,8 +3,8 @@
 import { useState, useEffect, useCallback } from "react";
 import listsApi from "@/features/lists/services/listsApi";
 
-export function useLists() {
-  const [lists, setLists] = useState([]);
+export function useLists(initialData = []) {
+  const [lists, setLists] = useState(initialData);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 

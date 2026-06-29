@@ -2,9 +2,9 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { PlusIcon, CheckIcon, ChevronDownIcon } from "lucide-react";
+import { PlusIcon, CheckIcon, ChevronDownIcon, Loader2Icon } from "lucide-react";
 
-export default function ListSwitcher({ lists = [], currentListId, onCreateList }) {
+export default function ListSwitcher({ lists = [], currentListId, currentList: propCurrentList, onCreateList }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [newTitle, setNewTitle] = useState("");
@@ -12,7 +12,7 @@ export default function ListSwitcher({ lists = [], currentListId, onCreateList }
   const containerRef = useRef(null);
   const inputRef = useRef(null);
 
-  const currentList = lists.find((l) => l.id === currentListId);
+  const currentList = propCurrentList ?? lists.find((l) => l.id === currentListId);
   const visible = lists.slice(0, 50);
 
   useEffect(() => {
@@ -112,7 +112,11 @@ export default function ListSwitcher({ lists = [], currentListId, onCreateList }
                 aria-label="Create list"
                 className="flex size-7 items-center justify-center rounded-md bg-foreground text-background transition-opacity hover:opacity-80 disabled:opacity-40"
               >
-                <PlusIcon className="size-3.5" />
+                {creating ? (
+                  <Loader2Icon className="size-3.5 animate-spin" />
+                ) : (
+                  <PlusIcon className="size-3.5" />
+                )}
               </button>
             </div>
           </div>

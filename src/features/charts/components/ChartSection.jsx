@@ -63,6 +63,7 @@ export default function ChartSection({
           isFetching={isFetching}
           refetch={refetch}
           onRowClick={setSelectedPodcast}
+          platform={platform}
         />
       </div>
       <PodcastDrawer

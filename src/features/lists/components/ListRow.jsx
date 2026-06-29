@@ -8,9 +8,13 @@ export default function ListRow({ item, onDelete }) {
     artist_or_publisher: item.podcast_author,
     artwork: item.artwork_url,
     genre: item.genre,
-    on_apple: item.platform === "apple",
-    on_spotify: item.platform === "spotify",
-    on_youtube: item.platform === "youtube",
+    match_key: item.match_key,
+    on_apple:    item.on_apple    ?? (item.platform === "apple"),
+    apple_url:   item.apple_url   ?? null,
+    on_spotify:  item.on_spotify  ?? (item.platform === "spotify"),
+    spotify_id:  item.spotify_id  ?? null,
+    on_youtube:  item.on_youtube  ?? (item.platform === "youtube"),
+    youtube_url: item.youtube_url ?? null,
   };
 
   return (

@@ -1,17 +1,18 @@
 "use client";
 
 import { useLists } from "@/features/lists/hooks/useLists";
+import { useListDetail } from "@/features/lists/hooks/useListDetail";
 import ListSwitcher from "@/features/lists/components/ListSwitcher";
 
 export default function ListsShell({ initialLists, currentListId }) {
-  const { lists, createList } = useLists();
-  // Use live hook data once loaded; fall back to server-fetched initial lists
-  const displayLists = lists.length > 0 ? lists : initialLists;
+  const { lists, createList } = useLists(initialLists);
+  const { list: currentList } = useListDetail(currentListId);
 
   return (
     <ListSwitcher
-      lists={displayLists}
+      lists={lists}
       currentListId={currentListId}
+      currentList={currentList}
       onCreateList={createList}
     />
   );

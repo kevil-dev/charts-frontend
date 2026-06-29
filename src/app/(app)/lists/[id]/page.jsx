@@ -22,14 +22,11 @@ export default async function ListDetailPage({ params }) {
   const lists = await fetchAllLists();
 
   return (
-    <div>
-      {/* Switcher — constrained width */}
-      <div className="mx-auto max-w-4xl px-6 pt-6 pb-4">
+    <>
+      <div className="mb-4">
         <ListsShell initialLists={lists} currentListId={id} />
       </div>
-
-      {/* ListPage — full width so hero-mesh bleeds edge to edge */}
       <ListPage listId={id} />
-    </div>
+    </>
   );
 }

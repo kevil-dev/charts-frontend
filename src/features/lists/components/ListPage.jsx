@@ -52,20 +52,9 @@ export default function ListPage({ listId }) {
     [list, updateMeta]
   );
 
-  const handleShareToggle = useCallback(async () => {
-    if (!list) return;
-    try {
-      if (list.is_shared) {
-        await listsApi.revokeShare(list.id);
-        updateMeta({ is_shared: false });
-      } else {
-        await listsApi.share(list.id);
-        updateMeta({ is_shared: true });
-      }
-    } catch {
-      // revert silently
-    }
-  }, [list, updateMeta]);
+  const handleShareChange = useCallback((shareToken) => {
+    updateMeta({ share_token: shareToken, is_shared: !!shareToken, is_private: shareToken ? 0 : 1 });
+  }, [updateMeta]);
 
   const handleDelete = useCallback(
     (item) => {
@@ -106,17 +95,14 @@ export default function ListPage({ listId }) {
   const items = list.items ?? [];
 
   return (
-  <div>
-    {/* Hero — full width, no max-w wrapper */}
-    <ListHeader
-      list={list}
-      onUpdate={handleUpdate}
-      onShareToggle={handleShareToggle}
-    />
+    <>
+      <ListHeader
+        list={list}
+        onUpdate={handleUpdate}
+        onShareChange={handleShareChange}
+      />
 
-    {/* Rows — constrained width, same as charts table */}
-    <div className="mx-auto max-w-4xl px-6 mt-6 mb-6">
-      <div className="rounded-xl border border-border bg-card overflow-hidden">
+      <div className="mt-6 rounded-xl border border-border bg-card overflow-hidden">
         {items.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-center">
             <p className="text-base font-medium text-foreground">No podcasts yet</p>
@@ -134,7 +120,6 @@ export default function ListPage({ listId }) {
           ))
         )}
       </div>
-    </div>
-  </div>
-);
+    </>
+  );
 }

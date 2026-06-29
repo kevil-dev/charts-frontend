@@ -1,8 +1,6 @@
 export const navLinks = [
   { href: "/charts/apple/us/top", label: "Charts" },
   { href: "/pricing", label: "Pricing" },
-  { href: "/blog", label: "Blog" },
-  { href: "/about", label: "About" },
 ];
 
 export const footerLinks = [

@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { UserIcon, MapPinIcon, Trash2Icon } from "lucide-react";
+import { UserIcon, MapPinIcon, Trash2Icon, BookmarkPlusIcon } from "lucide-react";
+import AddToListDropdown from "@/features/lists/components/AddToListDropdown";
 
 // Gradient palette for square avatar fallbacks — indexed by (rank % 8)
 const GRADIENTS = [
@@ -191,12 +192,8 @@ export function PlatformIcon({ row, className = "size-4 ", dark = false }) {
   );
 }
 
-export default function ChartRow({ row, isSelected, onToggle, onRowClick }) {
-  function handleAddToList() {
-    // TODO: replace with sonner toast when installed
-    console.log("Add to list:", row.name);
-  }
-
+export default function ChartRow({ row, isSelected, onToggle, onRowClick, platform }) {
+  const [addOpen, setAddOpen] = useState(false);
   const showBadge = row.rank_move === "UP" || row.rank_move === "DOWN";
 
   return (
@@ -299,18 +296,29 @@ export default function ChartRow({ row, isSelected, onToggle, onRowClick }) {
 
       {/* Add to list */}
       <td className="py-3 pr-4 text-right">
-        <button
-          onClick={handleAddToList}
-          className="rounded-md border border-border px-2.5 py-1 text-xs font-medium text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 hover:bg-muted hover:text-foreground focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        >
-          Add to list
-        </button>
+        <div className="relative inline-block">
+          <button
+            onMouseDown={(e) => e.stopPropagation()}
+            onClick={(e) => { e.stopPropagation(); setAddOpen((v) => !v); }}
+            className="rounded-md border border-border px-2.5 py-1 text-xs font-medium text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 hover:bg-muted hover:text-foreground focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            Add to list
+          </button>
+          <AddToListDropdown
+            rows={[row]}
+            platform={platform}
+            open={addOpen}
+            onClose={() => setAddOpen(false)}
+            anchorClassName="absolute right-0 top-full z-50 mt-2 w-64 rounded-xl border border-border bg-popover shadow-lg"
+          />
+        </div>
       </td>
     </tr>
   );
 }
 
-export function ChartRowCard({ row, isSelected, onToggle, onRowClick, listMode = false, onDelete }) {
+export function ChartRowCard({ row, isSelected, onToggle, onRowClick, listMode = false, onDelete, platform }) {
+  const [addOpen, setAddOpen] = useState(false);
   const showBadge =
     !listMode &&
     (row.rank_move === "UP" ||
@@ -416,6 +424,27 @@ export function ChartRowCard({ row, isSelected, onToggle, onRowClick, listMode =
       <div className="shrink-0">
         <PlatformIcon row={row} className="size-3.5" />
       </div>
+
+      {/* Add to list — only in chart mode */}
+      {!listMode && (
+        <div className="relative shrink-0">
+          <button
+            onMouseDown={(e) => e.stopPropagation()}
+            onClick={(e) => { e.stopPropagation(); setAddOpen((v) => !v); }}
+            aria-label={`Add ${row.name} to list`}
+            className="rounded-md p-1.5 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 hover:bg-muted hover:text-foreground focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <BookmarkPlusIcon className="size-4" />
+          </button>
+          <AddToListDropdown
+            rows={[row]}
+            platform={platform}
+            open={addOpen}
+            onClose={() => setAddOpen(false)}
+            anchorClassName="absolute right-0 top-full z-50 mt-2 w-64 rounded-xl border border-border bg-popover shadow-lg"
+          />
+        </div>
+      )}
 
       {/* Delete button — only in list mode when a handler is provided */}
       {listMode && onDelete && (

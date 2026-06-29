@@ -14,7 +14,8 @@ import ChartRow, {
 import { useAuth } from "@/features/auth/context/AuthContext";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { PodiumSkeleton,SkeletonRow } from "./ChartsSkeletons";
-import PodiumCard from "./PodiumCard"
+import PodiumCard from "./PodiumCard";
+import AddToListDropdown from "@/features/lists/components/AddToListDropdown";
 
 export default function ChartTable({
   page,
@@ -25,8 +26,10 @@ export default function ChartTable({
   isFetching,
   refetch,
   onRowClick,
+  platform,
 }) {
   const [selected, setSelected] = useState(new Set());
+  const [bulkAddOpen, setBulkAddOpen] = useState(false);
   const masterRef = useRef(null);
   const { user } = useAuth();
   const isGuest = !user;
@@ -66,15 +69,7 @@ export default function ChartTable({
     setSelected(allSelected ? new Set() : new Set(rowIds));
   }
 
-  function handleBulkAdd() {
-    // TODO: replace with sonner toast when installed
-    console.log("Bulk add:", [...selected]);
-  }
-
-  function handleAddSingle(row) {
-    // TODO: replace with sonner toast when installed
-    console.log("Add to list:", row.name);
-  }
+  const selectedRows = results.filter((r) => selected.has(r.id));
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -173,8 +168,8 @@ export default function ChartTable({
                 isFirst={i === 0}
                 isSelected={selected.has(row.id)}
                 onToggle={toggleRow}
-                onAddToList={handleAddSingle}
                 onRowClick={onRowClick}
+                platform={platform}
               />
             ))}
           </div>
@@ -194,13 +189,23 @@ export default function ChartTable({
                 ? `${selectedCount} of ${results.length} selected`
                 : `${total.toLocaleString()} podcasts`}
             </span>
-            <button
-              onClick={handleBulkAdd}
-              disabled={selectedCount === 0}
-              className="rounded-md bg-primary px-2.5 py-1 text-xs font-medium text-primary-foreground transition-opacity disabled:opacity-40"
-            >
-              Add to list
-            </button>
+            <div className="relative">
+              <button
+                onMouseDown={(e) => e.stopPropagation()}
+                onClick={(e) => { e.stopPropagation(); if (selectedCount > 0) setBulkAddOpen((v) => !v); }}
+                disabled={selectedCount === 0}
+                className="rounded-md bg-primary px-2.5 py-1 text-xs font-medium text-primary-foreground transition-opacity disabled:opacity-40"
+              >
+                Add to list
+              </button>
+              <AddToListDropdown
+                rows={selectedRows}
+                platform={platform}
+                open={bulkAddOpen}
+                onClose={() => setBulkAddOpen(false)}
+                anchorClassName="absolute right-0 top-full z-50 mt-2 w-64 rounded-xl border border-border bg-popover shadow-lg"
+              />
+            </div>
           </div>
         </div>
 
@@ -235,6 +240,7 @@ export default function ChartTable({
                     isSelected={selected.has(row.id)}
                     onToggle={toggleRow}
                     onRowClick={onRowClick}
+                    platform={platform}
                   />
                 ))}
               </tbody>
@@ -250,6 +256,7 @@ export default function ChartTable({
                 isSelected={selected.has(row.id)}
                 onToggle={toggleRow}
                 onRowClick={onRowClick}
+                platform={platform}
               />
             ))}
           </div>
