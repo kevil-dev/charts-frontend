@@ -6,6 +6,7 @@ import DynamicBreadcrumb from "./DynamicBreadcrumb";
 import PlatformTabs from "./PlatformTabs";
 import ChartFilters from "./ChartFilters";
 import { useFilters } from "@/features/charts/hooks/useFilters";
+import { useState, useEffect } from "react";
 export default function ChartHero({
   platform,
   country,
@@ -19,6 +20,11 @@ export default function ChartHero({
   isFetching,
 }) {
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const currentPlatform = platform;
   const currentCountry = country;
@@ -101,14 +107,14 @@ export default function ChartHero({
         {/* Refresh */}
         <button
           onClick={refetch}
-          disabled={isFetching || !refetch}
+          disabled={!mounted || isFetching}
           aria-label="Refresh chart data"
           className="flex shrink-0 items-center gap-1 rounded-md px-2.5 py-1.5 text-xs font-medium text-muted-foreground hover:bg-muted hover:text-foreground disabled:opacity-50"
         >
           <RefreshCwIcon
             className={`size-3.5 ${isFetching ? "animate-spin" : ""}`}
           />
-          {isFetching ? "Refreshing…" : "Refresh"}
+           {mounted && isFetching ? "Refreshing…" : "Refresh"}
         </button>
       </div>
       {/* ── /Filter bar ────────────────────────────────────────────────────── */}

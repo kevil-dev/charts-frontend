@@ -10,6 +10,7 @@ const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
 });
+import QueryProvider from "@/components/providers/QueryProvider"
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
@@ -18,7 +19,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Million Charts",
-  description: "Million Podcasts — ranked charts across Apple, Spotify, and YouTube.",
+  description:
+    "Million Podcasts — ranked charts across Apple, Spotify, and YouTube.",
 };
 
 export default function RootLayout({
@@ -36,15 +38,14 @@ export default function RootLayout({
           src="https://accounts.google.com/gsi/client"
           strategy="afterInteractive"
         />
-        <AuthProvider>
-
-          <LeftLinks />
-          <main className="flex-1">
-            {children}
-          </main>
-          <Footer />
-          <Toaster position="bottom-right" />
-        </AuthProvider>
+        <QueryProvider>
+          <AuthProvider>
+            <LeftLinks />
+            <main className="flex-1">{children}</main>
+            <Footer />
+            <Toaster position="bottom-right" />
+          </AuthProvider>
+        </QueryProvider>
       </body>
     </html>
   );
