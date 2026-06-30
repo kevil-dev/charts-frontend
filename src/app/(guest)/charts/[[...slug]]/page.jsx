@@ -1,5 +1,6 @@
 import { cache } from "react";
 import { redirect } from "next/navigation";
+import { dehydrate, HydrationBoundary, QueryClient } from "@tanstack/react-query";
 import ChartSection from "@/features/charts/components/ChartSection";
 import { platforms } from "../../../../../config/charts";
 
@@ -14,6 +15,27 @@ const fetchMeta = cache(async (platform, country, category) => {
       `${backendUrl}/charts/meta?platform=${platform}&country=${country}&chart=${category}`,
       { next: { revalidate: 3600 } }
     );
+    if (!res.ok) return null;
+    const json = await res.json();
+    return json.data ?? null;
+  } catch {
+    return null;
+  }
+});
+
+const fetchCharts = cache(async (platform, country, category, page) => {
+  const backendUrl = process.env.INTERNAL_API_URL;
+  try {
+    const params = new URLSearchParams({
+      platform,
+      country: country.toUpperCase(),
+      chart: category,
+      page: String(page),
+      limit: "50",
+    });
+    const res = await fetch(`${backendUrl}/charts?${params.toString()}`, {
+      cache: "no-store",
+    });
     if (!res.ok) return null;
     const json = await res.json();
     return json.data ?? null;
@@ -58,22 +80,36 @@ export default async function ChartPage({ params, searchParams }) {
   if (canonicalUrl) redirect(canonicalUrl);
 
   const [platform, country, category] = slug;
-
-  const meta = await fetchMeta(platform, country, category);
-  if (!meta) redirect(FALLBACK_URL);
-
+  const lowerCountry = country.toLowerCase();
   const currentPage = Math.max(1, parseInt(resolvedSearch?.page) || 1);
 
+  const [meta, charts] = await Promise.all([
+    fetchMeta(platform, country, category),
+    fetchCharts(platform, lowerCountry, category, currentPage),
+  ]);
+
+  if (!meta) redirect(FALLBACK_URL);
+
+  const queryClient = new QueryClient();
+  if (charts) {
+    queryClient.setQueryData(
+      ["charts", platform, lowerCountry, category, currentPage],
+      charts
+    );
+  }
+
   return (
-    <ChartSection
-      platform={platform}
-      country={country.toLowerCase()}
-      category={category}
-      platformLabel={meta.platform_label}
-      countryName={meta.country_name}
-      countryFlag={meta.country_flag}
-      chartLabel={meta.chart_label}
-      currentPage={currentPage}
-    />
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <ChartSection
+        platform={platform}
+        country={lowerCountry}
+        category={category}
+        platformLabel={meta.platform_label}
+        countryName={meta.country_name}
+        countryFlag={meta.country_flag}
+        chartLabel={meta.chart_label}
+        currentPage={currentPage}
+      />
+    </HydrationBoundary>
   );
 }
