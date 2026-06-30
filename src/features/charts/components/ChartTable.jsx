@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import {
   AlertCircleIcon,
   RefreshCwIcon,
@@ -45,7 +45,7 @@ export default function ChartTable({
   const showPodium = isFirstPage && results.length >= 3;
   const podiumRows = showPodium ? results.slice(0, 3) : [];
   const tableRows = results;
-  const rowIds = results.map((r) => r.id);
+  const rowIds = useMemo(() => results.map((r) => r.id), [results]);
 
   useEffect(() => {
     if (!masterRef.current) return;
@@ -69,7 +69,10 @@ export default function ChartTable({
     setSelected(allSelected ? new Set() : new Set(rowIds));
   }
 
-  const selectedRows = results.filter((r) => selected.has(r.id));
+  const selectedRows = useMemo(
+    () => results.filter((r) => selected.has(r.id)),
+    [results, selected]
+  );
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();

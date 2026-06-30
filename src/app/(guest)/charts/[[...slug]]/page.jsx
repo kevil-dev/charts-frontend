@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { redirect } from "next/navigation";
 import ChartSection from "@/features/charts/components/ChartSection";
 import { platforms } from "../../../../../config/charts";
@@ -6,8 +7,8 @@ const VALID_PLATFORMS = platforms.map((p) => p.slug);
 const DEFAULT = { platform: "apple", country: "us", category: "top" };
 const FALLBACK_URL = `/charts/${DEFAULT.platform}/${DEFAULT.country}/${DEFAULT.category}`;
 
-async function fetchMeta(platform, country, category) {
-  const backendUrl = process.env.NEXT_PUBLIC_API_URL;
+const fetchMeta = cache(async (platform, country, category) => {
+  const backendUrl = process.env.INTERNAL_API_URL;
   try {
     const res = await fetch(
       `${backendUrl}/charts/meta?platform=${platform}&country=${country}&chart=${category}`,
@@ -19,6 +20,24 @@ async function fetchMeta(platform, country, category) {
   } catch {
     return null;
   }
+});
+
+function computeCanonicalSlug(slug) {
+  const [platform, country, category] = slug;
+
+  const resolvedPlatform =
+    platform && VALID_PLATFORMS.includes(platform) ? platform : DEFAULT.platform;
+  const resolvedCountry = country || DEFAULT.country;
+  const resolvedCategory = category || DEFAULT.category;
+
+  const isCanonical =
+    resolvedPlatform === platform &&
+    resolvedCountry === country &&
+    resolvedCategory === category;
+
+  if (isCanonical) return null;
+
+  return `/charts/${resolvedPlatform}/${resolvedCountry}/${resolvedCategory}`;
 }
 
 export async function generateMetadata({ params }) {
@@ -35,13 +54,10 @@ export default async function ChartPage({ params, searchParams }) {
   const { slug = [] } = await params;
   const resolvedSearch = await searchParams;
 
-  if (slug.length === 0) redirect(FALLBACK_URL);
+  const canonicalUrl = computeCanonicalSlug(slug);
+  if (canonicalUrl) redirect(canonicalUrl);
 
   const [platform, country, category] = slug;
-
-  if (!platform || !VALID_PLATFORMS.includes(platform)) redirect(FALLBACK_URL);
-  if (!country) redirect(`/charts/${platform}/${DEFAULT.country}/${DEFAULT.category}`);
-  if (!category) redirect(`/charts/${platform}/${country}/${DEFAULT.category}`);
 
   const meta = await fetchMeta(platform, country, category);
   if (!meta) redirect(FALLBACK_URL);

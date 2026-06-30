@@ -26,6 +26,8 @@ export default function ChartSection({
   countryFlag,
   chartLabel,
   currentPage,
+  initialCharts,
+  initialFilters
 }) {
   const [selectedPodcast, setSelectedPodcast] = useState(null);
 
@@ -34,6 +36,7 @@ export default function ChartSection({
     country,
     category,
     page: currentPage,
+    initialData: initialCharts
   });
 
   const runDate = formatRunDate(data?.run_date);
@@ -51,6 +54,7 @@ export default function ChartSection({
         runDate={runDate}
         refetch={refetch}
         isFetching={isFetching}
+        initialFilters={initialFilters}
       />
       <div className="mt-8 border-t border-border pt-6">
         <ChartTable

@@ -1,12 +1,11 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { RefreshCwIcon } from "lucide-react";
 import DynamicBreadcrumb from "./DynamicBreadcrumb";
 import PlatformTabs from "./PlatformTabs";
 import ChartFilters from "./ChartFilters";
 import { useFilters } from "@/features/charts/hooks/useFilters";
-import { useState, useEffect } from "react";
+
 export default function ChartHero({
   platform,
   country,
@@ -16,15 +15,9 @@ export default function ChartHero({
   countryFlag,
   chartLabel,
   runDate,
-  refetch,
-  isFetching,
+  initialFilters
 }) {
   const router = useRouter();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const currentPlatform = platform;
   const currentCountry = country;
@@ -34,7 +27,7 @@ export default function ChartHero({
     countries: liveCountries,
     genres: liveGenres,
     isLoading: filtersLoading,
-  } = useFilters({ platform: currentPlatform, country: currentCountry });
+  } = useFilters({ platform: currentPlatform, country: currentCountry ,initialData : initialFilters});
 
   /** Push a new URL, preserving whatever segments aren't being changed. */
   function navigate({ platform, country, category } = {}) {
@@ -101,21 +94,6 @@ export default function ChartHero({
           filtersLoading={filtersLoading}
         />
 
-        {/* Divider */}
-        <div className="mx-1 h-6 w-px shrink-0 bg-border" aria-hidden="true" />
-
-        {/* Refresh */}
-        <button
-          onClick={refetch}
-          disabled={!mounted || isFetching}
-          aria-label="Refresh chart data"
-          className="flex shrink-0 items-center gap-1 rounded-md px-2.5 py-1.5 text-xs font-medium text-muted-foreground hover:bg-muted hover:text-foreground disabled:opacity-50"
-        >
-          <RefreshCwIcon
-            className={`size-3.5 ${isFetching ? "animate-spin" : ""}`}
-          />
-           {mounted && isFetching ? "Refreshing…" : "Refresh"}
-        </button>
       </div>
       {/* ── /Filter bar ────────────────────────────────────────────────────── */}
     </div>

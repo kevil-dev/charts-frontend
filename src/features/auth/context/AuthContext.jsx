@@ -5,9 +5,9 @@ import { authApi } from "@/features/auth/services/authApi";
 
 const AuthContext = createContext(null);
 
-export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+export function AuthProvider({ children, initialUser = null }) {
+  const [user, setUser] = useState(initialUser);
+  const [isLoading, setIsLoading] = useState(!initialUser);
 
   useEffect(() => {
     authApi

@@ -1,17 +1,14 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import CreateFirstList from "../../../features/lists/components/CreateFirstList";
+import CreateFirstList from "@/features/lists/components/CreateFirstList";
 
 async function fetchLists() {
   const cookieStore = await cookies();
   try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/lists`,
-      {
-        headers: { Cookie: cookieStore.toString() },
-        cache: "no-store",
-      }
-    );
+    const res = await fetch(`${process.env.INTERNAL_API_URL}/lists`, {
+      headers: { Cookie: cookieStore.toString() },
+      cache: "no-store",
+    });
     if (!res.ok) return [];
     const json = await res.json();
     return json.data?.lists ?? [];

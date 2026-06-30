@@ -1,45 +1,48 @@
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import LeftLinks from "@/components/layout/LeftLinks";
 import Footer from "@/components/layout/Footer";
 import { AuthProvider } from "@/features/auth/context/AuthContext";
+import QueryProvider from "@/components/providers/QueryProvider";
 import Script from "next/script";
 import { Toaster } from "sonner";
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-import QueryProvider from "@/components/providers/QueryProvider"
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
+const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Million Charts",
-  description:
-    "Million Podcasts — ranked charts across Apple, Spotify, and YouTube.",
+  description: "Million Podcasts — ranked charts across Apple, Spotify, and YouTube.",
 };
 
-export default function RootLayout({
+async function getServerUser() {
+  const cookieStore = await cookies();
+  try {
+    const res = await fetch(`${process.env.INTERNAL_API_URL}/auth/me`, {
+      headers: { Cookie: cookieStore.toString() },
+      cache: "no-store",
+    });
+    if (!res.ok) return null;
+    const json = await res.json();
+    return json.data?.user ?? json.data ?? null;
+  } catch {
+    return null;
+  }
+}
+
+export default async function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
+  const initialUser = await getServerUser();
+
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
-        <Script
-          src="https://accounts.google.com/gsi/client"
-          strategy="afterInteractive"
-        />
+        <Script src="https://accounts.google.com/gsi/client" strategy="afterInteractive" />
         <QueryProvider>
-          <AuthProvider>
+          <AuthProvider initialUser={initialUser}>
             <LeftLinks />
             <main className="flex-1">{children}</main>
             <Footer />

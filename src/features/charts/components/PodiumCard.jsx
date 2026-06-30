@@ -64,6 +64,7 @@ export default function PodiumCard({
               alt={row.name}
               width={56}
               height={56}
+              priority={isFirst}
               className="size-14 rounded-full object-cover"
               onError={() => setArtworkError(true)}
             />

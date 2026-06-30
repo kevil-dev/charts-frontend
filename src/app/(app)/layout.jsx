@@ -3,9 +3,13 @@ import { redirect } from "next/navigation";
 
 export default async function AppLayout({ children }) {
   const cookieStore = await cookies();
-  const token = cookieStore.get("mp_token");
 
-  if (!token) {
+  const res = await fetch(`${process.env.INTERNAL_API_URL}/auth/me`, {
+    headers: { Cookie: cookieStore.toString() },
+    cache: "no-store",
+  });
+
+  if (!res.ok) {
     redirect("/login");
   }
 

@@ -5,7 +5,7 @@ import ListRow from "@/features/lists/components/ListRow";
 async function fetchSharedList(token) {
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/lists/shared/${token}`,
+      `${process.env.INTERNAL_API_URL}/lists/shared/${token}`,
       { cache: "no-store" }
     );
     if (!res.ok) return null;

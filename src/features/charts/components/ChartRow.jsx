@@ -5,6 +5,13 @@ import Image from "next/image";
 import { UserIcon, MapPinIcon, Trash2Icon, BookmarkPlusIcon } from "lucide-react";
 import AddToListDropdown from "@/features/lists/components/AddToListDropdown";
 
+const SIZE_CLASSES = {
+  8: "size-8",
+  10: "size-10",
+  14: "size-14",
+  20: "size-20",
+};
+
 // Gradient palette for square avatar fallbacks — indexed by (rank % 8)
 const GRADIENTS = [
   ["#0070f3", "#00dfd8"], // rank % 8 === 0
@@ -29,7 +36,7 @@ function ArtworkFallback({ name, size = 10, square = false, rank = 1 }) {
     const [colorA, colorB] = GRADIENTS[rank % 8];
     return (
       <div
-        className={`flex size-${size} shrink-0 items-center justify-center rounded-lg text-sm font-bold text-white`}
+        className={`flex ${SIZE_CLASSES[size] ?? "size-10"} shrink-0 items-center justify-center rounded-lg text-sm font-bold text-white`}
         style={{
           background: `linear-gradient(135deg, ${colorA} 0%, ${colorB} 100%)`,
         }}
@@ -42,7 +49,7 @@ function ArtworkFallback({ name, size = 10, square = false, rank = 1 }) {
   const hue = nameToHue(name);
   return (
     <div
-      className={`flex size-${size} shrink-0 items-center justify-center rounded-full text-sm font-bold text-white`}
+      className={`flex ${SIZE_CLASSES[size] ?? "size-10"} shrink-0 items-center justify-center rounded-full text-sm font-bold text-white`}
       style={{ background: `hsl(${hue}deg 55% 45%)` }}
       aria-hidden="true"
     >
@@ -62,7 +69,7 @@ export function Artwork({ src, name, size = 10, square = false, rank = 1 }) {
 
   return (
     <div
-      className={`relative size-${size} shrink-0 overflow-hidden ${square ? "rounded-lg" : "rounded-full"}`}
+      className={`relative ${SIZE_CLASSES[size] ?? "size-10"} shrink-0 overflow-hidden ${square ? "rounded-lg" : "rounded-full"}`}
     >
       <Image
         src={src}

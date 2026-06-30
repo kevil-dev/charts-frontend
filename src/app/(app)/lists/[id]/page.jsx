@@ -5,7 +5,7 @@ import ListPage from "@/features/lists/components/ListPage";
 async function fetchAllLists() {
   const cookieStore = await cookies();
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/lists`, {
+    const res = await fetch(`${process.env.INTERNAL_API_URL}/lists`, {
       headers: { Cookie: cookieStore.toString() },
       cache: "no-store",
     });
