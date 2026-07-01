@@ -7,6 +7,7 @@ import { XIcon, LockIcon, ArrowLeftIcon, Loader2Icon, ExternalLinkIcon } from "l
 import { useAuth } from "@/features/auth/context/AuthContext";
 import { RankMoveBadge } from "./ChartRow";
 import { usePodcastMeta } from "@/features/podcasts/hooks/usePodcastMeta";
+import { resolveTier } from "@/features/billing/utils/resolveTier";
 
 // ── tiny inline sparkline for rank_history (elite only) ───────────────────────
 function RankSparkline({ data }) {
@@ -92,10 +93,74 @@ function UpgradeGate({ message }) {
   );
 }
 
-// ── main drawer ───────────────────────────────────────────────────────────────
+// ── blurred pro-tier preview for free plan users ───────────────────────────────
+const DUMMY_PRO_ROWS = [
+  { label: "Full Description", value: "An in-depth weekly exploration of technology, culture, and the forces shaping the modern world through expert interviews and narrative storytelling." },
+  { label: "Release Frequency", value: "Weekly" },
+  { label: "Avg Episode Length", value: "48 min" },
+  { label: "Language", value: "English" },
+  { label: "Content Rating", value: "Clean" },
+  { label: "First Published", value: "Mar 2017" },
+  { label: "Latest Episode", value: "Jun 2025" },
+];
+
+function LockedProSection() {
+  return (
+    <div className="relative mt-2">
+      {/* Blurred dummy content */}
+      <div
+        className="px-5 flex flex-col gap-5 pb-4 select-none pointer-events-none"
+        aria-hidden="true"
+        style={{ filter: "blur(5px)", opacity: 0.6 }}
+      >
+        <div className="h-px bg-border" />
+        {DUMMY_PRO_ROWS.map((row) => (
+          <div key={row.label}>
+            <p className="text-xs font-medium text-muted-foreground mb-0.5 uppercase tracking-wide">
+              {row.label}
+            </p>
+            <p className="text-sm text-foreground">{row.value}</p>
+          </div>
+        ))}
+        <div className="flex flex-col gap-2">
+          <span className="inline-flex items-center gap-1.5 text-sm text-[var(--brand-link)]">
+            Website <ExternalLinkIcon className="size-3" />
+          </span>
+          <span className="inline-flex items-center gap-1.5 text-sm text-[var(--brand-link)]">
+            RSS Feed <ExternalLinkIcon className="size-3" />
+          </span>
+        </div>
+      </div>
+
+      {/* Lock overlay */}
+      <div className="absolute inset-0 flex flex-col items-center justify-center px-8 text-center">
+        <div className="rounded-2xl border border-border bg-background/90 backdrop-blur-sm px-6 py-5 shadow-lg flex flex-col items-center">
+          <div className="flex size-9 items-center justify-center rounded-full bg-muted mb-3">
+            <LockIcon className="size-4 text-muted-foreground" />
+          </div>
+          <p className="text-sm font-semibold text-foreground mb-1">
+            Pro metadata locked
+          </p>
+          <p className="text-xs text-muted-foreground mb-4">
+            Upgrade to Pro for full show profiles, episode stats, links, and more.
+          </p>
+          <Link
+            href="/pricing"
+            className="inline-flex items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-80 transition-opacity"
+          >
+            Upgrade to view
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
 export default function PodcastDrawer({ podcast, onClose }) {
   const { user } = useAuth();
   const isGuest = !user;
+  const isFree = resolveTier(user) === "free";
   const isOpen = !!podcast;
   const [artworkError, setArtworkError] = useState(false);
 
@@ -106,6 +171,7 @@ export default function PodcastDrawer({ podcast, onClose }) {
 
   const upgradeError = error?.code === "UPGRADE";
   const notFound = error?.code === "NO_DATA_FOUND";
+
 
   useEffect(() => { setArtworkError(false); }, [podcast?.id]);
 
@@ -286,7 +352,11 @@ export default function PodcastDrawer({ podcast, onClose }) {
                     <MetaRow label="Episodes" value={meta.episode_count.toLocaleString("en-IN")} />
                   )}
 
-                  {/* ── Pro tier fields ── */}
+                  {/* ── Locked pro preview for free users ── */}
+                  {isFree && !isLoading && meta && <LockedProSection />}
+
+                  {/* ── Pro tier fields (pro/elite only — won't render for free users) ── */}
+
                   {meta?.long_description && (
                     <div>
                       <p className="text-xs font-medium text-muted-foreground mb-0.5 uppercase tracking-wide">
