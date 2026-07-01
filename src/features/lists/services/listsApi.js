@@ -30,6 +30,9 @@ const listsApi = {
 
   removeItem: (listId, itemId) =>
     api.delete(`/lists/${listId}/items/${itemId}`),
+
+  emailExport: (id, { format, recipient, email }) =>
+    api.post(`/lists/${id}/email`, { format, recipient, email }),
 };
 
 export default listsApi;

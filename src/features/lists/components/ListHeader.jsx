@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import listsApi from "@/features/lists/services/listsApi";
+import EmailExportModal from "./EmailExportModal";
 
 // ── Export helpers ────────────────────────────────────────────────────────────
 
@@ -348,6 +349,7 @@ export default function ListHeader({
   const router = useRouter();
   const [exportOpen, setExportOpen] = useState(false);
   const [shareModalOpen, setShareModalOpen] = useState(false);
+  const [emailModalOpen, setEmailModalOpen] = useState(false);
   const exportRef = useRef(null);
 
   const items = list?.items ?? [];
@@ -458,6 +460,16 @@ export default function ListHeader({
                     >
                       Export as JSON
                     </button>
+                    <button
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        setEmailModalOpen(true);
+                        setExportOpen(false);
+                      }}
+                      className="w-full px-4 py-2.5 text-left text-sm hover:bg-muted transition-colors border-t border-border"
+                    >
+                      Email export
+                    </button>
                   </div>
                 )}
               </div>
@@ -472,6 +484,14 @@ export default function ListHeader({
           list={list}
           onClose={() => setShareModalOpen(false)}
           onShareChange={onShareChange}
+        />
+      )}
+
+      {/* Email Export modal */}
+      {emailModalOpen && (
+        <EmailExportModal
+          list={list}
+          onClose={() => setEmailModalOpen(false)}
         />
       )}
     </>
