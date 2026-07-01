@@ -20,8 +20,11 @@ export default function CreateFirstList() {
       const res = await listsApi.create(t);
       const newList = res.list;
       if (newList?.id) router.push(`/lists/${newList.id}`);
-    } catch {
+    } catch (err) {
       setCreating(false);
+      if (err?.code === "LIMIT_EXCEEDED") {
+        router.push("/pricing");
+      }
     }
   }
 

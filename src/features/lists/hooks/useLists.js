@@ -25,11 +25,20 @@ export function useLists(initialData = []) {
   }, [fetchLists]);
 
   const createList = useCallback(async (title, description = null) => {
-    const res = await listsApi.create(title, description);
-    const newList = res.list ?? null;
-    if (!newList) throw new Error("Failed to create list");
-    setLists((prev) => [newList, ...prev]);
-    return newList;
+    try {
+      const res = await listsApi.create(title, description);
+      const newList = res.list ?? null;
+      if (!newList) throw new Error("Failed to create list");
+      setLists((prev) => [newList, ...prev]);
+      return newList;
+    } catch (err) {
+      if (err?.code === "LIMIT_EXCEEDED") {
+        const limitErr = new Error("List limit reached");
+        limitErr.code = "LIMIT_EXCEEDED";
+        throw limitErr;
+      }
+      throw err;
+    }
   }, []);
 
   const deleteList = useCallback(async (id) => {

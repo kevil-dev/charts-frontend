@@ -57,18 +57,41 @@ export function useAddToList() {
   }, []);
 
   const createList = useCallback(async (title) => {
-    const res = await listsApi.create(title);
-    const newList = res.list ?? null;
-    if (!newList) throw new Error("Failed to create list");
-    listsCache = listsCache ? [newList, ...listsCache] : [newList];
-    setLists((prev) => [newList, ...prev]);
-    return newList;
+    try {
+      const res = await listsApi.create(title);
+      const newList = res.list ?? null;
+      if (!newList) throw new Error("Failed to create list");
+      listsCache = listsCache ? [newList, ...listsCache] : [newList];
+      setLists((prev) => [newList, ...prev]);
+      return newList;
+    } catch (err) {
+      if (err?.code === "LIMIT_EXCEEDED") {
+        const limitErr = new Error("List limit reached");
+        limitErr.code = "LIMIT_EXCEEDED";
+        throw limitErr;
+      }
+      throw err;
+    }
   }, []);
 
   const createListAndAdd = useCallback(async (title, row, platform) => {
-    const newList = await createList(title);
-    await addPodcastToList(newList.id, newList.title, row, platform);
-    return newList;
+    try {
+      const newList = await createList(title);
+      await addPodcastToList(newList.id, newList.title, row, platform);
+      return newList;
+    } catch (err) {
+      if (err?.code === "LIMIT_EXCEEDED") {
+        toast.error("List limit reached — upgrade to create more.", {
+          action: {
+            label: "Upgrade",
+            onClick: () => { window.location.href = "/pricing"; },
+          },
+          duration: 6000,
+        });
+        return null;
+      }
+      throw err;
+    }
   }, [createList, addPodcastToList]);
 
   const addManyToList = useCallback(async (listId, listTitle, rows, platform) => {

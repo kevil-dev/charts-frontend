@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { PlusIcon, CheckIcon, ChevronDownIcon, Loader2Icon } from "lucide-react";
+import { toast } from "sonner";
 
 export default function ListSwitcher({ lists = [], currentListId, currentList: propCurrentList, onCreateList }) {
   const router = useRouter();
@@ -36,6 +37,17 @@ export default function ListSwitcher({ lists = [], currentListId, currentList: p
       setNewTitle("");
       setOpen(false);
       if (newList?.id) router.push(`/lists/${newList.id}`);
+    } catch (err) {
+      if (err?.code === "LIMIT_EXCEEDED") {
+        toast.error("List limit reached — upgrade to create more.", {
+          action: {
+            label: "Upgrade",
+            onClick: () => router.push("/pricing"),
+          },
+          duration: 6000,
+        });
+        setOpen(false);
+      }
     } finally {
       setCreating(false);
     }
