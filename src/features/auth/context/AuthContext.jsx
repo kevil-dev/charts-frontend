@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { authApi } from "@/features/auth/services/authApi";
 
 const AuthContext = createContext(null);
@@ -9,14 +9,14 @@ export function AuthProvider({ children, initialUser = null }) {
   const [user, setUser] = useState(initialUser);
   const [isLoading, setIsLoading] = useState(!initialUser);
 
-  async function refetchUser() {
+  const refetchUser = useCallback(async function refetchUser() {
     try {
       const data = await authApi.me();
       setUser(data.user ?? data);
     } catch {
       setUser(null);
     }
-  }
+  }, []);
 
   useEffect(() => {
     refetchUser().finally(() => setIsLoading(false));

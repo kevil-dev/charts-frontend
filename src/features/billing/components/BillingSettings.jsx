@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { Loader2Icon } from "lucide-react";
 import { useBillingStatus } from "@/features/billing/hooks/useBillingStatus";
 import { billingApi } from "@/features/billing/services/billingApi";
+import { useAuth } from "@/features/auth/context/AuthContext";
 
 const STATUS_LABELS = {
   trialing: "Trialing",
@@ -30,8 +31,10 @@ function formatDate(dateStr) {
 export default function BillingSettings() {
   const { data, isLoading } = useBillingStatus();
   const queryClient = useQueryClient();
+  const { refetchUser } = useAuth();
   const [confirming, setConfirming] = useState(false);
   const [canceling, setCanceling] = useState(false);
+  const [upgrading, setUpgrading] = useState(false);
 
   if (isLoading || !data) {
     return <p className="text-sm text-muted-foreground">Loading…</p>;
@@ -63,6 +66,20 @@ export default function BillingSettings() {
   const tierName = TIER_NAMES[selected_tier] ?? selected_tier;
   const statusLabel = STATUS_LABELS[plan_status] ?? plan_status;
   const canCancel = ["trialing", "active"].includes(plan_status) && !cancel_at_period_end;
+
+  async function handleUpgrade() {
+    setUpgrading(true);
+    try {
+      await billingApi.upgrade();
+      await queryClient.invalidateQueries({ queryKey: ["billing-status"] });
+      await refetchUser();
+      toast("Upgraded to Elite.");
+    } catch (err) {
+      toast.error(err.message || "Couldn't upgrade — please try again.");
+    } finally {
+      setUpgrading(false);
+    }
+  }
 
   async function handleCancel() {
     setCanceling(true);
@@ -107,6 +124,17 @@ export default function BillingSettings() {
             Next billing date {formatDate(current_period_end)}
           </p>
         )
+      )}
+
+      {selected_tier === "pro" && ["trialing", "active"].includes(plan_status) && (
+        <button
+          onClick={handleUpgrade}
+          disabled={upgrading}
+          className="mt-4 flex items-center gap-2 rounded-lg bg-[#171717] px-4 py-2.5 text-sm font-medium text-white transition-opacity hover:opacity-80 disabled:opacity-50"
+        >
+          {upgrading && <Loader2Icon className="size-4 animate-spin" />}
+          Upgrade to Elite
+        </button>
       )}
 
       {canCancel && (

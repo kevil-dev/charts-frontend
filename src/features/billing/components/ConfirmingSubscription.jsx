@@ -7,8 +7,8 @@ import { Loader2Icon } from "lucide-react";
 import { billingApi } from "@/features/billing/services/billingApi";
 import { useAuth } from "@/features/auth/context/AuthContext";
 
-const POLL_INTERVAL_MS = 1500;
-const MAX_ATTEMPTS = 12;
+const POLL_INTERVAL_MS = 2000;
+const MAX_ATTEMPTS = 20;
 const PAID_STATUSES = ["trialing", "active"];
 
 export default function ConfirmingSubscription() {

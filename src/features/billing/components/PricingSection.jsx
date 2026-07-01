@@ -36,7 +36,7 @@ const TIERS = [
 ];
 
 export default function PricingSection() {
-  const { user } = useAuth();
+  const { user, refetchUser } = useAuth();
   const [billingInterval, setBillingInterval] = useState("monthly");
   const [pendingTier, setPendingTier] = useState(null);
   const userTier = resolveTier(user);
@@ -48,6 +48,19 @@ export default function PricingSection() {
       window.location.href = res.url;
     } catch (err) {
       toast.error(err.message || "Something went wrong — please try again.");
+      setPendingTier(null);
+    }
+  }
+
+  async function handleUpgrade() {
+    setPendingTier("elite");
+    try {
+      await billingApi.upgrade();
+      await refetchUser();
+      toast("Upgraded to Elite.");
+    } catch (err) {
+      toast.error(err.message || "Something went wrong — please try again.");
+    } finally {
       setPendingTier(null);
     }
   }
@@ -67,19 +80,16 @@ export default function PricingSection() {
       return { label: "Manage subscription", href: "/billing" };
     }
 
-    // Elite users have the top tier, no upgrades available
-    if (userTier === "elite") return null;
+    if (userTier === "pro" && tier === "elite") {
+      return {
+        label: pendingTier === "elite" ? "Upgrading…" : "Upgrade to Elite",
+        onClick: () => handleUpgrade(),
+        pending: pendingTier === "elite",
+      };
+    }
 
-    // Pro users can only upgrade to Elite
-    if (userTier === "pro") {
-      if (tier === "elite") {
-        return {
-          label: pendingTier === tier ? "Redirecting…" : "Upgrade to Elite",
-          onClick: () => handleCheckout(tier),
-          pending: pendingTier === tier,
-        };
-      }
-      return null;
+    if (userTier === "pro" || userTier === "elite") {
+      return null; // no downgrade path
     }
 
     // Free users
