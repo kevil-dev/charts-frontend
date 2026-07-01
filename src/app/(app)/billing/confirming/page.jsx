@@ -1,0 +1,7 @@
+import ConfirmingSubscription from "@/features/billing/components/ConfirmingSubscription";
+
+export const metadata = { title: "Confirming subscription — Million Podcasts" };
+
+export default function ConfirmingPage() {
+  return <ConfirmingSubscription />;
+}

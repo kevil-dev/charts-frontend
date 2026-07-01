@@ -52,6 +52,16 @@ src/
 ├── services/             # chartsApi.js
 
 └── utils/                # normalise.js, any pure helpers
+
+└── billing/
+    ├── components/           # Pricing cards, billing status UI
+    ├── hooks/                # useBillingStatus.js
+    ├── services/             # billingApi.js
+    └── utils/                # resolveTier.js — pure function, no imports
+
+└── podcasts/
+    ├── services/             # podcastMetaApi.js
+    └── hooks/                # usePodcastMeta.js
 ## 3. Rules for placing new files
 
 - New chart UI component → `src/features/charts/components/`
@@ -60,6 +70,13 @@ src/
 - New lists UI component → `src/features/lists/components/`
 - New lists hook → `src/features/lists/hooks/`
 - New lists API call → `src/features/lists/services/listsApi.js`
+- New billing UI component → `src/features/billing/components/`
+- New billing hook → `src/features/billing/hooks/`
+- New billing API call → `src/features/billing/services/billingApi.js`
+- Tier resolution logic (UI display only, never for access control) →
+  `src/features/billing/utils/resolveTier.js`
+- New podcast metadata API call → `src/features/podcasts/services/podcastMetaApi.js`
+- New podcast metadata hook → `src/features/podcasts/hooks/`
 - New auth UI component → `src/features/auth/components/`
 - New feature entirely → `src/features/<feature-name>/` with the same sub-structure
 - Global reusable UI (not feature-specific) → `src/components/ui/` or `src/components/layout/`
@@ -75,6 +92,9 @@ src/
 - Charts API: `@/features/charts/services/chartsApi`
 - Charts hooks: `@/features/charts/hooks/useCharts` etc.
 - Lists API: `@/features/lists/services/listsApi`
+- Billing API: `@/features/billing/services/billingApi`
+- Tier resolution: `@/features/billing/utils/resolveTier`
+- Podcast metadata API: `@/features/podcasts/services/podcastMetaApi`
 
 ## 5. Auth pattern — strictly enforced
 

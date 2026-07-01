@@ -24,8 +24,8 @@ export default function PodiumCard({
       className={[
         "rounded-xl p-[22px] flex flex-col relative cursor-pointer",
         isDark
-          ? "bg-[#171717] text-white border border-[#2a2a2e]"
-          : "bg-white border border-border text-foreground",
+          ? "bg-[#171717] text-white border border-[#2a2a2e] shadow-[0_8px_40px_rgba(0,0,0,0.35)]"
+          : "bg-white border border-border text-foreground shadow-[0_2px_16px_rgba(0,0,0,0.06),0_1px_4px_rgba(0,0,0,0.04)]",
       ].join(" ")}
     >
       {/* Checkbox — top-right absolute */}

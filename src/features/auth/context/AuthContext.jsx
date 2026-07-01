@@ -9,36 +9,32 @@ export function AuthProvider({ children, initialUser = null }) {
   const [user, setUser] = useState(initialUser);
   const [isLoading, setIsLoading] = useState(!initialUser);
 
+  async function refetchUser() {
+    try {
+      const data = await authApi.me();
+      setUser(data.user ?? data);
+    } catch {
+      setUser(null);
+    }
+  }
+
   useEffect(() => {
-    authApi
-      .me()
-      .then((data) => {
-        setUser(data.user ?? data);
-      })
-      .catch(() => {
-        setUser(null);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
+    refetchUser().finally(() => setIsLoading(false));
   }, []);
 
   async function login(email, password) {
-    const result = await authApi.login({ email, password });
-    setUser(result.user ?? result);
-    return result;
+    await authApi.login({ email, password });
+    await refetchUser();
   }
 
   async function register(name, email, password) {
-    const result = await authApi.register({ name, email, password });
-    setUser(result.user ?? result);
-    return result;
+    await authApi.register({ name, email, password });
+    await refetchUser();
   }
 
   async function loginWithGoogle(credential) {
-    const result = await authApi.google(credential);
-    setUser(result.user ?? result);
-    return result;
+    await authApi.google(credential);
+    await refetchUser();
   }
 
   async function logout() {
@@ -52,7 +48,7 @@ export function AuthProvider({ children, initialUser = null }) {
 
   return (
     <AuthContext.Provider
-      value={{ user, isLoading, login, register, logout, loginWithGoogle }}
+      value={{ user, isLoading, login, register, logout, loginWithGoogle, refetchUser }}
     >
       {children}
     </AuthContext.Provider>

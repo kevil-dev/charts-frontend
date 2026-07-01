@@ -213,7 +213,7 @@ export default function ChartTable({
         </div>
 
         {/* Table */}
-        <div className="overflow-hidden rounded-xl border border-border bg-card chart-glow">
+        <div className="overflow-hidden rounded-xl border border-border bg-card shadow-[0_2px_16px_rgba(0,0,0,0.06),0_1px_4px_rgba(0,0,0,0.04)]">
           {/* Desktop table — hidden on mobile */}
           <div className="hidden md:block overflow-x-auto">
             <table className="w-full table-auto">

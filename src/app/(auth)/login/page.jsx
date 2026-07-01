@@ -109,7 +109,7 @@ function LoginPageContent() {
   }
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6 bg-white p-8 sm:p-10 rounded-2xl border border-[rgba(0,0,0,0.08)] shadow-[0_2px_16px_rgba(0,0,0,0.06),0_1px_4px_rgba(0,0,0,0.04)]">
       {/* Header */}
       <div className="flex flex-col gap-2">
         <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">

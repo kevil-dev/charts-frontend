@@ -6,9 +6,10 @@ export default function AuthLayout({ children }) {
   return (
     <div className="fixed inset-0 z-[100] flex">
       {/* ── Left Panel ────────────────────────────────────────────────────── */}
-      <div className="flex w-full flex-col overflow-y-auto bg-background lg:w-[55%]">
+      <div className="relative flex w-full flex-col overflow-y-auto bg-background/95 lg:w-[55%]">
+        <div className="refined-mesh-full" style={{ position: "absolute", opacity: 0.4 }} aria-hidden="true" />
         {/* Mini header */}
-        <div className="flex items-center justify-between px-8 py-5">
+        <div className="relative z-10 flex items-center justify-between px-8 py-5">
           <Link href="/">
             <Logo />
           </Link>
@@ -22,12 +23,12 @@ export default function AuthLayout({ children }) {
         </div>
 
         {/* Form content — vertically centered */}
-        <div className="flex flex-1 items-center justify-center px-8 pb-8">
-          <div className="w-full max-w-[400px]">{children}</div>
+        <div className="relative z-10 flex flex-1 items-center justify-center px-8 pb-8">
+          <div className="w-full max-w-[460px]">{children}</div>
         </div>
 
         {/* Bottom legal text */}
-        <p className="px-8 pb-6 text-center text-xs text-muted-foreground">
+        <p className="relative z-10 px-8 pb-6 text-center text-xs text-muted-foreground">
           By continuing you agree to the{" "}
           <span className="cursor-pointer underline underline-offset-2">
             Terms

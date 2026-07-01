@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 import { useAuth } from "@/features/auth/context/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -34,9 +34,11 @@ function GoogleIcon() {
   );
 }
 
-export default function RegisterPage() {
+function RegisterPageContent() {
   const { user, isLoading, register, loginWithGoogle } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const from = searchParams.get("from");
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -47,9 +49,9 @@ export default function RegisterPage() {
 
   useEffect(() => {
     if (!isLoading && user) {
-      router.replace("/charts/apple/us/top");
+      router.replace(from && from.startsWith("/") ? from : "/charts/apple/us/top");
     }
-  }, [isLoading, user, router]);
+  }, [isLoading, user, router, from]);
 
   const googleBtnRef = useRef(null);
 
@@ -62,7 +64,9 @@ export default function RegisterPage() {
         callback: async (response) => {
           try {
             await loginWithGoogle(response.credential);
-            router.push("/charts/apple/us/top");
+            router.push(
+              from && from.startsWith("/") ? from : "/charts/apple/us/top",
+            );
           } catch (err) {
             setError(err.message);
           }
@@ -94,7 +98,7 @@ export default function RegisterPage() {
     setError(null);
     try {
       await register(name, email, password);
-      router.push("/charts/apple/us/top");
+      router.push(from && from.startsWith("/") ? from : "/charts/apple/us/top");
     } catch (err) {
       setError(err.message);
     } finally {
@@ -107,7 +111,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6 bg-white p-8 sm:p-10 rounded-2xl border border-[rgba(0,0,0,0.08)] shadow-[0_2px_16px_rgba(0,0,0,0.06),0_1px_4px_rgba(0,0,0,0.04)]">
       {/* Header */}
       <div className="flex flex-col gap-2">
         <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
@@ -242,5 +246,13 @@ export default function RegisterPage() {
         </Link>
       </p>
     </div>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense>
+      <RegisterPageContent />
+    </Suspense>
   );
 }
