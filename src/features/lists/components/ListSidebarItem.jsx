@@ -39,7 +39,7 @@ export default function ListSidebarItem({ list, isActive, onDelete }) {
   return (
     <div
       className={`group flex w-full items-center gap-3 rounded-lg px-3 py-2.5 ${
-        isActive ? "bg-white/10" : "hover:bg-white/5"
+        isActive ? "bg-white/[0.12] border-l-2 border-l-white" : "border-l-2 border-l-transparent hover:bg-white/5"
       }`}
     >
       <Link href={`/lists/${list.id}`} className="flex flex-1 min-w-0 items-center gap-3">
@@ -52,7 +52,7 @@ export default function ListSidebarItem({ list, isActive, onDelete }) {
         <div className="min-w-0 flex-1">
           <p
             className={`truncate text-sm ${
-              isActive ? "font-medium text-white" : "text-white"
+              isActive ? "font-semibold text-white" : "font-normal text-white/80"
             }`}
           >
             {list.title}
