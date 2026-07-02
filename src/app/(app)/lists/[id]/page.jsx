@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import ListsShell from "@/features/lists/components/ListsShell";
+import ListsSidebarClient from "@/features/lists/components/ListsSidebarClient";
 import ListPage from "@/features/lists/components/ListPage";
 
 async function fetchAllLists() {
@@ -22,11 +22,13 @@ export default async function ListDetailPage({ params }) {
   const lists = await fetchAllLists();
 
   return (
-    <>
-      <div className="mb-4">
-        <ListsShell initialLists={lists} currentListId={id} />
+    <div className="flex h-[calc(100vh-var(--navbar-height))] overflow-hidden">
+      <div className="w-72 shrink-0 border-r border-border overflow-y-auto px-3 py-4">
+        <ListsSidebarClient initialLists={lists} currentListId={id} />
       </div>
-      <ListPage listId={id} />
-    </>
+      <div className="flex-1 overflow-y-auto px-6 py-6">
+        <ListPage listId={id} />
+      </div>
+    </div>
   );
 }
