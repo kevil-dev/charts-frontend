@@ -8,7 +8,7 @@ import ListSidebar from "@/features/lists/components/ListSidebar";
 
 export default function ListsSidebarClient({ initialLists, currentListId }) {
   const router = useRouter();
-  const { lists, createList, deleteList } = useLists(initialLists);
+  const { lists, createList, deleteList } = useLists();
 
   const handleCreateList = useCallback(async (title) => {
     try {

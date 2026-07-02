@@ -1,38 +1,21 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import listsApi from "@/features/lists/services/listsApi";
-
-let listsCache = null;
-let cachePromise = null;
+import { useListsCache } from "@/features/lists/context/ListsCacheContext";
 
 export function useAddToList() {
-  const [lists, setLists] = useState(() => listsCache ?? []);
+  const router = useRouter();
+  const { lists, ensureLoaded, addList } = useListsCache();
   const [loading, setLoading] = useState(false);
 
-  const ensureLoaded = useCallback(async () => {
-    if (listsCache !== null) {
-      setLists(listsCache);
-      return;
-    }
-    if (!cachePromise) {
-      cachePromise = (async () => {
-        try {
-          const res = await listsApi.getAll();
-          listsCache = res.lists ?? [];
-        } catch {
-          // leave listsCache null so next call retries
-        } finally {
-          cachePromise = null;
-        }
-      })();
-    }
+  const ensureListsLoaded = useCallback(async () => {
     setLoading(true);
-    await cachePromise;
-    setLists(listsCache ?? []);
+    await ensureLoaded();
     setLoading(false);
-  }, []);
+  }, [ensureLoaded]);
 
   const addPodcastToList = useCallback(async (listId, listTitle, row, platform) => {
     try {
@@ -44,54 +27,36 @@ export function useAddToList() {
         platform,
         genre:          row.genre ?? null,
       });
-      toast.success(`Added to ${listTitle}`);
+      toast.success(`Added to "${listTitle}"`, {
+        action: {
+          label: "View list",
+          onClick: () => router.push(`/lists/${listId}`),
+        },
+        duration: 5000,
+      });
       return true;
     } catch (err) {
       if (err.message?.includes("Already")) {
-        toast.error(`Already in ${listTitle}`);
+        toast.error(`Already in "${listTitle}"`);
       } else {
         toast.error("Couldn't add to list");
       }
       return false;
     }
-  }, []);
+  }, [router]);
 
   const createList = useCallback(async (title) => {
-    try {
-      const res = await listsApi.create(title);
-      const newList = res.list ?? null;
-      if (!newList) throw new Error("Failed to create list");
-      listsCache = listsCache ? [newList, ...listsCache] : [newList];
-      setLists((prev) => [newList, ...prev]);
-      return newList;
-    } catch (err) {
-      if (err?.code === "LIMIT_EXCEEDED") {
-        const limitErr = new Error("List limit reached");
-        limitErr.code = "LIMIT_EXCEEDED";
-        throw limitErr;
-      }
-      throw err;
-    }
-  }, []);
+    const res = await listsApi.create(title);
+    const newList = res.list ?? null;
+    if (!newList) throw new Error("Failed to create list");
+    addList(newList);
+    return newList;
+  }, [addList]);
 
   const createListAndAdd = useCallback(async (title, row, platform) => {
-    try {
-      const newList = await createList(title);
-      await addPodcastToList(newList.id, newList.title, row, platform);
-      return newList;
-    } catch (err) {
-      if (err?.code === "LIMIT_EXCEEDED") {
-        toast.error("List limit reached — upgrade to create more.", {
-          action: {
-            label: "Upgrade",
-            onClick: () => { window.location.href = "/pricing"; },
-          },
-          duration: 6000,
-        });
-        return null;
-      }
-      throw err;
-    }
+    const newList = await createList(title);
+    await addPodcastToList(newList.id, newList.title, row, platform);
+    return newList;
   }, [createList, addPodcastToList]);
 
   const addManyToList = useCallback(async (listId, listTitle, rows, platform) => {
@@ -109,16 +74,20 @@ export function useAddToList() {
         });
         successes++;
       } catch (err) {
-        if (err.message?.includes("Already")) {
-          duplicates++;
-        }
+        if (err.message?.includes("Already")) duplicates++;
       }
     }
-    let message = `Added ${successes} to ${listTitle}`;
+    let message = `Added ${successes} to "${listTitle}"`;
     if (duplicates > 0) message += ` · ${duplicates} already there`;
-    toast.success(message);
+    toast.success(message, {
+      action: {
+        label: "View list",
+        onClick: () => router.push(`/lists/${listId}`),
+      },
+      duration: 5000,
+    });
     return { successes, duplicates };
-  }, []);
+  }, [router]);
 
-  return { lists, loading, ensureLoaded, addPodcastToList, createList, createListAndAdd, addManyToList };
+  return { lists, loading, ensureLoaded: ensureListsLoaded, addPodcastToList, createList, createListAndAdd, addManyToList };
 }

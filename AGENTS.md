@@ -76,6 +76,7 @@ src/
 - Lists sidebar → `src/features/lists/components/ListSidebar.jsx`
 - Lists sidebar item → `src/features/lists/components/ListSidebarItem.jsx`
 - Lists sidebar client shell → `src/features/lists/components/ListsSidebarClient.jsx`
+- Lists shared cache context → `src/features/lists/context/ListsCacheContext.jsx`
 - New billing UI component → `src/features/billing/components/`
 - New billing hook → `src/features/billing/hooks/`
 - New billing API call → `src/features/billing/services/billingApi.js`
