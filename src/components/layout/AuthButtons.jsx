@@ -63,8 +63,8 @@ export default function AuthButtons() {
         >
           Login
         </Link>
-        <Link href="/register" className={buttonVariants({ size: "lg" })}>
-          Start free trial
+        <Link href="/register?from=/pricing" className={buttonVariants({ size: "lg" })}>
+          Sign up free
         </Link>
       </>
     );

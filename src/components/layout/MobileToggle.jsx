@@ -150,10 +150,10 @@ export default function MobileMenuToggle() {
                   Login
                 </Link>
                 <Link
-                  href="/register"
+                  href="/register?from=/pricing"
                   className={buttonVariants({ size: "lg" })}
                 >
-                  Free Trial
+                  Sign up free
                 </Link>
               </>
             )}

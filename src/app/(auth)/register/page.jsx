@@ -49,7 +49,7 @@ function RegisterPageContent() {
 
   useEffect(() => {
     if (!isLoading && user) {
-      router.replace(from && from.startsWith("/") ? from : "/charts/apple/us/top");
+      router.replace(from && from.startsWith("/") ? from : "/pricing");
     }
   }, [isLoading, user, router, from]);
 
@@ -98,7 +98,7 @@ function RegisterPageContent() {
     setError(null);
     try {
       await register(name, email, password);
-      router.push(from && from.startsWith("/") ? from : "/charts/apple/us/top");
+      router.push(from && from.startsWith("/") ? from : "/pricing");
     } catch (err) {
       setError(err.message);
     } finally {
