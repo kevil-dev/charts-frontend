@@ -3,7 +3,8 @@
 import { useState, useRef, useEffect } from "react";
 import { PlusIcon, Loader2Icon, ArrowRightIcon } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { useAuth } from "@/features/auth/context/AuthContext";
 import { useAddToList } from "@/features/lists/hooks/useAddToList";
 
@@ -11,6 +12,7 @@ export default function AddToListDropdown({ rows, platform, open, onClose, ancho
   const { user } = useAuth();
   const isGuest = !user;
   const pathname = usePathname();
+  const router = useRouter();
   const { lists, loading, ensureLoaded, addPodcastToList, createList, createListAndAdd, addManyToList } =
     useAddToList();
   const [newTitle, setNewTitle] = useState("");
@@ -68,6 +70,19 @@ export default function AddToListDropdown({ rows, platform, open, onClose, ancho
       }
       setNewTitle("");
       onClose();
+    } catch (err) {
+      if (err?.code === "LIMIT_EXCEEDED" || err?.status === 403 ||
+          err?.message?.toLowerCase().includes("limit")) {
+        toast.error("List limit reached — upgrade to create more.", {
+          action: {
+            label: "Upgrade",
+            onClick: () => router.push("/pricing"),
+          },
+          duration: 6000,
+        });
+      } else {
+        toast.error(err?.message ?? "Failed to create list");
+      }
     } finally {
       setCreating(false);
     }

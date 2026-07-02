@@ -1,14 +1,16 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { toast } from "sonner";
 import { useLists } from "@/features/lists/hooks/useLists";
 import ListSidebar from "@/features/lists/components/ListSidebar";
 
-export default function ListsSidebarClient({ initialLists, currentListId }) {
+export default function ListsSidebarClient({ initialLists }) {
   const router = useRouter();
-  const { lists, createList, deleteList } = useLists(initialLists);
+  const params = useParams();
+  const activeListId = params?.id ? decodeURIComponent(params.id) : null;
+  const { lists, createList, deleteList } = useLists();
 
   const handleCreateList = useCallback(async (title) => {
     try {
@@ -43,7 +45,7 @@ export default function ListsSidebarClient({ initialLists, currentListId }) {
   return (
     <ListSidebar
       lists={lists}
-      currentListId={currentListId}
+      currentListId={activeListId}
       onCreateList={handleCreateList}
       onDeleteList={handleDeleteList}
     />

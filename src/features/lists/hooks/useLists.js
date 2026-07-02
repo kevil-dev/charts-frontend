@@ -1,54 +1,33 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useCallback } from "react";
+import { useListsCache } from "@/features/lists/context/ListsCacheContext";
 import listsApi from "@/features/lists/services/listsApi";
 
-export function useLists(initialData = []) {
-  const [lists, setLists] = useState(initialData);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  const fetchLists = useCallback(async () => {
-    try {
-      setLoading(true);
-      const res = await listsApi.getAll();
-      setLists(res.lists ?? []);
-    } catch (err) {
-      setError(err);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (initialData.length === 0) {
-      fetchLists();
-    } else {
-      setLoading(false);
-    }
-  }, []); // intentionally empty — runs once on mount only
+export function useLists() {
+  const { lists, addList, removeList } = useListsCache();
 
   const createList = useCallback(async (title, description = null) => {
     try {
       const res = await listsApi.create(title, description);
       const newList = res.list ?? null;
       if (!newList) throw new Error("Failed to create list");
-      setLists((prev) => [newList, ...prev]);
+      addList(newList);
       return newList;
     } catch (err) {
-      if (err?.code === "LIMIT_EXCEEDED") {
+      if (err?.status === 403 || err?.message?.toLowerCase().includes("limit")) {
         const limitErr = new Error("List limit reached");
         limitErr.code = "LIMIT_EXCEEDED";
         throw limitErr;
       }
       throw err;
     }
-  }, []);
+  }, [addList]);
 
   const deleteList = useCallback(async (id) => {
     await listsApi.destroy(id);
-    setLists((prev) => prev.filter((l) => l.id !== id));
-  }, []);
+    removeList(id);
+  }, [removeList]);
 
-  return { lists, loading, error, createList, deleteList, refetch: fetchLists };
+  return { lists, createList, deleteList };
 }

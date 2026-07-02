@@ -205,7 +205,10 @@ export default function ChartTable({
                 rows={selectedRows}
                 platform={platform}
                 open={bulkAddOpen}
-                onClose={() => setBulkAddOpen(false)}
+                onClose={() => {
+                  setBulkAddOpen(false);
+                  setSelected(new Set());
+                }}
                 anchorClassName="absolute right-0 top-full z-50 mt-2 w-64 rounded-xl border border-border bg-popover shadow-lg"
               />
             </div>
