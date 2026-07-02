@@ -432,6 +432,13 @@ export function ChartRowCard({ row, isSelected, onToggle, onRowClick, listMode =
         <PlatformIcon row={row} className="size-3.5" />
       </div>
 
+      {/* Genre pill — only in list mode */}
+      {listMode && row.genre && (
+        <span className="shrink-0 rounded-full bg-muted px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
+          {row.genre}
+        </span>
+      )}
+
       {/* Add to list — only in chart mode */}
       {!listMode && (
         <div className="relative shrink-0">
