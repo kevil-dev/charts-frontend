@@ -21,8 +21,12 @@ export function useLists(initialData = []) {
   }, []);
 
   useEffect(() => {
-    fetchLists();
-  }, [fetchLists]);
+    if (initialData.length === 0) {
+      fetchLists();
+    } else {
+      setLoading(false);
+    }
+  }, []); // intentionally empty — runs once on mount only
 
   const createList = useCallback(async (title, description = null) => {
     try {

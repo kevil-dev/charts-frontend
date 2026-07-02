@@ -22,13 +22,22 @@ export default async function ListDetailPage({ params }) {
   const lists = await fetchAllLists();
 
   return (
-    <div className="flex h-[calc(100vh-var(--navbar-height))] overflow-hidden">
-      <div className="w-72 shrink-0 border-r border-border overflow-y-auto px-3 py-4">
-        <ListsSidebarClient initialLists={lists} currentListId={id} />
+    <>
+      <div className="refined-mesh-full" aria-hidden="true" />
+      <div className="relative overflow-hidden">
+        <div className="hero-mesh" aria-hidden="true" />
+        <div className="relative z-10 flex h-[calc(100vh-var(--navbar-height))] overflow-hidden">
+          {/* Left sidebar */}
+          <aside className="w-72 shrink-0 border-r border-white/10 overflow-y-auto px-3 py-4 bg-[#0a0a0a]">
+            <ListsSidebarClient initialLists={lists} currentListId={id} />
+          </aside>
+
+          {/* Right panel */}
+          <main className="flex-1 overflow-y-auto px-6 pt-10 pb-6">
+            <ListPage listId={id} />
+          </main>
+        </div>
       </div>
-      <div className="flex-1 overflow-y-auto px-6 py-6">
-        <ListPage listId={id} />
-      </div>
-    </div>
+    </>
   );
 }

@@ -39,7 +39,7 @@ export default function ListSidebarItem({ list, isActive, onDelete }) {
   return (
     <div
       className={`group flex w-full items-center gap-3 rounded-lg px-3 py-2.5 ${
-        isActive ? "bg-muted" : "hover:bg-muted/60"
+        isActive ? "bg-white/10" : "hover:bg-white/5"
       }`}
     >
       <Link href={`/lists/${list.id}`} className="flex flex-1 min-w-0 items-center gap-3">
@@ -52,21 +52,28 @@ export default function ListSidebarItem({ list, isActive, onDelete }) {
         <div className="min-w-0 flex-1">
           <p
             className={`truncate text-sm ${
-              isActive ? "font-medium text-foreground" : "text-muted-foreground"
+              isActive ? "font-medium text-white" : "text-white"
             }`}
           >
             {list.title}
           </p>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs text-white/40">
             {list.item_count} {list.item_count === 1 ? "show" : "shows"}
           </p>
         </div>
       </Link>
 
+      {isActive && (
+        <span
+          className="size-1.5 shrink-0 rounded-full bg-white transition-opacity group-hover:opacity-0"
+          aria-hidden="true"
+        />
+      )}
+
       <button
         onClick={handleDelete}
         aria-label="Delete list"
-        className="shrink-0 rounded p-1 text-muted-foreground opacity-0 transition-opacity hover:text-foreground group-hover:opacity-100"
+        className="shrink-0 rounded p-1 text-white/40 opacity-0 transition-opacity hover:text-white group-hover:opacity-100"
       >
         <Trash2 className="size-3.5" />
       </button>
