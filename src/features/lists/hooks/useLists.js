@@ -5,7 +5,7 @@ import { useListsCache } from "@/features/lists/context/ListsCacheContext";
 import listsApi from "@/features/lists/services/listsApi";
 
 export function useLists() {
-  const { lists, ensureLoaded, addList, removeList } = useListsCache();
+  const { lists, addList, removeList } = useListsCache();
 
   const createList = useCallback(async (title, description = null) => {
     try {
