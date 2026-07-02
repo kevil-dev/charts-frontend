@@ -4,9 +4,9 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { CiMenuFries } from "react-icons/ci";
-import { XIcon } from "lucide-react";
+import { XIcon, Bookmark, CreditCard, LogOut } from "lucide-react";
 import { navLinks } from "../../../config/navigation";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/features/auth/context/AuthContext";
 
@@ -122,13 +122,24 @@ export default function MobileMenuToggle() {
                     {user.name ?? user.email}
                   </span>
                 </div>
-                <Button
-                  variant="secondary"
-                  size="lg"
-                  onClick={handleLogout}
+                <Link
+                  href="/lists"
+                  className="rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-muted hover:text-foreground flex items-center gap-2"
                 >
-                  Logout
-                </Button>
+                  <Bookmark className="size-4" /> My Lists
+                </Link>
+                <Link
+                  href="/billing"
+                  className="rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-muted hover:text-foreground flex items-center gap-2"
+                >
+                  <CreditCard className="size-4" /> Billing
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="rounded-md px-3 py-2 text-sm text-[#ee0000] hover:bg-[#fff0f0] text-left flex items-center gap-2 w-full"
+                >
+                  <LogOut className="size-4" /> Log out
+                </button>
               </>
             ) : (
               <>
@@ -139,10 +150,10 @@ export default function MobileMenuToggle() {
                   Login
                 </Link>
                 <Link
-                  href="/register"
+                  href="/register?from=/pricing"
                   className={buttonVariants({ size: "lg" })}
                 >
-                  Free Trial
+                  Sign up free
                 </Link>
               </>
             )}

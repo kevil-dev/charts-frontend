@@ -22,6 +22,9 @@ src/
 │   ├── ui/                       # shadcn primitives — do not modify
 
 │   └── layout/                   # Global layout: navbar, footer, logo
+│       # AuthButtons.jsx owns the avatar dropdown for authenticated users —
+│       # My Lists / Billing nav items live there (and in MobileToggle.jsx's
+│       # mobile equivalent), not in config/navigation.js
 
 │
 
