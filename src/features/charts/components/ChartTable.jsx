@@ -5,6 +5,7 @@ import {
   AlertCircleIcon,
   RefreshCwIcon,
   InboxIcon,
+  BookmarkPlusIcon,
 } from "lucide-react";
 import ChartRow, {
   PlatformIcon,
@@ -163,17 +164,21 @@ export default function ChartTable({
               This week's leaders
             </span>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-12">
-            {podiumRows.map((row, i) => (
-              <PodiumCard
-                key={row.id}
-                row={row}
-                isFirst={i === 0}
-                isSelected={selected.has(row.id)}
-                onToggle={toggleRow}
-                onRowClick={onRowClick}
-                platform={platform}
-              />
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-12">
+            {podiumRows.map((row) => (
+              <div 
+                key={row.id} 
+                className="h-full"
+              >
+                <PodiumCard
+                  row={row}
+                  isFirst={row.chart_rank === 1}
+                  isSelected={selected.has(row.id)}
+                  onToggle={toggleRow}
+                  onRowClick={onRowClick}
+                  platform={platform}
+                />
+              </div>
             ))}
           </div>
         </div>
@@ -197,8 +202,9 @@ export default function ChartTable({
                 onMouseDown={(e) => e.stopPropagation()}
                 onClick={(e) => { e.stopPropagation(); if (selectedCount > 0) setBulkAddOpen((v) => !v); }}
                 disabled={selectedCount === 0}
-                className="rounded-md bg-primary px-2.5 py-1 text-xs font-medium text-primary-foreground transition-opacity disabled:opacity-40"
+                className="flex items-center gap-1.5 rounded-full bg-[oklch(60%_0.25_280)] px-3.5 py-1.5 text-xs font-semibold text-white shadow-sm transition-all hover:bg-[oklch(55%_0.25_280)] hover:-translate-y-0.5 disabled:opacity-50 disabled:pointer-events-none disabled:transform-none"
               >
+                <BookmarkPlusIcon className="size-3.5" />
                 Add to list
               </button>
               <AddToListDropdown
