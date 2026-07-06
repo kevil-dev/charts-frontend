@@ -61,12 +61,12 @@ function exportJson(list) {
 
 function ArtworkCell({ item }) {
   return (
-    <div className="w-full h-full bg-muted/30 overflow-hidden">
+    <div className="w-full h-full overflow-hidden bg-muted">
       {item ? (
         <img
           src={item.artwork_url}
           alt={item.podcast_name}
-          className="w-full h-full object-cover mix-blend-overlay opacity-90 transition-opacity hover:opacity-100"
+          className="w-full h-full object-cover transition-opacity hover:opacity-100"
         />
       ) : (
         <div className="w-full h-full flex items-center justify-center bg-muted/20 backdrop-blur-sm">
@@ -383,9 +383,6 @@ export default function ListHeader({
 
           {/* Meta */}
           <div className="flex flex-col gap-2 min-w-0 flex-1 pt-2 w-full text-center md:text-left">
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground mb-1">
-              Public Playlist
-            </p>
             
             <InlineTitle
               value={list?.title}
