@@ -371,7 +371,7 @@ export default function ListHeader({
 
   return (
     <>
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-b from-muted/50 to-background border border-border/50 p-6 md:p-10 mb-8 shadow-xl">
+      <div className="relative rounded-3xl bg-gradient-to-b from-muted/50 to-background border border-border/50 p-6 md:p-10 mb-8 shadow-xl">
         <div className="relative z-10 flex flex-col md:flex-row items-center md:items-end gap-8">
           
           {/* 2×2 artwork grid */}

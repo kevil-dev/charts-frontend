@@ -37,6 +37,20 @@ function PremiumSparkline({ data }) {
 
   const areaData = `${pathData} L ${points[points.length - 1].x},${H} L ${points[0].x},${H} Z`;
 
+  const currentRank = ranks[ranks.length - 1];
+  const previousRank = ranks.length > 1 ? ranks[ranks.length - 2] : currentRank;
+  
+  let rankMove = "SAME";
+  let shift = 0;
+  
+  if (currentRank < previousRank) {
+    rankMove = "UP";
+    shift = previousRank - currentRank;
+  } else if (currentRank > previousRank) {
+    rankMove = "DOWN";
+    shift = currentRank - previousRank;
+  }
+
   return (
     <div className="relative mt-4 overflow-hidden rounded-2xl border border-border/50 bg-muted/20 p-6 backdrop-blur-xl">
       <div className="flex items-center justify-between mb-8">
@@ -49,9 +63,12 @@ function PremiumSparkline({ data }) {
             Performance over the last {data.length} weeks
           </p>
         </div>
-        <div className="text-right">
-          <p className="text-2xl font-bold font-mono tracking-tighter">#{ranks[ranks.length - 1]}</p>
-          <p className="text-xs text-muted-foreground uppercase tracking-widest">Current</p>
+        <div className="flex items-center gap-4 text-right">
+          <RankMoveBadge rankMove={rankMove} />
+          <div>
+            <p className="text-2xl font-bold font-mono tracking-tighter">#{currentRank}</p>
+            <p className="text-xs text-muted-foreground uppercase tracking-widest">Current</p>
+          </div>
         </div>
       </div>
       
