@@ -19,6 +19,47 @@ function formatDate(dateStr) {
   });
 }
 
+import confetti from "canvas-confetti";
+import { CheckIcon } from "lucide-react";
+
+function PlanBenefits({ tier }) {
+  const benefits = {
+    pro: [
+      "Full US Apple & Spotify Charts",
+      "Up to 5 custom lists",
+      "Advanced Rank Analytics",
+      "Platform & Genre Filtering",
+      "Standard Support",
+    ],
+    elite: [
+      "Global Footprint Analytics",
+      "Infinite custom lists",
+      "CSV, JSON & Email Exports",
+      "Historical Rank Area Charts",
+      "Priority Support",
+      "Access to all future features",
+    ]
+  };
+
+  const list = benefits[tier] || benefits.pro;
+
+  return (
+    <div className="mt-12 px-4 md:px-0">
+      <h3 className="text-lg font-bold tracking-tight mb-6">Your Plan Benefits</h3>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+        {list.map((benefit, i) => (
+          <div key={i} className="flex items-center gap-3 p-4 rounded-xl border border-border/50 bg-card shadow-sm">
+            <div className="flex items-center justify-center size-8 rounded-full bg-[var(--brand-indigo)]/10 text-[var(--brand-indigo)] shrink-0">
+              <CheckIcon className="size-4" />
+            </div>
+            <p className="text-sm font-medium">{benefit}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function BillingSettings() {
   const { data, isLoading } = useBillingStatus();
   const queryClient = useQueryClient();
@@ -70,7 +111,14 @@ export default function BillingSettings() {
       await billingApi.upgrade();
       await queryClient.invalidateQueries({ queryKey: ["billing-status"] });
       await refetchUser();
-      toast("Upgraded to Elite.");
+      
+      confetti({
+        particleCount: 150,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#7928ca', '#ff0080', '#00dfd8', '#f9cb28']
+      });
+      toast.success("Welcome to Elite! You've been upgraded.");
     } catch (err) {
       toast.error(err.message || "Couldn't upgrade — please try again.");
     } finally {
@@ -93,7 +141,7 @@ export default function BillingSettings() {
   }
 
   return (
-    <div>
+    <div className="max-w-4xl pb-24">
       <BillingCard
         planStatus={plan_status}
         selectedTier={selected_tier}
@@ -117,6 +165,7 @@ export default function BillingSettings() {
         canceling={canceling}
         confirming={confirming}
       />
+      <PlanBenefits tier={selected_tier} />
     </div>
   );
 }

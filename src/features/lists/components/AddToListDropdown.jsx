@@ -7,6 +7,14 @@ import { usePathname, useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useAuth } from "@/features/auth/context/AuthContext";
 import { useAddToList } from "@/features/lists/hooks/useAddToList";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { BookmarkPlusIcon } from "lucide-react";
 
 export default function AddToListDropdown({ rows, platform, open, onClose, anchorClassName }) {
   const { user } = useAuth();
@@ -98,6 +106,38 @@ export default function AddToListDropdown({ rows, platform, open, onClose, ancho
 
   if (!open) return null;
 
+  if (isGuest) {
+    return (
+      <Dialog open={open} onOpenChange={onClose}>
+        <DialogContent className="sm:max-w-md p-8 gap-6 rounded-3xl border-none shadow-2xl bg-background">
+          <DialogHeader className="gap-2">
+            <div className="mx-auto bg-[oklch(60%_0.25_280)]/10 text-[oklch(60%_0.25_280)] p-4 rounded-full w-fit mb-2">
+              <BookmarkPlusIcon className="size-8" />
+            </div>
+            <DialogTitle className="text-center text-2xl font-bold tracking-tight text-foreground">Save to your lists</DialogTitle>
+            <DialogDescription className="text-center text-base text-muted-foreground">
+              Sign in to save your favorite podcasts, track your listening, and never lose a great show again.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col gap-3 mt-2">
+            <Link
+              href={`/login?from=${pathname}`}
+              className="flex items-center justify-center w-full rounded-full bg-[oklch(60%_0.25_280)] px-4 py-3 text-sm font-semibold text-white shadow-sm transition-all hover:bg-[oklch(55%_0.25_280)] hover:-translate-y-0.5"
+            >
+              Sign in or create account
+            </Link>
+            <button
+              onClick={onClose}
+              className="flex items-center justify-center w-full rounded-full bg-muted/50 px-4 py-3 text-sm font-semibold text-foreground transition-all hover:bg-muted"
+            >
+              Maybe later
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
   return (
     <div
       ref={containerRef}
@@ -107,20 +147,7 @@ export default function AddToListDropdown({ rows, platform, open, onClose, ancho
         "absolute left-0 top-full z-50 mt-2 w-64 rounded-xl border border-border bg-popover shadow-lg"
       }
     >
-      {isGuest ? (
-        <div className="flex flex-col items-center gap-2 px-4 py-5 text-center">
-          <p className="text-xs text-muted-foreground">
-            Sign in to add podcasts to lists
-          </p>
-          <Link
-            href={`/login?from=${pathname}`}
-            className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:opacity-80 transition-opacity"
-          >
-            Sign in <ArrowRightIcon className="size-3" />
-          </Link>
-        </div>
-      ) : (
-        <>
+      <>
           <div className="max-h-64 overflow-y-auto py-1">
             {loading && lists.length === 0 ? (
               <p className="px-3 py-2 text-xs text-muted-foreground">Loading…</p>
@@ -170,7 +197,6 @@ export default function AddToListDropdown({ rows, platform, open, onClose, ancho
             </div>
           </div>
         </>
-      )}
     </div>
   );
 }

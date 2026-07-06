@@ -50,19 +50,19 @@ export default function ChartHero({
       />
 
       {/* Live badge */}
-      <div className="self-start inline-flex items-center gap-2 rounded-full border border-border bg-background px-3 py-1 shadow-sm">
-        <span className="h-1.5 w-1.5 rounded-full bg-[#0070f3] animate-[livePulse_1.8s_ease-in-out_infinite]" />
-        <span className="font-mono text-[11px] font-normal uppercase tracking-[0.06em] text-muted-foreground">
+      <div className="self-start inline-flex items-center gap-2 rounded-full border border-[oklch(60%_0.25_280)]/20 bg-[oklch(60%_0.25_280)]/5 px-3 py-1 shadow-sm">
+        <span className="h-1.5 w-1.5 rounded-full bg-[oklch(60%_0.25_280)] animate-[livePulse_1.8s_ease-in-out_infinite]" />
+        <span className="font-mono text-[11px] font-bold uppercase tracking-[0.06em] text-[oklch(60%_0.25_280)]">
           Last updated: {runDate}
         </span>
       </div>
 
       {/* Title + subtitle */}
       <div>
-        <h1 className="text-5xl font-semibold tracking-tighter">
+        <h1 className="text-6xl sm:text-7xl font-bold tracking-[-0.05em] text-foreground leading-[0.95]">
           The podcast chart.
         </h1>
-        <p className="mt-3 max-w-lg text-lg text-muted-foreground">
+        <p className="mt-4 max-w-xl text-lg sm:text-xl font-medium tracking-[-0.01em] text-muted-foreground leading-relaxed">
           Every show ranked across Apple, Spotify, and YouTube — refreshed
           daily, with movement, hosts, and reach in one view.
         </p>
@@ -92,6 +92,7 @@ export default function ChartHero({
           countriesList={liveCountries}
           categoriesList={liveGenres}
           filtersLoading={filtersLoading}
+          ssrFlag={countryFlag}
         />
 
       </div>

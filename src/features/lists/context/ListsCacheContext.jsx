@@ -45,9 +45,13 @@ export function ListsCacheProvider({ children, initialLists = [] }) {
     setLists([]);
   }, []);
 
+  const updateList = useCallback((id, updater) => {
+    setLists((prev) => prev.map((l) => (l.id === id ? updater(l) : l)));
+  }, []);
+
   return (
     <ListsCacheContext.Provider
-      value={{ lists, loaded, ensureLoaded, addList, removeList, invalidate }}
+      value={{ lists, loaded, ensureLoaded, addList, removeList, invalidate, updateList }}
     >
       {children}
     </ListsCacheContext.Provider>

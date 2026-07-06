@@ -207,9 +207,9 @@ export default function ChartRow({ row, isSelected, onToggle, onRowClick, platfo
     <tr
       onClick={() => onRowClick?.(row)}
       className={[
-        "group transition-colors cursor-pointer",
+        "group transition-all duration-200 cursor-pointer",
         isSelected
-          ? "border-l-2 border-l-primary bg-primary/5"
+          ? "border-l-2 border-l-[oklch(60%_0.25_280)] bg-[oklch(60%_0.25_280)]/5"
           : "hover:bg-muted/40",
       ].join(" ")}
     >
@@ -235,7 +235,7 @@ export default function ChartRow({ row, isSelected, onToggle, onRowClick, platfo
 
       {/* Square artwork + trend badge */}
       <td className="py-3 pr-4">
-        <div className="relative inline-block">
+        <div className="relative inline-block transition-transform duration-300 group-hover:scale-105">
           <Artwork
             src={row.artwork}
             name={row.name}
@@ -277,21 +277,15 @@ export default function ChartRow({ row, isSelected, onToggle, onRowClick, platfo
         </div>
       </td>
 
-      {/* Name + artist + location */}
+      {/* Name + artist */}
       <td className="min-w-0 py-3 pr-6">
-        <p className="truncate text-sm font-semibold leading-tight">
+        <p className="truncate text-sm font-semibold leading-tight group-hover:text-[oklch(60%_0.25_280)] transition-colors">
           {row.name}
         </p>
         {row.artist_or_publisher && (
           <p className="mt-0.5 flex items-center gap-1 truncate text-xs text-muted-foreground">
             <UserIcon className="size-3 shrink-0" aria-hidden="true" />
             {row.artist_or_publisher}
-          </p>
-        )}
-        {row.country_name && (
-          <p className="mt-0.5 flex items-center gap-1 truncate text-xs text-muted-foreground">
-            <MapPinIcon className="size-3 shrink-0" aria-hidden="true" />
-            {row.country_name}
           </p>
         )}
       </td>
@@ -307,7 +301,7 @@ export default function ChartRow({ row, isSelected, onToggle, onRowClick, platfo
           <button
             onMouseDown={(e) => e.stopPropagation()}
             onClick={(e) => { e.stopPropagation(); setAddOpen((v) => !v); }}
-            className="rounded-md border border-border px-2.5 py-1 text-xs font-medium text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 hover:bg-muted hover:text-foreground focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="rounded-md border border-border/50 px-2.5 py-1 text-xs font-medium text-muted-foreground opacity-40 transition-all duration-200 group-hover:opacity-100 group-hover:border-border hover:bg-[oklch(96%_0.02_280)] hover:text-[oklch(60%_0.25_280)] focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             Add to list
           </button>
@@ -336,10 +330,10 @@ export function ChartRowCard({ row, isSelected, onToggle, onRowClick, listMode =
     <div
       onClick={() => !listMode && onRowClick?.(row)}
       className={[
-        "group flex items-center gap-3 px-4 py-3 border-b border-border last:border-0 transition-colors",
+        "group flex items-center gap-3 px-4 py-3 border-b border-border last:border-0 transition-all duration-200",
         listMode ? "cursor-default" : "cursor-pointer",
         isSelected && !listMode
-          ? "bg-primary/5 border-l-2 border-l-primary"
+          ? "bg-[oklch(60%_0.25_280)]/5 border-l-2 border-l-[oklch(60%_0.25_280)]"
           : "hover:bg-muted/40",
       ].join(" ")}
     >
@@ -366,7 +360,7 @@ export function ChartRowCard({ row, isSelected, onToggle, onRowClick, listMode =
       )}
 
       {/* Artwork — badge hidden in list mode */}
-      <div className="relative shrink-0">
+      <div className="relative shrink-0 transition-transform duration-300 group-hover:scale-105">
         <Artwork
           src={row.artwork}
           name={row.name}
@@ -446,7 +440,7 @@ export function ChartRowCard({ row, isSelected, onToggle, onRowClick, listMode =
             onMouseDown={(e) => e.stopPropagation()}
             onClick={(e) => { e.stopPropagation(); setAddOpen((v) => !v); }}
             aria-label={`Add ${row.name} to list`}
-            className="rounded-md p-1.5 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 hover:bg-muted hover:text-foreground focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="rounded-md p-1.5 text-muted-foreground opacity-40 transition-all duration-200 group-hover:opacity-100 hover:bg-[oklch(96%_0.02_280)] hover:text-[oklch(60%_0.25_280)] focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             <BookmarkPlusIcon className="size-4" />
           </button>

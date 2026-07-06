@@ -10,6 +10,16 @@ import {
 } from "@/components/ui/select";
 import { normaliseCountries, normaliseCategories } from "@/features/charts/utils/normalise";
 
+const getFlagImg = (code) => (
+  <img 
+    src={`https://flagcdn.com/w20/${code?.toLowerCase()}.png`} 
+    srcSet={`https://flagcdn.com/w40/${code?.toLowerCase()}.png 2x`}
+    width="20" 
+    alt="" 
+    className="w-5 h-auto rounded-[2px] shadow-sm shrink-0" 
+  />
+);
+
 /**
  * Country + category dropdowns. Refresh button is in ChartTable (has access to refetch).
  *
@@ -29,6 +39,7 @@ export default function ChartFilters({
   countriesList,
   categoriesList,
   filtersLoading,
+  ssrFlag,
 }) {
   const countries = countriesList?.length ? normaliseCountries(countriesList) : [];
   const categories = categoriesList?.length ? normaliseCategories(categoriesList) : [];
@@ -36,7 +47,7 @@ export default function ChartFilters({
   const activeCountry = countries.find((c) => c.code === currentCountry?.toLowerCase());
   const activeCategory = categories.find((c) => c.slug === currentCategory);
 
-  const currentFlag = activeCountry?.flag ?? "";
+  const currentFlag = activeCountry?.flag || ssrFlag || "";
   const currentName = activeCountry?.name ?? currentCountry?.toUpperCase() ?? "";
   const currentCategoryLabel = activeCategory?.label ?? currentCategory ?? "";
 
@@ -48,8 +59,8 @@ export default function ChartFilters({
           className="shrink-0 border-none bg-transparent shadow-none focus-visible:ring-0 hover:bg-muted/50 rounded-lg px-3 py-1.5 h-9 text-sm gap-1.5"
           aria-label="Select country"
         >
-          {currentFlag
-            ? <span className="text-base leading-none" aria-hidden="true">{currentFlag}</span>
+          {currentCountry
+            ? getFlagImg(currentCountry)
             : <GlobeIcon className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
           }
           <span className="truncate">{filtersLoading && !activeCountry ? "Loading…" : currentName}</span>
@@ -57,8 +68,10 @@ export default function ChartFilters({
         <SelectContent position="popper" align="start">
           {countries.map((c) => (
             <SelectItem key={c.code} value={c.code} className="py-2 px-3">
-              {c.flag && <span className="mr-1.5" aria-hidden="true">{c.flag}</span>}
-              {c.name}
+              <div className="flex items-center gap-2">
+                {getFlagImg(c.code)}
+                <span>{c.name}</span>
+              </div>
             </SelectItem>
           ))}
         </SelectContent>

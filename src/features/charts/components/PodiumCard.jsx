@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { BookmarkPlusIcon } from "lucide-react";
+import { BookmarkPlusIcon, CheckIcon } from "lucide-react";
 import { PlatformIcon, RankMoveBadge } from "./ChartRow";
 import AddToListDropdown from "@/features/lists/components/AddToListDropdown";
 
@@ -16,20 +16,28 @@ export default function PodiumCard({
 }) {
   const [artworkError, setArtworkError] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
-  const isDark = isFirst;
 
   return (
     <div
       onClick={() => onRowClick?.(row)}
       className={[
-        "rounded-xl p-[22px] flex flex-col relative cursor-pointer",
-        isDark
-          ? "bg-[#171717] text-white border border-[#2a2a2e] shadow-[0_8px_40px_rgba(0,0,0,0.35)]"
-          : "bg-white border border-border text-foreground shadow-[0_2px_16px_rgba(0,0,0,0.06),0_1px_4px_rgba(0,0,0,0.04)]",
+        "rounded-[20px] p-6 flex flex-col relative cursor-pointer group transition-all duration-300 h-full",
+        "bg-[oklch(15%_0.05_280)] text-white",
+        isSelected 
+          ? "border-[oklch(60%_0.25_280)] shadow-[0_8px_30px_oklch(60%_0.25_280/0.25)] ring-1 ring-[oklch(60%_0.25_280)]"
+          : "border border-white/10 shadow-2xl hover:shadow-[0_20px_40px_rgba(0,0,0,0.4)] hover:-translate-y-1.5 hover:border-white/20",
       ].join(" ")}
     >
-      {/* Checkbox — top-right absolute */}
-      <div className="absolute top-4 right-4">
+      {/* Giant Background Number for Boldness */}
+      <div 
+        className="absolute top-2 -right-2 text-[140px] font-black leading-none select-none pointer-events-none transition-colors duration-300 tracking-tighter"
+        style={{ color: isSelected ? "oklch(60% 0.25 280 / 0.3)" : "rgba(255,255,255,0.12)" }}
+      >
+        {row.chart_rank}
+      </div>
+
+      {/* Checkbox — top-left absolute */}
+      <div className="absolute top-4 left-4 z-20">
         <button
           onClick={(e) => {
             e.stopPropagation();
@@ -37,83 +45,68 @@ export default function PodiumCard({
           }}
           aria-label={isSelected ? `Deselect ${row.name}` : `Select ${row.name}`}
           className={[
-            "flex size-7 items-center justify-center rounded-lg border transition-colors",
+            "flex size-7 items-center justify-center rounded-full border transition-all duration-200",
             isSelected
-              ? isDark
-                ? "bg-white border-white text-[#171717]"
-                : "bg-[#171717] border-[#171717] text-white"
-              : isDark
-              ? "border-white/20 text-white/40 hover:border-white/60"
-              : "border-border text-transparent hover:border-foreground/40",
+              ? "bg-[oklch(60%_0.25_280)] border-[oklch(60%_0.25_280)] text-white scale-110"
+              : "bg-white/10 backdrop-blur-sm border-white/20 text-transparent hover:border-white/40",
           ].join(" ")}
         >
-          {isSelected && (
-            <svg viewBox="0 0 24 24" className="size-3.5" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M5 13l4 4L19 7" />
-            </svg>
-          )}
+          <CheckIcon strokeWidth={3} className="size-3.5" />
         </button>
       </div>
 
-      {/* Rank + artwork + name */}
-      <div className="flex items-start gap-4.5 pr-8">
-        <div className="relative shrink-0">
-          {row.artwork && !artworkError ? (
-            <Image
-              src={row.artwork}
-              alt={row.name}
-              width={56}
-              height={56}
-              priority={isFirst}
-              className="size-14 rounded-full object-cover"
-              onError={() => setArtworkError(true)}
-            />
-          ) : (
-            <div className={`size-14 rounded-full flex items-center justify-center text-lg font-bold ${isDark ? "bg-white/10 text-white" : "bg-muted text-muted-foreground"}`}>
-              {(row.name?.[0] ?? "?").toUpperCase()}
-            </div>
-          )}
-        </div>
-
-        <div className="flex-1 min-w-0">
-          <p className={`text-[11px] font-mono uppercase tracking-[0.06em] ${isDark ? "text-white/50" : "text-muted-foreground"}`}>
-            #{row.chart_rank}
-          </p>
-          <p className={`mt-0.5 text-base font-semibold leading-tight tracking-[-0.02em] line-clamp-2 ${isDark ? "text-white" : "text-foreground"}`}>
-            {row.name}
-          </p>
-          {row.artist_or_publisher && (
-            <p className={`mt-1.75 text-sm tracking-[-0.01em] leading-[1.4] ${isDark ? "text-[#a1a1a1]" : "text-muted-foreground"}`}>
-              {row.artist_or_publisher}
-            </p>
-          )}
+      {/* Artwork */}
+      <div className="relative z-10 self-center mb-5 mt-2 transition-transform duration-300 group-hover:scale-105">
+        {row.artwork && !artworkError ? (
+          <Image
+            src={row.artwork}
+            alt={row.name}
+            width={120}
+            height={120}
+            priority={isFirst}
+            className="size-[100px] sm:size-[120px] rounded-full object-cover shadow-lg border-4 border-white"
+            onError={() => setArtworkError(true)}
+          />
+        ) : (
+          <div className="size-[100px] sm:size-[120px] rounded-full flex items-center justify-center text-3xl font-bold bg-muted text-muted-foreground shadow-lg border-4 border-white">
+            {(row.name?.[0] ?? "?").toUpperCase()}
+          </div>
+        )}
+        
+        {/* Rank movement badge on top of artwork */}
+        <div className="absolute -bottom-2 inset-x-0 flex justify-center">
+          <RankMoveBadge rankMove={row.rank_move} />
         </div>
       </div>
 
-      {/* Rank movement badge */}
-      <div className="mt-4 self-start">
-        <RankMoveBadge rankMove={row.rank_move} />
+      {/* Details */}
+      <div className="flex-1 min-w-0 flex flex-col items-center text-center z-10 pt-2 mb-6">
+        <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-[oklch(60%_0.25_280)] mb-1.5">
+          #{row.chart_rank}
+        </p>
+        <p className="text-lg font-bold leading-[1.15] tracking-tight line-clamp-2 text-white group-hover:text-[oklch(60%_0.25_280)] transition-colors">
+          {row.name}
+        </p>
+        {row.artist_or_publisher && (
+          <p className="mt-1.5 text-sm font-medium tracking-tight text-white/60 line-clamp-1">
+            {row.artist_or_publisher}
+          </p>
+        )}
       </div>
 
-      {/* Divider */}
-      <div className={`h-px my-5 ${isDark ? "bg-white/[12%]" : "bg-[#ebebeb]"}`} />
-
-      {/* Bottom row */}
-      <div className="flex items-center justify-between">
-        <PlatformIcon row={row} dark={isDark} />
+      {/* Bottom actions */}
+      <div className="flex items-center justify-between z-10 w-full pt-4 border-t border-white/10">
+        <PlatformIcon row={row} dark={true} />
         <div className="relative">
           <button
             onMouseDown={(e) => e.stopPropagation()}
             onClick={(e) => { e.stopPropagation(); setAddOpen((v) => !v); }}
             className={[
-              "flex items-center gap-1.5 rounded-lg border px-[15px] py-[9px] text-sm font-medium transition-colors",
-              isDark
-                ? "bg-white text-[#171717] border-white hover:bg-[#ededed]"
-                : "bg-white text-[#171717] border-[#ebebeb] hover:bg-[#171717] hover:text-white hover:border-[#171717]",
+              "flex items-center justify-center size-9 rounded-full transition-colors",
+              "text-white/40 hover:bg-white/10 hover:text-[oklch(60%_0.25_280)]",
             ].join(" ")}
           >
-            <BookmarkPlusIcon className="size-4" />
-            Add to list
+            <BookmarkPlusIcon className="size-4.5" />
           </button>
           <AddToListDropdown
             rows={[row]}
