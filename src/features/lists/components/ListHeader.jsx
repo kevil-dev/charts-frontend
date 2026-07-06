@@ -61,13 +61,17 @@ function exportJson(list) {
 
 function ArtworkCell({ item }) {
   return (
-    <div className="w-16 h-16 bg-muted overflow-hidden">
-      {item && (
+    <div className="w-full h-full bg-muted/30 overflow-hidden">
+      {item ? (
         <img
           src={item.artwork_url}
           alt={item.podcast_name}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover mix-blend-overlay opacity-90 transition-opacity hover:opacity-100"
         />
+      ) : (
+        <div className="w-full h-full flex items-center justify-center bg-muted/20 backdrop-blur-sm">
+          <Link2Icon className="size-8 text-muted-foreground/30" />
+        </div>
       )}
     </div>
   );
@@ -227,7 +231,7 @@ function InlineTitle({ value, onSave, readOnly }) {
 
   if (editing) {
     return (
-      <div>
+      <div className="mb-2">
         <input
           autoFocus
           value={draft}
@@ -235,33 +239,33 @@ function InlineTitle({ value, onSave, readOnly }) {
           onBlur={commit}
           onKeyDown={onKeyDown}
           maxLength={60}
-          className="text-4xl font-bold tracking-tight bg-transparent border-b border-border outline-none w-full"
+          className="text-4xl md:text-6xl font-extrabold tracking-tight bg-transparent border-b-2 border-[var(--brand-indigo)] outline-none w-full text-foreground"
         />
-        <span className="text-xs text-muted-foreground">{draft.length}/60</span>
+        <span className="text-xs text-[var(--brand-indigo)] mt-1 inline-block font-mono">{draft.length}/60</span>
       </div>
     );
   }
 
   return (
-    <div className={readOnly ? "" : "group flex items-start gap-1.5"}>
+    <div className={readOnly ? "mb-2" : "group flex items-center gap-3 mb-2"}>
       <span
         onClick={startEdit}
         role={readOnly ? undefined : "button"}
         tabIndex={readOnly ? undefined : 0}
         onKeyDown={(e) => e.key === "Enter" && startEdit()}
-        className={`text-4xl font-bold tracking-tight text-foreground leading-tight block ${
+        className={`text-4xl md:text-7xl font-black tracking-tighter text-foreground leading-[1.1] block ${
           readOnly ? "" : "cursor-text hover:opacity-80 transition-opacity"
         }`}
       >
-        {value || <span className="text-muted-foreground/50">Untitled list</span>}
+        {value || <span className="text-muted-foreground/40 font-bold">Untitled List</span>}
       </span>
       {!readOnly && (
         <button
           onClick={startEdit}
           aria-label="Edit title"
-          className="mt-3 shrink-0 rounded p-0.5 text-muted-foreground opacity-0 transition-opacity hover:text-foreground group-hover:opacity-100"
+          className="shrink-0 rounded-full p-2 bg-muted/50 text-muted-foreground opacity-0 transition-all hover:bg-muted hover:text-foreground group-hover:opacity-100"
         >
-          <PencilIcon className="size-3.5" />
+          <PencilIcon className="size-4" />
         </button>
       )}
     </div>
@@ -367,114 +371,122 @@ export default function ListHeader({
 
   return (
     <>
-      <div className="flex items-start gap-6 pb-6">
-
-        {/* 2×2 artwork grid */}
-        <div className="grid grid-cols-2 gap-0.5 w-32 h-32 rounded-xl overflow-hidden shrink-0">
-          {artworkSlots.map((item, i) => (
-            <ArtworkCell key={i} item={item} />
-          ))}
-        </div>
-
-        {/* Meta */}
-        <div className="flex flex-col gap-1 min-w-0 flex-1 pt-1">
-          <InlineTitle
-            value={list?.title}
-            onSave={handleTitleSave}
-            readOnly={readOnly}
-          />
-
-          <InlineDescription
-            value={list?.description}
-            onSave={handleDescriptionSave}
-            readOnly={readOnly}
-          />
-
-          {/* Stats + privacy pill + share button */}
-          <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
-            <span>{itemCount} {itemCount === 1 ? "show" : "shows"}</span>
-            <span aria-hidden="true">·</span>
-            <span className="inline-flex items-center gap-1 rounded-full border border-border px-2.5 py-0.5 text-xs">
-              {list?.share_token ? (
-                <><Link2Icon className="size-3" />Shared</>
-              ) : (
-                <><LockIcon className="size-3" />Private</>
-              )}
-            </span>
-            {!readOnly && (
-              <button
-                onClick={() => setShareModalOpen(true)}
-                className="rounded-full border border-border p-1.5 hover:bg-muted transition-colors"
-                aria-label="Share list"
-              >
-                <Share2Icon className="size-4" />
-              </button>
-            )}
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-b from-muted/50 to-background border border-border/50 p-6 md:p-10 mb-8 shadow-xl">
+        <div className="relative z-10 flex flex-col md:flex-row items-center md:items-end gap-8">
+          
+          {/* 2×2 artwork grid */}
+          <div className="grid grid-cols-2 gap-0.5 w-48 h-48 md:w-64 md:h-64 rounded-2xl overflow-hidden shrink-0 shadow-2xl shadow-black/50 border border-white/10 bg-muted">
+            {artworkSlots.map((item, i) => (
+              <ArtworkCell key={i} item={item} />
+            ))}
           </div>
 
-          {/* Action buttons — hidden in readOnly mode */}
-          {!readOnly && (
-            <div className="mt-4 flex items-center gap-3">
-              <button
-                onClick={() => router.push("/charts/apple/us/top")}
-                className="rounded-full bg-foreground text-background text-sm font-medium px-5 py-2 hover:opacity-80 transition-opacity flex items-center gap-1.5"
-              >
-                <PlusIcon className="size-4" />
-                Add podcasts
-              </button>
+          {/* Meta */}
+          <div className="flex flex-col gap-2 min-w-0 flex-1 pt-2 w-full text-center md:text-left">
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground mb-1">
+              Public Playlist
+            </p>
+            
+            <InlineTitle
+              value={list?.title}
+              onSave={handleTitleSave}
+              readOnly={readOnly}
+            />
 
-              <div className="relative" ref={exportRef}>
+            <InlineDescription
+              value={list?.description}
+              onSave={handleDescriptionSave}
+              readOnly={readOnly}
+            />
+
+            {/* Stats + privacy pill + share button */}
+            <div className="mt-4 flex flex-wrap items-center justify-center md:justify-start gap-3 text-sm text-muted-foreground font-medium">
+              <span className="text-foreground">{itemCount} {itemCount === 1 ? "podcast" : "podcasts"}</span>
+              <span aria-hidden="true" className="opacity-50">•</span>
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-border/50 bg-background/50 px-3 py-1 text-xs backdrop-blur-md">
+                {list?.share_token ? (
+                  <><Link2Icon className="size-3.5 text-[var(--brand-indigo)]" />Shared</>
+                ) : (
+                  <><LockIcon className="size-3.5" />Private</>
+                )}
+              </span>
+              {!readOnly && (
                 <button
-                  onClick={() => setExportOpen((v) => !v)}
-                  onBlur={(e) => {
-                    if (!exportRef.current?.contains(e.relatedTarget)) {
-                      setExportOpen(false);
-                    }
-                  }}
-                  className="rounded-full border border-border text-sm font-medium px-4 py-2 hover:bg-muted transition-colors flex items-center gap-1.5"
+                  onClick={() => setShareModalOpen(true)}
+                  className="rounded-full bg-[var(--brand-indigo)]/10 text-[var(--brand-indigo)] p-2 hover:bg-[var(--brand-indigo)] hover:text-white transition-colors"
+                  aria-label="Share list"
                 >
-                  <DownloadIcon className="size-4" />
-                  Export
-                  <ChevronDownIcon className="size-3" />
+                  <Share2Icon className="size-4" />
+                </button>
+              )}
+            </div>
+
+            {/* Action buttons — hidden in readOnly mode */}
+            {!readOnly && (
+              <div className="mt-8 flex items-center justify-center md:justify-start gap-4">
+                <button
+                  onClick={() => router.push("/charts/apple/us/top")}
+                  className="rounded-full bg-foreground text-background text-sm font-bold px-8 py-3 hover:scale-105 transition-transform flex items-center gap-2 shadow-lg shadow-black/20"
+                >
+                  <PlusIcon className="size-5" />
+                  Add to List
                 </button>
 
-                {exportOpen && (
-                  <div className="absolute left-0 top-full z-50 mt-1 w-40 rounded-lg border border-border bg-popover shadow-md overflow-hidden">
-                    <button
-                      onMouseDown={(e) => {
-                        e.preventDefault();
-                        exportCsv(list);
+                <div className="relative" ref={exportRef}>
+                  <button
+                    onClick={() => setExportOpen((v) => !v)}
+                    onBlur={(e) => {
+                      if (!exportRef.current?.contains(e.relatedTarget)) {
                         setExportOpen(false);
-                      }}
-                      className="w-full px-4 py-2.5 text-left text-sm hover:bg-muted transition-colors"
-                    >
-                      Export as CSV
-                    </button>
-                    <button
-                      onMouseDown={(e) => {
-                        e.preventDefault();
-                        exportJson(list);
-                        setExportOpen(false);
-                      }}
-                      className="w-full px-4 py-2.5 text-left text-sm hover:bg-muted transition-colors border-t border-border"
-                    >
-                      Export as JSON
-                    </button>
-                    <button
-                      onMouseDown={(e) => {
-                        e.preventDefault();
-                        setEmailModalOpen(true);
-                        setExportOpen(false);
-                      }}
-                      className="w-full px-4 py-2.5 text-left text-sm hover:bg-muted transition-colors border-t border-border"
-                    >
-                      Email export
-                    </button>
-                  </div>
-                )}
+                      }
+                    }}
+                    className="rounded-full border-2 border-border text-sm font-bold px-6 py-2.5 hover:bg-muted transition-colors flex items-center gap-2"
+                  >
+                    <DownloadIcon className="size-4" />
+                    Export
+                    <ChevronDownIcon className="size-4 opacity-50" />
+                  </button>
+
+                  {exportOpen && (
+                    <div className="absolute left-0 top-full z-50 mt-2 w-48 rounded-xl border border-border bg-popover shadow-2xl overflow-hidden animate-in fade-in zoom-in-95">
+                      <button
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          exportCsv(list);
+                          setExportOpen(false);
+                        }}
+                        className="w-full px-4 py-3 text-left text-sm font-medium hover:bg-muted transition-colors flex items-center gap-2"
+                      >
+                        <span className="font-mono text-[10px] uppercase bg-muted px-1.5 py-0.5 rounded text-muted-foreground">CSV</span>
+                        Export Data
+                      </button>
+                      <button
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          exportJson(list);
+                          setExportOpen(false);
+                        }}
+                        className="w-full px-4 py-3 text-left text-sm font-medium hover:bg-muted transition-colors border-t border-border flex items-center gap-2"
+                      >
+                        <span className="font-mono text-[10px] uppercase bg-muted px-1.5 py-0.5 rounded text-muted-foreground">JSON</span>
+                        Export Data
+                      </button>
+                      <button
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          setEmailModalOpen(true);
+                          setExportOpen(false);
+                        }}
+                        className="w-full px-4 py-3 text-left text-sm font-medium hover:bg-muted transition-colors border-t border-border text-[var(--brand-indigo)]"
+                      >
+                        Email Export
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
 

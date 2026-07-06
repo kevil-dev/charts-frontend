@@ -9,55 +9,6 @@ import { RankMoveBadge } from "./ChartRow";
 import { usePodcastMeta } from "@/features/podcasts/hooks/usePodcastMeta";
 import { resolveTier } from "@/features/billing/utils/resolveTier";
 
-// ── tiny inline sparkline for rank_history (elite only) ───────────────────────
-function RankSparkline({ data }) {
-  if (!data?.length || data.length < 2) return null;
-
-  const ranks = data.map((d) => d.rank);
-  const weeks = data.map((d) => d.week);
-  const minRank = Math.min(...ranks);
-  const maxRank = Math.max(...ranks);
-  const range = maxRank - minRank || 1;
-
-  const W = 200;
-  const H = 48;
-  const pad = 4;
-
-  // Invert Y so rank 1 is at the top
-  const points = ranks.map((r, i) => {
-    const x = pad + (i / (ranks.length - 1)) * (W - pad * 2);
-    const y = pad + ((r - minRank) / range) * (H - pad * 2);
-    return `${x},${y}`;
-  });
-
-  const polyline = points.join(" ");
-  const lastX = parseFloat(points[points.length - 1].split(",")[0]);
-  const lastY = parseFloat(points[points.length - 1].split(",")[1]);
-
-  return (
-    <div>
-      <p className="text-xs font-medium text-muted-foreground mb-2 uppercase tracking-wide">
-        Rank trend
-      </p>
-      <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-12 overflow-visible">
-        <polyline
-          points={polyline}
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          strokeLinejoin="round"
-          strokeLinecap="round"
-          className="text-foreground"
-        />
-        <circle cx={lastX} cy={lastY} r="3" className="fill-foreground" />
-      </svg>
-      <div className="flex justify-between mt-1">
-        <span className="font-mono text-[10px] text-muted-foreground">{weeks[0]}</span>
-        <span className="font-mono text-[10px] text-muted-foreground">{weeks[weeks.length - 1]}</span>
-      </div>
-    </div>
-  );
-}
 
 // ── single labelled metadata row ──────────────────────────────────────────────
 function MetaRow({ label, value }) {
@@ -104,7 +55,7 @@ const DUMMY_PRO_ROWS = [
   { label: "Latest Episode", value: "Jun 2025" },
 ];
 
-function LockedProSection() {
+function LockedProSection({ podcastId }) {
   return (
     <div className="relative mt-2">
       {/* Blurred dummy content */}
@@ -114,7 +65,7 @@ function LockedProSection() {
         style={{ filter: "blur(5px)", opacity: 0.6 }}
       >
         <div className="h-px bg-border" />
-        {DUMMY_PRO_ROWS.map((row) => (
+        {DUMMY_PRO_ROWS.slice(0, 3).map((row) => (
           <div key={row.label}>
             <p className="text-xs font-medium text-muted-foreground mb-0.5 uppercase tracking-wide">
               {row.label}
@@ -122,14 +73,6 @@ function LockedProSection() {
             <p className="text-sm text-foreground">{row.value}</p>
           </div>
         ))}
-        <div className="flex flex-col gap-2">
-          <span className="inline-flex items-center gap-1.5 text-sm text-[var(--brand-link)]">
-            Website <ExternalLinkIcon className="size-3" />
-          </span>
-          <span className="inline-flex items-center gap-1.5 text-sm text-[var(--brand-link)]">
-            RSS Feed <ExternalLinkIcon className="size-3" />
-          </span>
-        </div>
       </div>
 
       {/* Lock overlay */}
@@ -139,14 +82,14 @@ function LockedProSection() {
             <LockIcon className="size-4 text-muted-foreground" />
           </div>
           <p className="text-sm font-semibold text-foreground mb-1">
-            Pro metadata locked
+            Deep analytics locked
           </p>
           <p className="text-xs text-muted-foreground mb-4">
-            Upgrade to Pro for full show profiles, episode stats, links, and more.
+            Upgrade to view rank trends, deep metadata, and ratings.
           </p>
           <Link
             href="/pricing"
-            className="inline-flex items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-80 transition-opacity"
+            className="inline-flex w-full items-center justify-center rounded-xl bg-primary px-4 py-2.5 text-sm font-bold text-primary-foreground hover:opacity-90 transition-opacity"
           >
             Upgrade to view
           </Link>
@@ -353,124 +296,28 @@ export default function PodcastDrawer({ podcast, onClose }) {
                   )}
 
                   {/* ── Locked pro preview for free users ── */}
-                  {isFree && !isLoading && meta && <LockedProSection />}
+                  {isFree && !isLoading && meta && <LockedProSection podcastId={podcast.match_key} />}
 
-                  {/* ── Pro tier fields (pro/elite only — won't render for free users) ── */}
-
-                  {meta?.long_description && (
-                    <div>
-                      <p className="text-xs font-medium text-muted-foreground mb-0.5 uppercase tracking-wide">
-                        Full description
-                      </p>
-                      <p className="text-sm text-foreground leading-relaxed">
-                        {meta.long_description}
-                      </p>
-                    </div>
-                  )}
-                  {meta?.release_frequency && (
-                    <MetaRow label="Release frequency" value={meta.release_frequency} />
-                  )}
-                  {meta?.avg_episode_duration_minutes != null && (
-                    <MetaRow
-                      label="Avg episode length"
-                      value={`${meta.avg_episode_duration_minutes} min`}
-                    />
-                  )}
-                  {meta?.language && (
-                    <MetaRow label="Language" value={meta.language} />
-                  )}
-                  {meta?.content_advisory_rating && (
-                    <MetaRow label="Content rating" value={meta.content_advisory_rating} />
-                  )}
-                  {(meta?.first_published_date || meta?.last_published_date) && (
-                    <div className="flex gap-6">
-                      {meta?.first_published_date && (
-                        <div>
-                          <p className="text-xs font-medium text-muted-foreground mb-0.5 uppercase tracking-wide">First published</p>
-                          <p className="text-sm text-foreground">{meta.first_published_date}</p>
-                        </div>
-                      )}
-                      {meta?.last_published_date && (
-                        <div>
-                          <p className="text-xs font-medium text-muted-foreground mb-0.5 uppercase tracking-wide">Latest episode</p>
-                          <p className="text-sm text-foreground">{meta.last_published_date}</p>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                  {(meta?.website_url || meta?.feed_url) && (
-                    <div className="flex flex-col gap-2">
-                      {meta?.website_url && (
-                        <a
-                          href={meta.website_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 text-sm text-[var(--brand-link)] hover:underline"
-                        >
-                          Website <ExternalLinkIcon className="size-3" />
-                        </a>
-                      )}
-                      {meta?.feed_url && (
-                        <a
-                          href={meta.feed_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 text-sm text-[var(--brand-link)] hover:underline"
-                        >
-                          RSS Feed <ExternalLinkIcon className="size-3" />
-                        </a>
-                      )}
-                    </div>
-                  )}
-
-                  {/* ── Elite tier fields ── */}
-                  {(meta?.rating_average != null || meta?.rating_count != null) && (
+                  {/* ── Pro/Elite Navigation Button ── */}
+                  {!isFree && !isLoading && meta && (
                     <>
                       <div className="h-px bg-border" />
-                      <div className="flex gap-6">
-                        {meta?.rating_average != null && (
-                          <div>
-                            <p className="text-xs font-medium text-muted-foreground mb-0.5 uppercase tracking-wide">Rating</p>
-                            <p className="text-sm text-foreground font-semibold">{meta.rating_average} / 5</p>
-                          </div>
-                        )}
-                        {meta?.rating_count != null && (
-                          <div>
-                            <p className="text-xs font-medium text-muted-foreground mb-0.5 uppercase tracking-wide">Reviews</p>
-                            <p className="text-sm text-foreground">{meta.rating_count.toLocaleString("en-IN")}</p>
-                          </div>
-                        )}
-                      </div>
+                      <Link
+                        href={`/podcasts/${encodeURIComponent(podcast.match_key)}?name=${encodeURIComponent(podcast.name)}&artwork=${encodeURIComponent(podcast.artwork || podcast.artwork_url_600 || "")}`}
+                        className="group inline-flex w-full items-center justify-between rounded-xl bg-muted/50 border border-border/50 px-5 py-4 hover:bg-muted transition-colors"
+                      >
+                        <div className="flex flex-col text-left">
+                          <span className="text-sm font-bold text-foreground">View Full Analytics</span>
+                          <span className="text-xs text-muted-foreground mt-0.5">Rank trends, metadata, and ratings</span>
+                        </div>
+                        <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-background border border-border/50 shadow-sm group-hover:scale-110 transition-transform">
+                          <ExternalLinkIcon className="size-3.5 text-muted-foreground" />
+                        </div>
+                      </Link>
                     </>
                   )}
 
-                  {meta?.rank_history?.length > 1 && (
-                    <>
-                      <div className="h-px bg-border" />
-                      <RankSparkline data={meta.rank_history} />
-                    </>
-                  )}
 
-                  {meta?.global_footprint?.length > 0 && (
-                    <>
-                      <div className="h-px bg-border" />
-                      <div>
-                        <p className="text-xs font-medium text-muted-foreground mb-2 uppercase tracking-wide">
-                          Global presence
-                        </p>
-                        <div className="flex flex-wrap gap-1.5">
-                          {meta.global_footprint.map((f) => (
-                            <span
-                              key={f.country}
-                              className="rounded-full border border-border px-2.5 py-0.5 text-xs text-muted-foreground"
-                            >
-                              {f.country}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    </>
-                  )}
 
                   {/* ── Not found / empty state ── */}
                   {!isLoading && notFound && (
