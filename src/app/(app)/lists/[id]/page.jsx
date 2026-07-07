@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
-import ListsSidebarClient from "@/features/lists/components/ListsSidebarClient";
-import ListPage from "@/features/lists/components/ListPage";
+import ListsSidebarClient from "@/components/lists/ListsSidebarClient";
+import ListPage from "@/components/lists/ListPage";
 
 async function fetchAllLists() {
   const cookieStore = await cookies();

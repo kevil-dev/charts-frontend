@@ -5,87 +5,69 @@ Before any Next.js work, find and read the relevant doc in `node_modules/next/di
 Your training data is outdated — the docs are the source of truth.
 
 ## 2. Folder structure — strictly enforced
+
+Flat, type-based layout — files are grouped by *what they are* (component, hook,
+service, provider, util, constant), not by feature. There is no `src/features/`
+directory; do not recreate one.
+
+```
 src/
-
-├── app/                          # Routing ONLY — no business logic here
-
-│   ├── (auth)/                   # Login, register pages
-
-│   ├── (guest)/                  # Public pages (charts, landing, pricing, blog)
-
-│   └── (app)/                    # Authenticated-only pages (lists, billing, account)
-
+├── app/                    # Routing ONLY — no business logic here
+│   ├── (auth)/             # Login, register pages
+│   ├── (guest)/            # Public pages (charts, landing, pricing, blog)
+│   └── (app)/              # Authenticated-only pages (lists, billing, account)
 │
-
 ├── components/
-
-│   ├── ui/                       # shadcn primitives — do not modify
-
-│   └── layout/                   # Global layout: navbar, footer, logo
-│       # AuthButtons.jsx owns the avatar dropdown for authenticated users —
-│       # My Lists / Billing nav items live there (and in MobileToggle.jsx's
-│       # mobile equivalent), not in config/navigation.js
-
+│   ├── ui/                 # shadcn primitives — do not modify
+│   ├── layout/             # Global layout: navbar, footer, logo
+│   │   # AuthButtons.jsx owns the avatar dropdown for authenticated users —
+│   │   # My Lists / Billing nav items live there (and in MobileToggle.jsx's
+│   │   # mobile equivalent), not in src/constants/navigation.js
+│   ├── billing/            # Pricing cards, billing status UI
+│   ├── charts/             # All chart UI components
+│   ├── lists/              # All lists UI components (dropdowns/modals included, flat — no fragments/ subfolder)
+│   └── podcasts/           # Podcast profile UI
 │
-
-├── lib/
-
-│   └── api.js                    # Axios instance ONLY — no feature logic here
-
+├── hooks/                  # All data hooks, flat — useCharts.js, useFilters.js, useBillingStatus.js,
+│                           # useAddToList.js, useListDetail.js, useLists.js, usePodcastMeta.js
 │
-
-├── config/                       # Static app-wide config (navigation, platforms)
-
+├── services/               # All API call modules, flat — authApi.js, chartsApi.js, billingApi.js,
+│                           # listsApi.js, podcastMetaApi.js
 │
+├── providers/              # App-wide Context providers — AuthContext.jsx, ListsCacheContext.jsx,
+│                           # QueryProvider.jsx
+│
+├── utils/                  # Pure helper functions — resolveTier.js, normalise.js
+│
+├── constants/              # Static app-wide config/data — charts.js (platforms/fallbacks),
+│                           # navigation.js (navLinks/footerLinks)
+│
+└── lib/
+    └── api.js              # Axios instance ONLY — no feature logic here
+```
 
-└── features/
-
-├── auth/
-
-│   ├── context/              # AuthContext.jsx
-
-│   └── services/             # authApi.js
-
-└── charts/
-
-├── components/           # All chart UI components
-
-├── hooks/                # useCharts.js, useFilters.js
-
-├── services/             # chartsApi.js
-
-└── utils/                # normalise.js, any pure helpers
-
-└── billing/
-    ├── components/           # Pricing cards, billing status UI
-    ├── hooks/                # useBillingStatus.js
-    ├── services/             # billingApi.js
-    └── utils/                # resolveTier.js — pure function, no imports
-
-└── podcasts/
-    ├── services/             # podcastMetaApi.js
-    └── hooks/                # usePodcastMeta.js
 ## 3. Rules for placing new files
 
-- New chart UI component → `src/features/charts/components/`
-- New chart data hook → `src/features/charts/hooks/`
-- New chart API call → `src/features/charts/services/chartsApi.js`
-- New lists UI component → `src/features/lists/components/`
-- New lists hook → `src/features/lists/hooks/`
-- New lists API call → `src/features/lists/services/listsApi.js`
-- Lists sidebar → `src/features/lists/components/ListSidebar.jsx`
-- Lists sidebar item → `src/features/lists/components/ListSidebarItem.jsx`
-- Lists sidebar client shell → `src/features/lists/components/ListsSidebarClient.jsx`
-- Lists shared cache context → `src/features/lists/context/ListsCacheContext.jsx`
-- New billing UI component → `src/features/billing/components/`
-- New billing hook → `src/features/billing/hooks/`
-- New billing API call → `src/features/billing/services/billingApi.js`
+- New chart UI component → `src/components/charts/`
+- New chart data hook → `src/hooks/`
+- New chart API call → `src/services/chartsApi.js`
+- New lists UI component → `src/components/lists/`
+- New lists hook → `src/hooks/`
+- New lists API call → `src/services/listsApi.js`
+- Lists sidebar → `src/components/lists/ListSidebar.jsx`
+- Lists sidebar item → `src/components/lists/ListSidebarItem.jsx`
+- Lists sidebar client shell → `src/components/lists/ListsSidebarClient.jsx`
+- Lists shared cache provider → `src/providers/ListsCacheContext.jsx`
+- New billing UI component → `src/components/billing/`
+- New billing hook → `src/hooks/`
+- New billing API call → `src/services/billingApi.js`
 - Tier resolution logic (UI display only, never for access control) →
-  `src/features/billing/utils/resolveTier.js`
-- New podcast metadata API call → `src/features/podcasts/services/podcastMetaApi.js`
-- New podcast metadata hook → `src/features/podcasts/hooks/`
-- New auth UI component → `src/features/auth/components/`
-- New feature entirely → `src/features/<feature-name>/` with the same sub-structure
+  `src/utils/resolveTier.js`
+- New podcast metadata API call → `src/services/podcastMetaApi.js`
+- New podcast metadata hook → `src/hooks/`
+- New auth UI component → `src/components/auth/` (doesn't exist yet — create it when the first one is needed)
+- New feature entirely → add its components to `src/components/<feature-name>/`, hooks to `src/hooks/`,
+  services to `src/services/`, pure helpers to `src/utils/` — do not create a `src/features/` subtree
 - Global reusable UI (not feature-specific) → `src/components/ui/` or `src/components/layout/`
 - New authenticated page → `src/app/(app)/<page-name>/page.jsx`
 - New public page → `src/app/(guest)/<page-name>/page.jsx`
@@ -95,13 +77,15 @@ src/
 ## 4. Import path conventions
 
 - Always use `@/` alias — never relative `../../` paths
-- Auth context: `@/features/auth/context/AuthContext`
-- Charts API: `@/features/charts/services/chartsApi`
-- Charts hooks: `@/features/charts/hooks/useCharts` etc.
-- Lists API: `@/features/lists/services/listsApi`
-- Billing API: `@/features/billing/services/billingApi`
-- Tier resolution: `@/features/billing/utils/resolveTier`
-- Podcast metadata API: `@/features/podcasts/services/podcastMetaApi`
+- Auth context: `@/providers/AuthContext`
+- Charts API: `@/services/chartsApi`
+- Charts hooks: `@/hooks/useCharts` etc.
+- Lists API: `@/services/listsApi`
+- Lists cache provider: `@/providers/ListsCacheContext`
+- Billing API: `@/services/billingApi`
+- Tier resolution: `@/utils/resolveTier`
+- Podcast metadata API: `@/services/podcastMetaApi`
+- Static config/data: `@/constants/charts`, `@/constants/navigation`
 
 ## 5. Auth pattern — strictly enforced
 
@@ -124,4 +108,4 @@ src/
 
 - `src/components/ui/` — shadcn generated files, never edit manually
 - `src/lib/api.js` — only the axios instance lives here, withCredentials: true is required
-- `config/charts.js` — platform list and fallbacks, not for feature logic
+- `src/constants/charts.js` — platform list and fallbacks, not for feature logic

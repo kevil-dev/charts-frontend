@@ -1,4 +1,4 @@
-import PricingSection from "@/features/billing/components/PricingSection";
+import PricingSection from "@/components/billing/PricingSection";
 
 export const metadata = {
   title: "Pricing — Million Podcasts",

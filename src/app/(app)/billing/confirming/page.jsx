@@ -1,4 +1,4 @@
-import ConfirmingSubscription from "@/features/billing/components/ConfirmingSubscription";
+import ConfirmingSubscription from "@/components/billing/ConfirmingSubscription";
 
 export const metadata = { title: "Confirming subscription — Million Podcasts" };
 

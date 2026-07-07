@@ -1,6 +1,6 @@
 import Link from "next/link";
-import ListHeader from "@/features/lists/components/ListHeader";
-import ListRow from "@/features/lists/components/ListRow";
+import ListHeader from "@/components/lists/ListHeader";
+import ListRow from "@/components/lists/ListRow";
 
 async function fetchSharedList(token) {
   try {

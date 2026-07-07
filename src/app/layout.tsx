@@ -4,9 +4,9 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import LeftLinks from "@/components/layout/LeftLinks";
 import Footer from "@/components/layout/Footer";
-import { AuthProvider } from "@/features/auth/context/AuthContext";
-import { ListsCacheProvider } from "@/features/lists/context/ListsCacheContext";
-import QueryProvider from "@/components/providers/QueryProvider";
+import { AuthProvider } from "@/providers/AuthContext";
+import { ListsCacheProvider } from "@/providers/ListsCacheContext";
+import QueryProvider from "@/providers/QueryProvider";
 import Script from "next/script";
 import { Toaster } from "sonner";
 

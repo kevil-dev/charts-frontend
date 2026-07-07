@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/features/auth/context/AuthContext";
-import { resolveTier } from "@/features/billing/utils/resolveTier";
+import { useAuth } from "@/providers/AuthContext";
+import { resolveTier } from "@/utils/resolveTier";
 import {
   DropdownMenu,
   DropdownMenuContent,
