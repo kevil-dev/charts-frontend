@@ -8,7 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { normaliseCountries, normaliseCategories } from "@/features/charts/utils/normalise";
+import { normaliseCountries, normaliseCategories } from "@/utils/normalise";
 
 const getFlagImg = (code) => (
   <img 

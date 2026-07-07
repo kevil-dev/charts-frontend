@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { billingApi } from "@/features/billing/services/billingApi";
+import { billingApi } from "@/services/billingApi";
 
 export function useBillingStatus() {
   return useQuery({

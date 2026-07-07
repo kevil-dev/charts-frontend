@@ -1,6 +1,6 @@
 "use client";
 
-import { ChartRowCard } from "@/features/charts/components/ChartRow";
+import { ChartRowCard } from "@/components/charts/ChartRow";
 
 export default function ListRow({ item, onDelete }) {
   const row = {

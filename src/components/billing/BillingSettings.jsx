@@ -4,11 +4,11 @@ import { useState } from "react";
 import Link from "next/link";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { useBillingStatus } from "@/features/billing/hooks/useBillingStatus";
-import { billingApi } from "@/features/billing/services/billingApi";
-import { useAuth } from "@/features/auth/context/AuthContext";
-import BillingCard from "@/features/billing/components/BillingCard";
-import CancelRow from "@/features/billing/components/CancelRow";
+import { useBillingStatus } from "@/hooks/useBillingStatus";
+import { billingApi } from "@/services/billingApi";
+import { useAuth } from "@/providers/AuthContext";
+import BillingCard from "@/components/billing/BillingCard";
+import CancelRow from "@/components/billing/CancelRow";
 
 function formatDate(dateStr) {
   if (!dateStr) return null;

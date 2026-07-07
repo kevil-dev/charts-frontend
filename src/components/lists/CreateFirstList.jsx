@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { PlusIcon } from "lucide-react";
-import listsApi from "@/features/lists/services/listsApi";
+import listsApi from "@/services/listsApi";
 
 export default function CreateFirstList() {
   const router = useRouter();

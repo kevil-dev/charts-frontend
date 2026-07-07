@@ -1,4 +1,4 @@
-import PodcastProfile from "@/features/podcasts/components/PodcastProfile";
+import PodcastProfile from "@/components/podcasts/PodcastProfile";
 
 export async function generateMetadata({ params }) {
   // If you wanted to SSR metadata, you'd fetch it here.

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { UserIcon, MapPinIcon, Trash2Icon, BookmarkPlusIcon } from "lucide-react";
-import AddToListDropdown from "@/features/lists/components/AddToListDropdown";
+import AddToListDropdown from "@/components/lists/AddToListDropdown";
 
 const SIZE_CLASSES = {
   8: "size-8",

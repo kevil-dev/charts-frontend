@@ -4,7 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { BookmarkPlusIcon, CheckIcon } from "lucide-react";
 import { PlatformIcon, RankMoveBadge } from "./ChartRow";
-import AddToListDropdown from "@/features/lists/components/AddToListDropdown";
+import AddToListDropdown from "@/components/lists/AddToListDropdown";
 
 export default function PodiumCard({
   row,

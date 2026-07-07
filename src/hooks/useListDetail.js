@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import listsApi from "@/features/lists/services/listsApi";
+import listsApi from "@/services/listsApi";
 
 export function useListDetail(id) {
   const [list, setList]       = useState(null);

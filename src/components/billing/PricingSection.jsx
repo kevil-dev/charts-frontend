@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
-import { useAuth } from "@/features/auth/context/AuthContext";
-import { billingApi } from "@/features/billing/services/billingApi";
-import { resolveTier } from "@/features/billing/utils/resolveTier";
+import { useAuth } from "@/providers/AuthContext";
+import { billingApi } from "@/services/billingApi";
+import { resolveTier } from "@/utils/resolveTier";
 import PricingCard from "./PricingCard";
 
 const PRICING = {

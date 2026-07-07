@@ -5,8 +5,8 @@ import { PlusIcon, Loader2Icon, ArrowRightIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { useAuth } from "@/features/auth/context/AuthContext";
-import { useAddToList } from "@/features/lists/hooks/useAddToList";
+import { useAuth } from "@/providers/AuthContext";
+import { useAddToList } from "@/hooks/useAddToList";
 import {
   Dialog,
   DialogContent,

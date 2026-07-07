@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Loader2Icon } from "lucide-react";
-import { billingApi } from "@/features/billing/services/billingApi";
-import { useAuth } from "@/features/auth/context/AuthContext";
+import { billingApi } from "@/services/billingApi";
+import { useAuth } from "@/providers/AuthContext";
 
 const POLL_INTERVAL_MS = 2000;
 const MAX_ATTEMPTS = 20;

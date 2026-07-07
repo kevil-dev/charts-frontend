@@ -16,7 +16,7 @@ import {
   PencilIcon,
 } from "lucide-react";
 import { toast } from "sonner";
-import listsApi from "@/features/lists/services/listsApi";
+import listsApi from "@/services/listsApi";
 import EmailExportModal from "./EmailExportModal";
 
 // ── Export helpers ────────────────────────────────────────────────────────────

@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { podcastMetaApi } from "@/features/podcasts/services/podcastMetaApi";
+import { podcastMetaApi } from "@/services/podcastMetaApi";
 
 export function usePodcastMeta(matchKey, enabled) {
   return useQuery({

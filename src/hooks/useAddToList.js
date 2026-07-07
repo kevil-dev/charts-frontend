@@ -3,8 +3,8 @@
 import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import listsApi from "@/features/lists/services/listsApi";
-import { useListsCache } from "@/features/lists/context/ListsCacheContext";
+import listsApi from "@/services/listsApi";
+import { useListsCache } from "@/providers/ListsCacheContext";
 
 export function useAddToList() {
   const router = useRouter();

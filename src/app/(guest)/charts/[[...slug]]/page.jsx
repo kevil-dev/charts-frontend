@@ -1,8 +1,8 @@
 import { cache } from "react";
 import { redirect } from "next/navigation";
 import { dehydrate, HydrationBoundary, QueryClient } from "@tanstack/react-query";
-import ChartSection from "@/features/charts/components/ChartSection";
-import { platforms } from "../../../../../config/charts";
+import ChartSection from "@/components/charts/ChartSection";
+import { platforms } from "@/constants/charts";
 
 const VALID_PLATFORMS = platforms.map((p) => p.slug);
 const DEFAULT = { platform: "apple", country: "us", category: "top" };

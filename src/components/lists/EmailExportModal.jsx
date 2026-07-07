@@ -3,8 +3,8 @@
 import { useState, useEffect } from "react";
 import { XIcon, Loader2Icon } from "lucide-react";
 import { toast } from "sonner";
-import listsApi from "@/features/lists/services/listsApi";
-import { useAuth } from "@/features/auth/context/AuthContext";
+import listsApi from "@/services/listsApi";
+import { useAuth } from "@/providers/AuthContext";
 
 export default function EmailExportModal({ list, onClose }) {
   const { user } = useAuth();

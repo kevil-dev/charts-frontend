@@ -1,8 +1,8 @@
 "use client";
 
 import { useCallback } from "react";
-import { useListsCache } from "@/features/lists/context/ListsCacheContext";
-import listsApi from "@/features/lists/services/listsApi";
+import { useListsCache } from "@/providers/ListsCacheContext";
+import listsApi from "@/services/listsApi";
 
 export function useLists() {
   const { lists, addList, removeList } = useListsCache();

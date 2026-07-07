@@ -1,8 +1,8 @@
 "use client";
 
 import { createContext, useContext, useState, useCallback, useEffect, useRef } from "react";
-import listsApi from "@/features/lists/services/listsApi";
-import { useAuth } from "@/features/auth/context/AuthContext";
+import listsApi from "@/services/listsApi";
+import { useAuth } from "@/providers/AuthContext";
 
 const ListsCacheContext = createContext(null);
 

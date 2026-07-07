@@ -3,8 +3,8 @@
 import { useState, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { toast } from "sonner";
-import { useLists } from "@/features/lists/hooks/useLists";
-import ListSidebar from "@/features/lists/components/ListSidebar";
+import { useLists } from "@/hooks/useLists";
+import ListSidebar from "@/components/lists/ListSidebar";
 
 export default function ListsSidebarClient({ initialLists }) {
   const router = useRouter();

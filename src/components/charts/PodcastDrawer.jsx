@@ -4,10 +4,10 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { XIcon, LockIcon, ArrowLeftIcon, Loader2Icon, ExternalLinkIcon } from "lucide-react";
-import { useAuth } from "@/features/auth/context/AuthContext";
+import { useAuth } from "@/providers/AuthContext";
 import { RankMoveBadge } from "./ChartRow";
-import { usePodcastMeta } from "@/features/podcasts/hooks/usePodcastMeta";
-import { resolveTier } from "@/features/billing/utils/resolveTier";
+import { usePodcastMeta } from "@/hooks/usePodcastMeta";
+import { resolveTier } from "@/utils/resolveTier";
 
 
 // ── single labelled metadata row ──────────────────────────────────────────────

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useCharts } from "@/features/charts/hooks/useCharts";
+import { useCharts } from "@/hooks/useCharts";
 import ChartHero from "./ChartHero";
 import ChartTable from "./ChartTable";
 import PodcastDrawer from "./PodcastDrawer";

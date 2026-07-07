@@ -2,8 +2,8 @@
 
 import { useCallback } from "react";
 import Link from "next/link";
-import { useListDetail } from "@/features/lists/hooks/useListDetail";
-import listsApi from "@/features/lists/services/listsApi";
+import { useListDetail } from "@/hooks/useListDetail";
+import listsApi from "@/services/listsApi";
 import ListHeader from "./ListHeader";
 import ListRow from "./ListRow";
 import { showDeleteToast } from "./DeleteToast";

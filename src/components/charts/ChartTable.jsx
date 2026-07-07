@@ -12,11 +12,11 @@ import ChartRow, {
   RankMoveBadge,
   ChartRowCard,
 } from "./ChartRow";
-import { useAuth } from "@/features/auth/context/AuthContext";
+import { useAuth } from "@/providers/AuthContext";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { PodiumSkeleton,SkeletonRow } from "./ChartsSkeletons";
 import PodiumCard from "./PodiumCard";
-import AddToListDropdown from "@/features/lists/components/AddToListDropdown";
+import AddToListDropdown from "@/components/lists/AddToListDropdown";
 
 export default function ChartTable({
   page,

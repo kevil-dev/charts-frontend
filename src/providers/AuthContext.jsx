@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
-import { authApi } from "@/features/auth/services/authApi";
+import { authApi } from "@/services/authApi";
 
 const AuthContext = createContext(null);
 

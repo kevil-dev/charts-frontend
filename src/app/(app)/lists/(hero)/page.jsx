@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import CreateFirstList from "@/features/lists/components/CreateFirstList";
+import CreateFirstList from "@/components/lists/CreateFirstList";
 
 async function fetchLists() {
   const cookieStore = await cookies();

@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { chartsApi } from "@/features/charts/services/chartsApi";
+import { chartsApi } from "@/services/chartsApi";
 
 export function useCharts({ platform, country, category, page = 1 }) {
   const query = useQuery({

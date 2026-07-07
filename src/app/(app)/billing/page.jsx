@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { QueryClient, HydrationBoundary, dehydrate } from "@tanstack/react-query";
-import BillingSettings from "@/features/billing/components/BillingSettings";
+import BillingSettings from "@/components/billing/BillingSettings";
 
 async function fetchBillingStatus() {
   const cookieStore = await cookies();

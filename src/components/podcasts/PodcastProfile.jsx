@@ -5,10 +5,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { ArrowLeftIcon, ExternalLinkIcon, StarIcon, BarChart3Icon, GlobeIcon, Loader2Icon } from "lucide-react";
-import { usePodcastMeta } from "@/features/podcasts/hooks/usePodcastMeta";
-import { RankMoveBadge } from "@/features/charts/components/ChartRow";
+import { usePodcastMeta } from "@/hooks/usePodcastMeta";
+import { RankMoveBadge } from "@/components/charts/ChartRow";
 import { motion } from "motion/react";
-import { getFlagEmoji } from "@/features/charts/utils/normalise";
+import { getFlagEmoji } from "@/utils/normalise";
 
 // A massive, premium area chart for rank trends
 function PremiumSparkline({ data }) {

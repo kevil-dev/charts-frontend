@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import DynamicBreadcrumb from "./DynamicBreadcrumb";
 import PlatformTabs from "./PlatformTabs";
 import ChartFilters from "./ChartFilters";
-import { useFilters } from "@/features/charts/hooks/useFilters";
+import { useFilters } from "@/hooks/useFilters";
 
 export default function ChartHero({
   platform,

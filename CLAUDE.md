@@ -51,7 +51,7 @@ Feature services (`chartsApi`, `listsApi`, `authApi`) call the Axios instance. T
 
 ### TanStack Query
 
-`QueryProvider` wraps the app in `src/components/providers/QueryProvider.jsx`. Chart data uses `useCharts` hook with query key `["charts", platform, country, category, page]`. The server pre-seeds this key via `HydrationBoundary` in the charts page.
+`QueryProvider` wraps the app in `src/providers/QueryProvider.jsx`. Chart data uses `useCharts` hook with query key `["charts", platform, country, category, page]`. The server pre-seeds this key via `HydrationBoundary` in the charts page.
 
 ### Tailwind v4
 
