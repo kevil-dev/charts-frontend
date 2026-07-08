@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { selectUser, selectAuthLoading, register, loginWithGoogle } from "@/store/authSlice";
+import { resetAllApiCaches } from "@/store/resetApiCaches";
 import { Button } from "@/components/ui/button";
 
 function GoogleIcon() {
@@ -67,6 +68,8 @@ function RegisterPageContent() {
         callback: async (response) => {
           try {
             await dispatch(loginWithGoogle(response.credential)).unwrap();
+            // Defense-in-depth: flush any residual cache from a previous session.
+            resetAllApiCaches(dispatch);
             router.push(
               from && from.startsWith("/") ? from : "/charts/apple/us/top",
             );

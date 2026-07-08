@@ -10,6 +10,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { selectUser, selectAuthLoading, logout } from "@/store/authSlice";
+import { resetAllApiCaches } from "@/store/resetApiCaches";
 
 export default function MobileMenuToggle() {
   const user = useAppSelector(selectUser);
@@ -21,6 +22,9 @@ export default function MobileMenuToggle() {
 
   function handleLogout() {
     dispatch(logout());
+    // Clear every cached list/chart/billing/podcast entry so the next
+    // account that logs in doesn't briefly see this account's cached data.
+    resetAllApiCaches(dispatch);
     setOpen(false);
     router.push("/charts/apple/us/top");
   }

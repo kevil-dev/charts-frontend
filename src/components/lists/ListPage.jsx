@@ -51,13 +51,17 @@ export default function ListPage({ listId }) {
     async (fields) => {
       if (!list) return;
       try {
-        await updateListMeta({ id: list.id, ...fields }).unwrap();
+        // Must invalidate using listId (the same value passed to
+        // useGetListDetailQuery / its providesTags), not list.id from the
+        // response body — they can differ (route param is always a string;
+        // the response field is typically a number), which misses the tag.
+        await updateListMeta({ id: listId, ...fields }).unwrap();
       } catch {
         // invalidation refetches server truth on success; on failure the cache
         // is untouched, so the previous values remain shown
       }
     },
-    [list, updateListMeta]
+    [list, listId, updateListMeta]
   );
 
   const handleShareChange = useCallback(
