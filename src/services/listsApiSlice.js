@@ -129,7 +129,10 @@ export const listsApi = createApi({
       },
     }),
 
-    share: build.mutation({
+    // Endpoint key must be "shareList" (not "share") — RTK Query generates hook
+    // names as use<PascalCase(endpointKey)>Mutation, so "share" would produce
+    // useShareMutation, not the useShareListMutation that ListHeader.jsx imports.
+    shareList: build.mutation({
       query: (id) => ({ url: `/lists/${id}/share`, method: "POST" }),
       invalidatesTags: (result, error, id) => [{ type: "ListDetail", id }, "Lists"],
     }),
