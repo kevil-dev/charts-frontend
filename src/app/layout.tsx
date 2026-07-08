@@ -6,7 +6,7 @@ import LeftLinks from "@/components/layout/LeftLinks";
 import Footer from "@/components/layout/Footer";
 import { AuthProvider } from "@/providers/AuthContext";
 import { ListsCacheProvider } from "@/providers/ListsCacheContext";
-import QueryProvider from "@/providers/QueryProvider";
+import StoreProvider from "@/providers/StoreProvider";
 import Script from "next/script";
 import { Toaster } from "sonner";
 
@@ -58,7 +58,7 @@ export default async function RootLayout({
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
         <Script src="https://accounts.google.com/gsi/client" strategy="afterInteractive" />
-        <QueryProvider>
+        <StoreProvider>
           <AuthProvider initialUser={initialUser}>
             <ListsCacheProvider initialLists={initialLists}>
               <LeftLinks />
@@ -67,7 +67,7 @@ export default async function RootLayout({
               <Toaster position="bottom-right" />
             </ListsCacheProvider>
           </AuthProvider>
-        </QueryProvider>
+        </StoreProvider>
       </body>
     </html>
   );
