@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
-import { QueryClient, HydrationBoundary, dehydrate } from "@tanstack/react-query";
 import BillingSettings from "@/components/billing/BillingSettings";
+import BillingStoreSeeder from "@/components/billing/BillingStoreSeeder";
 
 async function fetchBillingStatus() {
   const cookieStore = await cookies();
@@ -21,10 +21,6 @@ export const metadata = { title: "Billing — Million Podcasts" };
 
 export default async function BillingPage() {
   const status = await fetchBillingStatus();
-  const queryClient = new QueryClient();
-  if (status) {
-    queryClient.setQueryData(["billing-status"], status);
-  }
 
   return (
     <div className="relative min-h-screen">
@@ -38,9 +34,8 @@ export default async function BillingPage() {
           Billing.
         </h1>
 
-        <HydrationBoundary state={dehydrate(queryClient)}>
-          <BillingSettings />
-        </HydrationBoundary>
+        {status && <BillingStoreSeeder billingData={status} />}
+        <BillingSettings />
       </div>
     </div>
   );

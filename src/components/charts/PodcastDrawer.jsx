@@ -6,7 +6,7 @@ import Link from "next/link";
 import { XIcon, LockIcon, ArrowLeftIcon, Loader2Icon, ExternalLinkIcon } from "lucide-react";
 import { useAuth } from "@/providers/AuthContext";
 import { RankMoveBadge } from "./ChartRow";
-import { usePodcastMeta } from "@/hooks/usePodcastMeta";
+import { useGetPodcastMetaQuery } from "@/services/podcastApiSlice";
 import { resolveTier } from "@/utils/resolveTier";
 
 
@@ -107,10 +107,9 @@ export default function PodcastDrawer({ podcast, onClose }) {
   const isOpen = !!podcast;
   const [artworkError, setArtworkError] = useState(false);
 
-  const { data: meta, isLoading, error } = usePodcastMeta(
-    podcast?.match_key,
-    !isGuest && isOpen
-  );
+  const { data: meta, isLoading, error } = useGetPodcastMetaQuery(podcast?.match_key, {
+    skip: isGuest || !isOpen || !podcast?.match_key,
+  });
 
   const upgradeError = error?.code === "UPGRADE";
   const notFound = error?.code === "NO_DATA_FOUND";
