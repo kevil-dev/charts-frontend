@@ -1,20 +1,29 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { toast } from "sonner";
-import { useLists } from "@/hooks/useLists";
+import {
+  useGetListsQuery,
+  useCreateListMutation,
+  useDeleteListMutation,
+} from "@/services/listsApiSlice";
 import ListSidebar from "@/components/lists/ListSidebar";
 
-export default function ListsSidebarClient({ initialLists }) {
+export default function ListsSidebarClient() {
   const router = useRouter();
   const params = useParams();
   const activeListId = params?.id ? decodeURIComponent(params.id) : null;
-  const { lists, createList, deleteList } = useLists();
+
+  const { data } = useGetListsQuery();
+  const lists = useMemo(() => data?.lists ?? [], [data]);
+  const [createList] = useCreateListMutation();
+  const [deleteList] = useDeleteListMutation();
 
   const handleCreateList = useCallback(async (title) => {
     try {
-      const newList = await createList(title);
+      const res = await createList({ title, description: null }).unwrap();
+      const newList = res?.list ?? null;
       if (newList?.id) router.push(`/lists/${newList.id}`);
     } catch (err) {
       if (err?.code === "LIMIT_EXCEEDED") {
@@ -30,7 +39,7 @@ export default function ListsSidebarClient({ initialLists }) {
 
   const handleDeleteList = useCallback(async (list) => {
     try {
-      await deleteList(list.id);
+      await deleteList(list.id).unwrap();
       const remaining = lists.filter((l) => l.id !== list.id);
       if (remaining.length > 0) {
         router.push(`/lists/${remaining[0].id}`);

@@ -2,8 +2,13 @@
 
 import { useCallback } from "react";
 import Link from "next/link";
-import { useListDetail } from "@/hooks/useListDetail";
-import listsApi from "@/services/listsApi";
+import {
+  useGetListDetailQuery,
+  useRemoveItemMutation,
+  useUpdateListMetaMutation,
+  listsApi,
+} from "@/services/listsApiSlice";
+import { useAppDispatch } from "@/store/hooks";
 import ListHeader from "./ListHeader";
 import ListRow from "./ListRow";
 import { showDeleteToast } from "./DeleteToast";
@@ -36,39 +41,64 @@ function SkeletonRow() {
 }
 
 export default function ListPage({ listId }) {
-  const { list, loading, removeItem, restoreItem, commitRemoveItem, updateMeta } =
-    useListDetail(listId);
+  const dispatch = useAppDispatch();
+  const { data, isLoading: loading, refetch } = useGetListDetailQuery(listId);
+  const list = data?.list ?? null;
+  const [removeItem] = useRemoveItemMutation();
+  const [updateListMeta] = useUpdateListMetaMutation();
 
   const handleUpdate = useCallback(
     async (fields) => {
       if (!list) return;
-      updateMeta(fields);
       try {
-        await listsApi.update(list.id, fields);
+        await updateListMeta({ id: list.id, ...fields }).unwrap();
       } catch {
-        updateMeta({ title: list.title, description: list.description });
+        // invalidation refetches server truth on success; on failure the cache
+        // is untouched, so the previous values remain shown
       }
     },
-    [list, updateMeta]
+    [list, updateListMeta]
   );
 
-  const handleShareChange = useCallback((shareToken) => {
-    updateMeta({ share_token: shareToken, is_shared: !!shareToken, is_private: shareToken ? 0 : 1 });
-  }, [updateMeta]);
+  const handleShareChange = useCallback(
+    (shareToken) => {
+      dispatch(
+        listsApi.util.updateQueryData("getListDetail", listId, (draft) => {
+          if (draft?.list) {
+            draft.list.share_token = shareToken;
+            draft.list.is_shared = !!shareToken;
+            draft.list.is_private = shareToken ? 0 : 1;
+          }
+        })
+      );
+    },
+    [dispatch, listId]
+  );
 
   const handleDelete = useCallback(
     (item) => {
       if (!list) return;
-      removeItem(item.id);
+      // 1. Optimistically remove from the cache immediately — no network yet.
+      const patch = dispatch(
+        listsApi.util.updateQueryData("getListDetail", listId, (draft) => {
+          if (draft?.list?.items) {
+            draft.list.items = draft.list.items.filter((i) => i.id !== item.id);
+          }
+        })
+      );
+      // 4. Commit the server delete only once the undo window closes.
       const timeoutId = setTimeout(() => {
-        commitRemoveItem(list.id, item.id);
+        removeItem({ listId, itemId: item.id })
+          .unwrap()
+          .catch(() => refetch());
       }, 5000);
+      // 2 + 3. Undo cancels the commit and restores the item — no mutation runs.
       showDeleteToast(item, () => {
         clearTimeout(timeoutId);
-        restoreItem(item);
+        patch.undo();
       });
     },
-    [list, removeItem, restoreItem, commitRemoveItem]
+    [list, listId, dispatch, removeItem, refetch]
   );
 
   if (loading) {

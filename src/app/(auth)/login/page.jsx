@@ -4,7 +4,8 @@ import { useState, useEffect, useRef, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
-import { useAuth } from "@/providers/AuthContext";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { selectUser, selectAuthLoading, login, loginWithGoogle } from "@/store/authSlice";
 import { Button } from "@/components/ui/button";
 
 function GoogleIcon() {
@@ -35,6 +36,19 @@ function GoogleIcon() {
 }
 
 function LoginPageContent() {
+  const user = useAppSelector(selectUser);
+  const isLoading = useAppSelector(selectAuthLoading);
+  const dispatch = useAppDispatch();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const from = searchParams.get("from");
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
+
   const googleBtnRef = useRef(null);
 
   useEffect(() => {
@@ -45,7 +59,7 @@ function LoginPageContent() {
         client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
         callback: async (response) => {
           try {
-            await loginWithGoogle(response.credential);
+            await dispatch(loginWithGoogle(response.credential)).unwrap();
             router.push(
               from && from.startsWith("/") ? from : "/charts/apple/us/top",
             );
@@ -72,16 +86,6 @@ function LoginPageContent() {
 
     return () => clearInterval(interval);
   }, []);
-  const { user, isLoading, login, loginWithGoogle } = useAuth();
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const from = searchParams.get("from");
-
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState(null);
-  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     if (!isLoading && user) {
@@ -95,7 +99,7 @@ function LoginPageContent() {
     setSubmitting(true);
     setError(null);
     try {
-      await login(email, password);
+      await dispatch(login({ email, password })).unwrap();
       router.push(from && from.startsWith("/") ? from : "/charts/apple/us/top");
     } catch (err) {
       setError(err.message);

@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
-import { useAuth } from "@/providers/AuthContext";
-import { billingApi } from "@/services/billingApi";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { selectUser, fetchUser } from "@/store/authSlice";
+import { useCheckoutMutation, useUpgradeMutation } from "@/services/billingApiSlice";
 import { resolveTier } from "@/utils/resolveTier";
 import PricingCard from "./PricingCard";
 
@@ -36,15 +37,18 @@ const TIERS = [
 ];
 
 export default function PricingSection() {
-  const { user, refetchUser } = useAuth();
+  const user = useAppSelector(selectUser);
+  const dispatch = useAppDispatch();
   const [billingInterval, setBillingInterval] = useState("monthly");
   const [pendingTier, setPendingTier] = useState(null);
   const userTier = resolveTier(user);
+  const [checkout] = useCheckoutMutation();
+  const [upgrade] = useUpgradeMutation();
 
   async function handleCheckout(tier) {
     setPendingTier(tier);
     try {
-      const res = await billingApi.checkout(tier, billingInterval);
+      const res = await checkout({ tier, interval: billingInterval }).unwrap();
       window.location.href = res.url;
     } catch (err) {
       toast.error(err.message || "Something went wrong — please try again.");
@@ -55,8 +59,8 @@ export default function PricingSection() {
   async function handleUpgrade() {
     setPendingTier("elite");
     try {
-      await billingApi.upgrade();
-      await refetchUser();
+      await upgrade().unwrap();
+      await dispatch(fetchUser());
       toast("Upgraded to Elite.");
     } catch (err) {
       toast.error(err.message || "Something went wrong — please try again.");

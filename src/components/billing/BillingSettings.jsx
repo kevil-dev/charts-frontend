@@ -2,11 +2,14 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { useBillingStatus } from "@/hooks/useBillingStatus";
-import { billingApi } from "@/services/billingApi";
-import { useAuth } from "@/providers/AuthContext";
+import {
+  useGetBillingStatusQuery,
+  useCancelMutation,
+  useUpgradeMutation,
+} from "@/services/billingApiSlice";
+import { useAppDispatch } from "@/store/hooks";
+import { fetchUser } from "@/store/authSlice";
 import BillingCard from "@/components/billing/BillingCard";
 import CancelRow from "@/components/billing/CancelRow";
 
@@ -61,12 +64,11 @@ function PlanBenefits({ tier }) {
 }
 
 export default function BillingSettings() {
-  const { data, isLoading } = useBillingStatus();
-  const queryClient = useQueryClient();
-  const { refetchUser } = useAuth();
+  const { data, isLoading } = useGetBillingStatusQuery();
+  const dispatch = useAppDispatch();
   const [confirming, setConfirming] = useState(false);
-  const [canceling, setCanceling] = useState(false);
-  const [upgrading, setUpgrading] = useState(false);
+  const [cancel, { isLoading: canceling }] = useCancelMutation();
+  const [upgrade, { isLoading: upgrading }] = useUpgradeMutation();
 
   if (isLoading || !data) {
     return <p className="text-sm text-muted-foreground">Loading…</p>;
@@ -106,12 +108,10 @@ export default function BillingSettings() {
   }
 
   async function handleUpgrade() {
-    setUpgrading(true);
     try {
-      await billingApi.upgrade();
-      await queryClient.invalidateQueries({ queryKey: ["billing-status"] });
-      await refetchUser();
-      
+      await upgrade().unwrap();
+      await dispatch(fetchUser());
+
       confetti({
         particleCount: 150,
         spread: 70,
@@ -121,22 +121,16 @@ export default function BillingSettings() {
       toast.success("Welcome to Elite! You've been upgraded.");
     } catch (err) {
       toast.error(err.message || "Couldn't upgrade — please try again.");
-    } finally {
-      setUpgrading(false);
     }
   }
 
   async function handleConfirmCancel() {
-    setCanceling(true);
     try {
-      await billingApi.cancel();
-      await queryClient.invalidateQueries({ queryKey: ["billing-status"] });
+      await cancel().unwrap();
       toast(`Subscription will end on ${formatDate(current_period_end) ?? "the current period end"}.`);
       setConfirming(false);
     } catch (err) {
       toast.error(err.message || "Couldn't cancel — please try again.");
-    } finally {
-      setCanceling(false);
     }
   }
 

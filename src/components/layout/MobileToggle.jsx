@@ -8,16 +8,19 @@ import { XIcon, Bookmark, CreditCard, LogOut } from "lucide-react";
 import { navLinks } from "@/constants/navigation";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { useAuth } from "@/providers/AuthContext";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { selectUser, selectAuthLoading, logout } from "@/store/authSlice";
 
 export default function MobileMenuToggle() {
-  const { user, isLoading, logout } = useAuth();
+  const user = useAppSelector(selectUser);
+  const isLoading = useAppSelector(selectAuthLoading);
+  const dispatch = useAppDispatch();
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
 
   function handleLogout() {
-    logout();
+    dispatch(logout());
     setOpen(false);
     router.push("/charts/apple/us/top");
   }

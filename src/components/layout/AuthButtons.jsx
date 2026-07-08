@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/providers/AuthContext";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { selectUser, selectAuthLoading, logout } from "@/store/authSlice";
 import { resolveTier } from "@/utils/resolveTier";
 import {
   DropdownMenu,
@@ -47,7 +48,9 @@ function getTierBadge(user) {
  * Keeps LeftLinks as a server component.
  */
 export default function AuthButtons() {
-  const { user, isLoading, logout } = useAuth();
+  const user = useAppSelector(selectUser);
+  const isLoading = useAppSelector(selectAuthLoading);
+  const dispatch = useAppDispatch();
   const router = useRouter();
 
   if (isLoading) {
@@ -133,7 +136,7 @@ export default function AuthButtons() {
           <DropdownMenuItem
             className="gap-2 px-[10px] py-2 text-[13px] text-[#ee0000] rounded-md cursor-pointer hover:bg-[#fff0f0] focus:bg-[#fff0f0]"
             onSelect={() => {
-              logout();
+              dispatch(logout());
               router.push("/charts/apple/us/top");
             }}
           >

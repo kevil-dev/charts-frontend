@@ -28,14 +28,19 @@ src/
 │   ├── lists/              # All lists UI components (dropdowns/modals included, flat — no fragments/ subfolder)
 │   └── podcasts/           # Podcast profile UI
 │
-├── hooks/                  # All data hooks, flat — useCharts.js, useFilters.js, useBillingStatus.js,
-│                           # useAddToList.js, useListDetail.js, useLists.js, usePodcastMeta.js
+├── hooks/                  # Currently empty — data hooks are RTK Query generated hooks
+│                           # (useGetXxxQuery, useXxxMutation) exported from src/services/*ApiSlice.js,
+│                           # not hand-written files here
 │
-├── services/               # All API call modules, flat — authApi.js, chartsApi.js, billingApi.js,
-│                           # listsApi.js, podcastMetaApi.js
+├── services/               # API call modules, flat — authApi.js (plain axios service used by
+│                           # store/authSlice.js's thunks), plus RTK Query slices: chartsApiSlice.js,
+│                           # listsApiSlice.js, billingApiSlice.js, podcastApiSlice.js
 │
-├── providers/              # App-wide Context providers — AuthContext.jsx, ListsCacheContext.jsx,
-│                           # QueryProvider.jsx
+├── providers/              # App-wide client providers — StoreProvider.jsx (wraps <Provider store={...}>)
+│
+├── store/                  # Redux Toolkit store — store.ts (makeStore, AppStore/RootState/AppDispatch
+│                           # types), authSlice.js (createSlice + createAsyncThunk for user state),
+│                           # hooks.js (useAppDispatch, useAppSelector)
 │
 ├── utils/                  # Pure helper functions — resolveTier.js, normalise.js
 │
@@ -49,22 +54,17 @@ src/
 ## 3. Rules for placing new files
 
 - New chart UI component → `src/components/charts/`
-- New chart data hook → `src/hooks/`
-- New chart API call → `src/services/chartsApi.js`
+- New chart data-fetching endpoint → add to `src/services/chartsApiSlice.js`
 - New lists UI component → `src/components/lists/`
-- New lists hook → `src/hooks/`
-- New lists API call → `src/services/listsApi.js`
+- New lists data-fetching endpoint → add to `src/services/listsApiSlice.js`
 - Lists sidebar → `src/components/lists/ListSidebar.jsx`
 - Lists sidebar item → `src/components/lists/ListSidebarItem.jsx`
 - Lists sidebar client shell → `src/components/lists/ListsSidebarClient.jsx`
-- Lists shared cache provider → `src/providers/ListsCacheContext.jsx`
 - New billing UI component → `src/components/billing/`
-- New billing hook → `src/hooks/`
-- New billing API call → `src/services/billingApi.js`
+- New billing data-fetching endpoint → add to `src/services/billingApiSlice.js`
 - Tier resolution logic (UI display only, never for access control) →
   `src/utils/resolveTier.js`
-- New podcast metadata API call → `src/services/podcastMetaApi.js`
-- New podcast metadata hook → `src/hooks/`
+- New podcast metadata endpoint → add to `src/services/podcastApiSlice.js`
 - New auth UI component → `src/components/auth/` (doesn't exist yet — create it when the first one is needed)
 - New feature entirely → add its components to `src/components/<feature-name>/`, hooks to `src/hooks/`,
   services to `src/services/`, pure helpers to `src/utils/` — do not create a `src/features/` subtree
@@ -77,14 +77,13 @@ src/
 ## 4. Import path conventions
 
 - Always use `@/` alias — never relative `../../` paths
-- Auth context: `@/providers/AuthContext`
-- Charts API: `@/services/chartsApi`
-- Charts hooks: `@/hooks/useCharts` etc.
-- Lists API: `@/services/listsApi`
-- Lists cache provider: `@/providers/ListsCacheContext`
-- Billing API: `@/services/billingApi`
+- Auth state: `@/store/authSlice` (selectUser, selectAuthLoading, login, logout, register, loginWithGoogle, fetchUser)
+- Redux hooks: `@/store/hooks` (useAppDispatch, useAppSelector)
+- Charts API slice: `@/services/chartsApiSlice` (useGetChartsQuery, useGetFiltersQuery)
+- Lists API slice: `@/services/listsApiSlice`
+- Billing API slice: `@/services/billingApiSlice`
+- Podcast metadata API slice: `@/services/podcastApiSlice`
 - Tier resolution: `@/utils/resolveTier`
-- Podcast metadata API: `@/services/podcastMetaApi`
 - Static config/data: `@/constants/charts`, `@/constants/navigation`
 
 ## 5. Auth pattern — strictly enforced
@@ -95,7 +94,7 @@ src/
 - Never read or write `mp_token` from JavaScript — it is httpOnly and intentionally inaccessible
 - Route protection for `(app)` pages is handled server-side in `src/app/(app)/layout.jsx` via `cookies()` from `next/headers`
 - Individual `(app)` pages do NOT need their own auth guard — the layout handles it
-- `AuthContext` holds `user` state (null = guest, object = authenticated) and `isLoading` — use these for UI-level conditional rendering only, not for security
+- Redux `authSlice` (`src/store/authSlice.js`) holds `user` state (null = guest, object = authenticated) and `isLoading`, read via `selectUser`/`selectAuthLoading` — use these for UI-level conditional rendering only, not for security
 
 ## 6. Component conventions
 

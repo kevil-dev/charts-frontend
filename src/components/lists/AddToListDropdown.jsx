@@ -1,12 +1,17 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { PlusIcon, Loader2Icon, ArrowRightIcon } from "lucide-react";
+import { PlusIcon, Loader2Icon } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { useAuth } from "@/providers/AuthContext";
-import { useAddToList } from "@/hooks/useAddToList";
+import { useAppSelector } from "@/store/hooks";
+import { selectUser } from "@/store/authSlice";
+import {
+  useGetListsQuery,
+  useCreateListMutation,
+  useAddItemMutation,
+} from "@/services/listsApiSlice";
 import {
   Dialog,
   DialogContent,
@@ -17,21 +22,97 @@ import {
 import { BookmarkPlusIcon } from "lucide-react";
 
 export default function AddToListDropdown({ rows, platform, open, onClose, anchorClassName }) {
-  const { user } = useAuth();
+  const user = useAppSelector(selectUser);
   const isGuest = !user;
   const pathname = usePathname();
   const router = useRouter();
-  const { lists, loading, ensureLoaded, addPodcastToList, createList, createListAndAdd, addManyToList } =
-    useAddToList();
+
+  // skip: isGuest handles lazy loading — RTK Query fetches (once, deduped/cached
+  // across every dropdown instance) when a signed-in user first mounts the hook.
+  const { data, isLoading: loading } = useGetListsQuery(undefined, { skip: isGuest });
+  const lists = data?.lists ?? [];
+  const [createListMutation] = useCreateListMutation();
+  const [addItem] = useAddItemMutation();
+
   const [newTitle, setNewTitle] = useState("");
   const [creating, setCreating] = useState(false);
   const [pendingListId, setPendingListId] = useState(null);
   const busy = pendingListId !== null || creating;
   const containerRef = useRef(null);
 
-  useEffect(() => {
-    if (open && !isGuest) ensureLoaded();
-  }, [open, isGuest, ensureLoaded]);
+  async function addPodcastToList(listId, listTitle, row, platform) {
+    try {
+      await addItem({
+        listId,
+        podcast_name: row.name,
+        podcast_author: row.artist_or_publisher ?? null,
+        artwork_url: row.artwork ?? null,
+        match_key: row.match_key ?? null,
+        platform,
+        genre: row.genre ?? null,
+      }).unwrap();
+      toast.success(`Added to "${listTitle}"`, {
+        action: {
+          label: "View list",
+          onClick: () => router.push(`/lists/${listId}`),
+        },
+        duration: 5000,
+      });
+      return true;
+    } catch (err) {
+      if (err.message?.includes("Already")) {
+        toast.error(`Already in "${listTitle}"`);
+      } else {
+        toast.error("Couldn't add to list");
+      }
+      return false;
+    }
+  }
+
+  async function createList(title) {
+    const res = await createListMutation({ title, description: null }).unwrap();
+    const newList = res?.list ?? null;
+    if (!newList) throw new Error("Failed to create list");
+    return newList;
+  }
+
+  async function createListAndAdd(title, row, platform) {
+    const newList = await createList(title);
+    await addPodcastToList(newList.id, newList.title, row, platform);
+    return newList;
+  }
+
+  async function addManyToList(listId, listTitle, rows, platform) {
+    let successes = 0;
+    let duplicates = 0;
+    for (const row of rows) {
+      try {
+        await addItem({
+          listId,
+          podcast_name: row.name,
+          podcast_author: row.artist_or_publisher ?? null,
+          artwork_url: row.artwork ?? null,
+          match_key: row.match_key ?? null,
+          platform,
+          genre: row.genre ?? null,
+        }).unwrap();
+        successes++;
+      } catch (err) {
+        if (err.message?.includes("Already")) duplicates++;
+      }
+    }
+
+    let message = `Added ${successes} to "${listTitle}"`;
+    if (duplicates > 0) message += ` · ${duplicates} already there`;
+    toast.success(message, {
+      action: {
+        label: "View list",
+        onClick: () => router.push(`/lists/${listId}`),
+      },
+      duration: 5000,
+    });
+    return { successes, duplicates };
+  }
 
   useEffect(() => {
     if (!open) return;

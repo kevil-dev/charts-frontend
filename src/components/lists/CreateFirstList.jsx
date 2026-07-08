@@ -3,10 +3,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { PlusIcon } from "lucide-react";
-import listsApi from "@/services/listsApi";
+import { useCreateListMutation } from "@/services/listsApiSlice";
 
 export default function CreateFirstList() {
   const router = useRouter();
+  const [createList] = useCreateListMutation();
   const [showInput, setShowInput] = useState(false);
   const [title, setTitle] = useState("");
   const [creating, setCreating] = useState(false);
@@ -17,7 +18,7 @@ export default function CreateFirstList() {
     if (!t || creating) return;
     try {
       setCreating(true);
-      const res = await listsApi.create(t);
+      const res = await createList({ title: t, description: null }).unwrap();
       const newList = res.list;
       if (newList?.id) router.push(`/lists/${newList.id}`);
     } catch (err) {

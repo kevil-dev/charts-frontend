@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useCharts } from "@/hooks/useCharts";
+import { useGetChartsQuery } from "@/services/chartsApiSlice";
 import ChartHero from "./ChartHero";
 import ChartTable from "./ChartTable";
 import PodcastDrawer from "./PodcastDrawer";
@@ -30,12 +30,10 @@ export default function ChartSection({
 }) {
   const [selectedPodcast, setSelectedPodcast] = useState(null);
 
-  const { data, isLoading, isError, error, isFetching, refetch } = useCharts({
-    platform,
-    country,
-    category,
-    page: currentPage,
-  });
+  const { data, isLoading, isError, error, isFetching, refetch } = useGetChartsQuery(
+    { platform, country, chart: category, page: currentPage },
+    { skip: !platform || !country || !category }
+  );
 
   const runDate = formatRunDate(data?.run_date);
 

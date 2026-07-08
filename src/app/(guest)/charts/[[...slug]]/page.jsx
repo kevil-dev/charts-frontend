@@ -1,7 +1,7 @@
 import { cache } from "react";
 import { redirect } from "next/navigation";
-import { dehydrate, HydrationBoundary, QueryClient } from "@tanstack/react-query";
 import ChartSection from "@/components/charts/ChartSection";
+import ChartStoreSeeder from "@/components/charts/ChartStoreSeeder";
 import { platforms } from "@/constants/charts";
 
 const VALID_PLATFORMS = platforms.map((p) => p.slug);
@@ -90,16 +90,17 @@ export default async function ChartPage({ params, searchParams }) {
 
   if (!meta) redirect(FALLBACK_URL);
 
-  const queryClient = new QueryClient();
-  if (charts) {
-    queryClient.setQueryData(
-      ["charts", platform, lowerCountry, category, currentPage],
-      charts
-    );
-  }
-
   return (
-    <HydrationBoundary state={dehydrate(queryClient)}>
+    <>
+      {charts && (
+        <ChartStoreSeeder
+          chartsData={charts}
+          platform={platform}
+          country={lowerCountry}
+          category={category}
+          page={currentPage}
+        />
+      )}
       <ChartSection
         platform={platform}
         country={lowerCountry}
@@ -110,6 +111,6 @@ export default async function ChartPage({ params, searchParams }) {
         chartLabel={meta.chart_label}
         currentPage={currentPage}
       />
-    </HydrationBoundary>
+    </>
   );
 }

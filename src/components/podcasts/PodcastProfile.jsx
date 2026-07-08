@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { ArrowLeftIcon, ExternalLinkIcon, StarIcon, BarChart3Icon, GlobeIcon, Loader2Icon } from "lucide-react";
-import { usePodcastMeta } from "@/hooks/usePodcastMeta";
+import { useGetPodcastMetaQuery } from "@/services/podcastApiSlice";
 import { RankMoveBadge } from "@/components/charts/ChartRow";
 import { motion } from "motion/react";
 import { getFlagEmoji } from "@/utils/normalise";
@@ -147,7 +147,9 @@ function PodcastProfileContent({ matchKey }) {
   const [artworkError, setArtworkError] = useState(false);
   const searchParams = useSearchParams();
   
-  const { data: meta, isLoading, error } = usePodcastMeta(matchKey, true);
+  const { data: meta, isLoading, error } = useGetPodcastMetaQuery(matchKey, {
+    skip: !matchKey,
+  });
 
   if (isLoading) {
     return (

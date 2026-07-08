@@ -4,9 +4,10 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { XIcon, LockIcon, ArrowLeftIcon, Loader2Icon, ExternalLinkIcon } from "lucide-react";
-import { useAuth } from "@/providers/AuthContext";
+import { useAppSelector } from "@/store/hooks";
+import { selectUser } from "@/store/authSlice";
 import { RankMoveBadge } from "./ChartRow";
-import { usePodcastMeta } from "@/hooks/usePodcastMeta";
+import { useGetPodcastMetaQuery } from "@/services/podcastApiSlice";
 import { resolveTier } from "@/utils/resolveTier";
 
 
@@ -101,16 +102,15 @@ function LockedProSection({ podcastId }) {
 
 
 export default function PodcastDrawer({ podcast, onClose }) {
-  const { user } = useAuth();
+  const user = useAppSelector(selectUser);
   const isGuest = !user;
   const isFree = resolveTier(user) === "free";
   const isOpen = !!podcast;
   const [artworkError, setArtworkError] = useState(false);
 
-  const { data: meta, isLoading, error } = usePodcastMeta(
-    podcast?.match_key,
-    !isGuest && isOpen
-  );
+  const { data: meta, isLoading, error } = useGetPodcastMetaQuery(podcast?.match_key, {
+    skip: isGuest || !isOpen || !podcast?.match_key,
+  });
 
   const upgradeError = error?.code === "UPGRADE";
   const notFound = error?.code === "NO_DATA_FOUND";
