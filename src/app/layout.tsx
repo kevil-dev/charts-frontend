@@ -4,7 +4,6 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import LeftLinks from "@/components/layout/LeftLinks";
 import Footer from "@/components/layout/Footer";
-import { AuthProvider } from "@/providers/AuthContext";
 import StoreProvider from "@/providers/StoreProvider";
 import Script from "next/script";
 import { Toaster } from "sonner";
@@ -41,13 +40,11 @@ export default async function RootLayout({
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
         <Script src="https://accounts.google.com/gsi/client" strategy="afterInteractive" />
-        <StoreProvider>
-          <AuthProvider initialUser={initialUser}>
-            <LeftLinks />
-            <main className="flex-1">{children}</main>
-            <Footer />
-            <Toaster position="bottom-right" />
-          </AuthProvider>
+        <StoreProvider initialUser={initialUser}>
+          <LeftLinks />
+          <main className="flex-1">{children}</main>
+          <Footer />
+          <Toaster position="bottom-right" />
         </StoreProvider>
       </body>
     </html>

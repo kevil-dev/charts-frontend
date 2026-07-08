@@ -12,7 +12,8 @@ import ChartRow, {
   RankMoveBadge,
   ChartRowCard,
 } from "./ChartRow";
-import { useAuth } from "@/providers/AuthContext";
+import { useAppSelector } from "@/store/hooks";
+import { selectUser } from "@/store/authSlice";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { PodiumSkeleton,SkeletonRow } from "./ChartsSkeletons";
 import PodiumCard from "./PodiumCard";
@@ -32,7 +33,7 @@ export default function ChartTable({
   const [selected, setSelected] = useState(new Set());
   const [bulkAddOpen, setBulkAddOpen] = useState(false);
   const masterRef = useRef(null);
-  const { user } = useAuth();
+  const user = useAppSelector(selectUser);
   const isGuest = !user;
   const topRef = useRef(null);
 

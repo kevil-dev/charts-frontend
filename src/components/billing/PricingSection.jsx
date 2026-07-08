@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
-import { useAuth } from "@/providers/AuthContext";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { selectUser, fetchUser } from "@/store/authSlice";
 import { useCheckoutMutation, useUpgradeMutation } from "@/services/billingApiSlice";
 import { resolveTier } from "@/utils/resolveTier";
 import PricingCard from "./PricingCard";
@@ -36,7 +37,8 @@ const TIERS = [
 ];
 
 export default function PricingSection() {
-  const { user, refetchUser } = useAuth();
+  const user = useAppSelector(selectUser);
+  const dispatch = useAppDispatch();
   const [billingInterval, setBillingInterval] = useState("monthly");
   const [pendingTier, setPendingTier] = useState(null);
   const userTier = resolveTier(user);
@@ -58,7 +60,7 @@ export default function PricingSection() {
     setPendingTier("elite");
     try {
       await upgrade().unwrap();
-      await refetchUser();
+      await dispatch(fetchUser());
       toast("Upgraded to Elite.");
     } catch (err) {
       toast.error(err.message || "Something went wrong — please try again.");

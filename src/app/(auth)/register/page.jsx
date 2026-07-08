@@ -4,7 +4,8 @@ import { useState, useEffect, useRef, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
-import { useAuth } from "@/providers/AuthContext";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { selectUser, selectAuthLoading, register, loginWithGoogle } from "@/store/authSlice";
 import { Button } from "@/components/ui/button";
 
 function GoogleIcon() {
@@ -35,7 +36,9 @@ function GoogleIcon() {
 }
 
 function RegisterPageContent() {
-  const { user, isLoading, register, loginWithGoogle } = useAuth();
+  const user = useAppSelector(selectUser);
+  const isLoading = useAppSelector(selectAuthLoading);
+  const dispatch = useAppDispatch();
   const router = useRouter();
   const searchParams = useSearchParams();
   const from = searchParams.get("from");
@@ -63,7 +66,7 @@ function RegisterPageContent() {
         client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
         callback: async (response) => {
           try {
-            await loginWithGoogle(response.credential);
+            await dispatch(loginWithGoogle(response.credential)).unwrap();
             router.push(
               from && from.startsWith("/") ? from : "/charts/apple/us/top",
             );
@@ -97,7 +100,7 @@ function RegisterPageContent() {
     setSubmitting(true);
     setError(null);
     try {
-      await register(name, email, password);
+      await dispatch(register({ name, email, password })).unwrap();
       router.push(from && from.startsWith("/") ? from : "/pricing");
     } catch (err) {
       setError(err.message);

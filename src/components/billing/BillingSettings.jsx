@@ -8,7 +8,8 @@ import {
   useCancelMutation,
   useUpgradeMutation,
 } from "@/services/billingApiSlice";
-import { useAuth } from "@/providers/AuthContext";
+import { useAppDispatch } from "@/store/hooks";
+import { fetchUser } from "@/store/authSlice";
 import BillingCard from "@/components/billing/BillingCard";
 import CancelRow from "@/components/billing/CancelRow";
 
@@ -64,7 +65,7 @@ function PlanBenefits({ tier }) {
 
 export default function BillingSettings() {
   const { data, isLoading } = useGetBillingStatusQuery();
-  const { refetchUser } = useAuth();
+  const dispatch = useAppDispatch();
   const [confirming, setConfirming] = useState(false);
   const [cancel, { isLoading: canceling }] = useCancelMutation();
   const [upgrade, { isLoading: upgrading }] = useUpgradeMutation();
@@ -109,7 +110,7 @@ export default function BillingSettings() {
   async function handleUpgrade() {
     try {
       await upgrade().unwrap();
-      await refetchUser();
+      await dispatch(fetchUser());
 
       confetti({
         particleCount: 150,

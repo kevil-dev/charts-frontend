@@ -5,7 +5,8 @@ import { PlusIcon, Loader2Icon } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { useAuth } from "@/providers/AuthContext";
+import { useAppSelector } from "@/store/hooks";
+import { selectUser } from "@/store/authSlice";
 import {
   useGetListsQuery,
   useCreateListMutation,
@@ -21,7 +22,7 @@ import {
 import { BookmarkPlusIcon } from "lucide-react";
 
 export default function AddToListDropdown({ rows, platform, open, onClose, anchorClassName }) {
-  const { user } = useAuth();
+  const user = useAppSelector(selectUser);
   const isGuest = !user;
   const pathname = usePathname();
   const router = useRouter();

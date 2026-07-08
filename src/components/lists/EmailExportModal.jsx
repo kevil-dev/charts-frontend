@@ -4,10 +4,11 @@ import { useState, useEffect } from "react";
 import { XIcon, Loader2Icon } from "lucide-react";
 import { toast } from "sonner";
 import { useEmailExportMutation } from "@/services/listsApiSlice";
-import { useAuth } from "@/providers/AuthContext";
+import { useAppSelector } from "@/store/hooks";
+import { selectUser } from "@/store/authSlice";
 
 export default function EmailExportModal({ list, onClose }) {
-  const { user } = useAuth();
+  const user = useAppSelector(selectUser);
   const [emailExport, { isLoading: loading }] = useEmailExportMutation();
   const [recipient, setRecipient] = useState("account");
   const [customEmail, setCustomEmail] = useState("");

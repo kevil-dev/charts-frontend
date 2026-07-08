@@ -7,7 +7,7 @@ import { Loader2Icon } from "lucide-react";
 import api from "@/lib/api";
 import { billingApi } from "@/services/billingApiSlice";
 import { useAppDispatch } from "@/store/hooks";
-import { useAuth } from "@/providers/AuthContext";
+import { fetchUser } from "@/store/authSlice";
 
 const POLL_INTERVAL_MS = 2000;
 const MAX_ATTEMPTS = 20;
@@ -16,7 +16,6 @@ const PAID_STATUSES = ["trialing", "active"];
 export default function ConfirmingSubscription() {
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const { refetchUser } = useAuth();
   const [timedOut, setTimedOut] = useState(false);
 
   useEffect(() => {
@@ -28,7 +27,7 @@ export default function ConfirmingSubscription() {
         const status = await api.get("/billing/status");
         if (PAID_STATUSES.includes(status.plan_status)) {
           dispatch(billingApi.util.invalidateTags(["BillingStatus"]));
-          await refetchUser();
+          await dispatch(fetchUser());
           if (!cancelled) router.replace("/billing");
           return;
         }
@@ -49,7 +48,7 @@ export default function ConfirmingSubscription() {
     return () => {
       cancelled = true;
     };
-  }, [refetchUser, router, dispatch]);
+  }, [router, dispatch]);
 
   if (timedOut) {
     return (

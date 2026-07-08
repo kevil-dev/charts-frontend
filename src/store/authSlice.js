@@ -30,6 +30,22 @@ export const login = createAsyncThunk(
   }
 );
 
+export const register = createAsyncThunk(
+  "auth/register",
+  async ({ name, email, password }, { dispatch, rejectWithValue }) => {
+    try {
+      await authApi.register({ name, email, password });
+      await dispatch(fetchUser()).unwrap();
+    } catch (err) {
+      return rejectWithValue({
+        message: err.message,
+        status: err.status,
+        code: err.code,
+      });
+    }
+  }
+);
+
 export const loginWithGoogle = createAsyncThunk(
   "auth/loginWithGoogle",
   async (credential, { dispatch, rejectWithValue }) => {
