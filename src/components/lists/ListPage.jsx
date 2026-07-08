@@ -42,7 +42,14 @@ function SkeletonRow() {
 
 export default function ListPage({ listId }) {
   const dispatch = useAppDispatch();
-  const { data, isLoading: loading, refetch } = useGetListDetailQuery(listId);
+  // refetchOnMountOrArgChange: this list's data can be invalidated while this
+  // page isn't mounted (e.g. adding items via the Charts page dropdown), and
+  // RTK Query doesn't proactively refetch invalidated queries with no active
+  // subscribers. Without this, navigating back here can show a stale snapshot
+  // even though the sidebar (always-mounted useGetListsQuery) is up to date.
+  const { data, isLoading: loading, refetch } = useGetListDetailQuery(listId, {
+    refetchOnMountOrArgChange: true,
+  });
   const list = data?.list ?? null;
   const [removeItem] = useRemoveItemMutation();
   const [updateListMeta] = useUpdateListMetaMutation();
