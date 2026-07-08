@@ -3,12 +3,12 @@
 import { useState, useEffect } from "react";
 import { XIcon, Loader2Icon } from "lucide-react";
 import { toast } from "sonner";
-import listsApi from "@/services/listsApi";
+import { useEmailExportMutation } from "@/services/listsApiSlice";
 import { useAuth } from "@/providers/AuthContext";
 
 export default function EmailExportModal({ list, onClose }) {
   const { user } = useAuth();
-  const [loading, setLoading] = useState(false);
+  const [emailExport, { isLoading: loading }] = useEmailExportMutation();
   const [recipient, setRecipient] = useState("account");
   const [customEmail, setCustomEmail] = useState("");
   const [format, setFormat] = useState("csv");
@@ -30,19 +30,17 @@ export default function EmailExportModal({ list, onClose }) {
       return;
     }
 
-    setLoading(true);
     try {
-      await listsApi.emailExport(list.id, {
+      await emailExport({
+        id: list.id,
         format,
         recipient,
         email: customEmail.trim(),
-      });
+      }).unwrap();
       toast.success("List emailed successfully!");
       onClose();
     } catch {
       toast.error("Couldn't send email. Please try again.");
-    } finally {
-      setLoading(false);
     }
   }
 

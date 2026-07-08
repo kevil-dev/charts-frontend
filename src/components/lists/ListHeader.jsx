@@ -16,7 +16,7 @@ import {
   PencilIcon,
 } from "lucide-react";
 import { toast } from "sonner";
-import listsApi from "@/services/listsApi";
+import { useShareListMutation, useRevokeShareMutation } from "@/services/listsApiSlice";
 import EmailExportModal from "./EmailExportModal";
 
 // ── Export helpers ────────────────────────────────────────────────────────────
@@ -80,7 +80,9 @@ function ArtworkCell({ item }) {
 // ── Share modal ───────────────────────────────────────────────────────────────
 
 function ShareModal({ list, onClose, onShareChange }) {
-  const [loading, setLoading] = useState(false);
+  const [share, { isLoading: sharing }] = useShareListMutation();
+  const [revokeShare, { isLoading: revoking }] = useRevokeShareMutation();
+  const loading = sharing || revoking;
   const [copied, setCopied] = useState(false);
   const shareToken = list?.share_token ?? null;
   const shareUrl = shareToken
@@ -97,29 +99,23 @@ function ShareModal({ list, onClose, onShareChange }) {
 
   async function handleCreate() {
     if (loading) return;
-    setLoading(true);
     try {
-      const res = await listsApi.share(list.id);
+      const res = await share(list.id).unwrap();
       onShareChange(res.share_token);
     } catch {
       toast.error("Couldn't create share link");
-    } finally {
-      setLoading(false);
     }
   }
 
   async function handleRevoke() {
     if (loading) return;
-    setLoading(true);
     try {
-      await listsApi.revokeShare(list.id);
-      const res = await listsApi.share(list.id);
+      await revokeShare(list.id).unwrap();
+      const res = await share(list.id).unwrap();
       onShareChange(res.share_token);
       toast.success("New share link generated");
     } catch {
       toast.error("Couldn't regenerate link");
-    } finally {
-      setLoading(false);
     }
   }
 
