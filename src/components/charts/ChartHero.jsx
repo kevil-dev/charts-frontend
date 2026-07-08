@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import DynamicBreadcrumb from "./DynamicBreadcrumb";
 import PlatformTabs from "./PlatformTabs";
 import ChartFilters from "./ChartFilters";
-import { useFilters } from "@/hooks/useFilters";
+import { useGetFiltersQuery } from "@/services/chartsApiSlice";
 
 export default function ChartHero({
   platform,
@@ -15,7 +15,6 @@ export default function ChartHero({
   countryFlag,
   chartLabel,
   runDate,
-  initialFilters
 }) {
   const router = useRouter();
 
@@ -23,11 +22,12 @@ export default function ChartHero({
   const currentCountry = country;
   const currentCategory = category;
 
-  const {
-    countries: liveCountries,
-    genres: liveGenres,
-    isLoading: filtersLoading,
-  } = useFilters({ platform: currentPlatform, country: currentCountry ,initialData : initialFilters});
+  const { data, isLoading: filtersLoading } = useGetFiltersQuery(
+    { platform: currentPlatform, country: currentCountry },
+    { skip: !currentPlatform }
+  );
+  const liveCountries = data?.countries;
+  const liveGenres = data?.genres;
 
   /** Push a new URL, preserving whatever segments aren't being changed. */
   function navigate({ platform, country, category } = {}) {
