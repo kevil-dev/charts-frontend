@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { selectUser, selectAuthLoading, logout } from "@/store/authSlice";
+import { resetAllApiCaches } from "@/store/resetApiCaches";
 import { resolveTier } from "@/utils/resolveTier";
 import {
   DropdownMenu,
@@ -137,6 +138,10 @@ export default function AuthButtons() {
             className="gap-2 px-[10px] py-2 text-[13px] text-[#ee0000] rounded-md cursor-pointer hover:bg-[#fff0f0] focus:bg-[#fff0f0]"
             onSelect={() => {
               dispatch(logout());
+              // Clear every cached list/chart/billing/podcast entry so the
+              // next account that logs in doesn't briefly see this account's
+              // cached data.
+              resetAllApiCaches(dispatch);
               router.push("/charts/apple/us/top");
             }}
           >

@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { selectUser, selectAuthLoading, login, loginWithGoogle } from "@/store/authSlice";
+import { resetAllApiCaches } from "@/store/resetApiCaches";
 import { Button } from "@/components/ui/button";
 
 function GoogleIcon() {
@@ -60,6 +61,8 @@ function LoginPageContent() {
         callback: async (response) => {
           try {
             await dispatch(loginWithGoogle(response.credential)).unwrap();
+            // Defense-in-depth: flush any residual cache from a previous session.
+            resetAllApiCaches(dispatch);
             router.push(
               from && from.startsWith("/") ? from : "/charts/apple/us/top",
             );
@@ -100,6 +103,8 @@ function LoginPageContent() {
     setError(null);
     try {
       await dispatch(login({ email, password })).unwrap();
+      // Defense-in-depth: flush any residual cache from a previous session.
+      resetAllApiCaches(dispatch);
       router.push(from && from.startsWith("/") ? from : "/charts/apple/us/top");
     } catch (err) {
       setError(err.message);
